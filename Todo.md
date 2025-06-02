@@ -76,7 +76,7 @@ This document provides a detailed breakdown of tasks required to implement the D
 - [x] Create AI-driven content generation
 - [x] Set up document analysis features
 
-### 2.5 MCP Tool Implementation
+### 2.5 MCP Tool Implementation.
 - [x] Implement create_document tool
 - [x] Create analyze_requirements tool
 - [x] Add generate_chart tool
