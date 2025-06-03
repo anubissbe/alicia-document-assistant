@@ -2,6 +2,17 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DocumentFormat, DocumentTemplate } from '../models/documentTemplate';
+import { SecurityManager, SecurityLevel } from '../utils/securityManager';
+
+/**
+ * Template information for UI display
+ */
+export interface TemplateInfo {
+    id: string;
+    name: string;
+    description: string;
+    format: DocumentFormat;
+}
 
 /**
  * Service responsible for managing document templates
@@ -10,9 +21,11 @@ export class TemplateManagerService {
     private _extensionContext: vscode.ExtensionContext;
     private _storageKey: string = 'document-writer.templates';
     private _templates: DocumentTemplate[] = [];
+    private _securityManager: SecurityManager;
     
     constructor(context: vscode.ExtensionContext) {
         this._extensionContext = context;
+        this._securityManager = new SecurityManager(context);
         this._loadTemplates();
     }
     
@@ -21,6 +34,23 @@ export class TemplateManagerService {
      */
     public getTemplates(): DocumentTemplate[] {
         return [...this._templates];
+    }
+
+    /**
+     * Get all available templates formatted for UI display
+     */
+    public async getAvailableTemplates(): Promise<TemplateInfo[]> {
+        // If no templates are loaded, load some default templates
+        if (this._templates.length === 0) {
+            await this._loadDefaultTemplates();
+        }
+        
+        return this._templates.map(template => ({
+            id: template.id,
+            name: template.name,
+            description: template.description,
+            format: template.format
+        }));
     }
     
     /**
@@ -118,13 +148,32 @@ export class TemplateManagerService {
         name: string, 
         description: string
     ): Promise<DocumentTemplate> {
+        // Validate and normalize the file path
+        const normalizedPath = this._securityManager.normalizePath(filePath);
+        if (!normalizedPath) {
+            throw new Error(`Invalid template file path: ${filePath}`);
+        }
+        
+        // Validate the file is allowed
+        const isPathValid = this._securityManager.validatePath(
+            normalizedPath,
+            {
+                allowedExtensions: ['.docx', '.md', '.html', '.htm', '.pdf'],
+                securityLevel: SecurityLevel.HIGH
+            }
+        );
+        
+        if (!isPathValid) {
+            throw new Error(`Template file path not allowed: ${normalizedPath}`);
+        }
+        
         // Ensure the file exists
-        if (!fs.existsSync(filePath)) {
-            throw new Error(`File does not exist: ${filePath}`);
+        if (!fs.existsSync(normalizedPath)) {
+            throw new Error(`File does not exist: ${normalizedPath}`);
         }
         
         // Determine the format based on file extension
-        const format = this._getFormatFromFilePath(filePath);
+        const format = this._getFormatFromFilePath(normalizedPath);
         
         // Create a new template
         return await this.addTemplate({
@@ -176,13 +225,63 @@ export class TemplateManagerService {
     }
     
     /**
+     * Load default templates
+     */
+    private async _loadDefaultTemplates(): Promise<void> {
+        try {
+            // Find template files in the extension's templates directory
+            const templatesDir = path.join(this._extensionContext.extensionPath, 'resources', 'templates');
+            const defaultTemplates = fs.readdirSync(templatesDir);
+            
+            // Import each template
+            for (const templateFile of defaultTemplates) {
+                const templatePath = path.join(templatesDir, templateFile);
+                const templateName = path.basename(templateFile, path.extname(templateFile));
+                
+                // Skip if template already exists
+                if (this._templates.some(t => t.name === templateName)) {
+                    continue;
+                }
+                
+                await this.importTemplate(
+                    templatePath,
+                    templateName,
+                    `Default ${templateName} template`
+                );
+            }
+        } catch (error) {
+            console.error('Error loading default templates:', error);
+            vscode.window.showErrorMessage('Failed to load default templates');
+        }
+    }
+    
+    /**
      * Validate a template
      * @param template The template to validate
      */
     private async _validateTemplate(template: DocumentTemplate): Promise<void> {
+        // Validate and normalize the template path
+        const normalizedPath = this._securityManager.normalizePath(template.templatePath);
+        if (!normalizedPath) {
+            throw new Error(`Invalid template file path: ${template.templatePath}`);
+        }
+        
+        // Validate the file is allowed
+        const isPathValid = this._securityManager.validatePath(
+            normalizedPath,
+            {
+                allowedExtensions: ['.docx', '.md', '.html', '.htm', '.pdf'],
+                securityLevel: SecurityLevel.HIGH
+            }
+        );
+        
+        if (!isPathValid) {
+            throw new Error(`Template file path not allowed: ${normalizedPath}`);
+        }
+        
         // Check if the template file exists
-        if (!fs.existsSync(template.templatePath)) {
-            throw new Error(`Template file does not exist: ${template.templatePath}`);
+        if (!fs.existsSync(normalizedPath)) {
+            throw new Error(`Template file does not exist: ${normalizedPath}`);
         }
         
         // Additional validation based on format

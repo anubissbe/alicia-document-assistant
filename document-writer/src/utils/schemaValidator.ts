@@ -1,245 +1,419 @@
-import { MCPToolInputSchema, MCPToolProperty } from '../models/mcpTool';
+// @ts-ignore
+import Ajv from 'ajv';
+// @ts-ignore
+import addFormats from 'ajv-formats';
 
-/**
- * Schema validation error interface
- */
-export interface ValidationError {
-    path: string;
-    message: string;
+// Define error type to fix TypeScript errors
+interface ErrorObjectWithParams {
+    instancePath?: string;
+    keyword: string;
+    message?: string;
+    params: any;
 }
 
 /**
- * Validates parameters against an MCP Tool input schema
- * @param params The parameters to validate
- * @param schema The schema to validate against
- * @returns Array of validation errors, empty if valid
+ * Options for schema validation
  */
-export function validateAgainstSchema(params: any, schema: MCPToolInputSchema): ValidationError[] {
-    const errors: ValidationError[] = [];
+export interface ValidationOptions {
+    /** 
+     * Whether to coerce types during validation (e.g., '123' to 123)
+     */
+    coerceTypes?: boolean;
     
-    // Check type
-    if (schema.type !== 'object') {
-        errors.push({
-            path: '',
-            message: `Expected type "object", got "${schema.type}"`
-        });
-        return errors;
-    }
+    /**
+     * Whether to allow additional properties not defined in the schema
+     */
+    allowAdditionalProperties?: boolean;
     
-    // Check required properties
-    for (const requiredProp of schema.required) {
-        if (params[requiredProp] === undefined) {
-            errors.push({
-                path: requiredProp,
-                message: `Missing required property "${requiredProp}"`
-            });
-        }
-    }
+    /**
+     * Whether to use strict mode for validation
+     */
+    strictMode?: boolean;
+}
+
+/**
+ * Result of object validation
+ */
+export interface ValidationResult<T = any> {
+    /**
+     * Whether the object is valid against the schema
+     */
+    valid: boolean;
     
-    // Check properties
-    for (const [propName, propValue] of Object.entries(params)) {
-        // If additionalProperties is false, check if the property is defined in the schema
-        if (schema.additionalProperties === false && !schema.properties[propName]) {
-            errors.push({
-                path: propName,
-                message: `Unknown property "${propName}"`
-            });
-            continue;
+    /**
+     * The validated object (if valid), or null (if invalid)
+     */
+    value: T | null;
+    
+    /**
+     * Validation errors (empty array if valid)
+     */
+    errors: string[];
+}
+
+/**
+ * JSON Schema type definitions helper
+ */
+export class SchemaTypes {
+    /**
+     * Create a string type definition
+     * @param description Field description
+     * @param format Optional format (e.g., 'email', 'uri')
+     * @returns JSON Schema type definition
+     */
+    static string(description: string, format?: string): any {
+        const schema: any = {
+            type: 'string',
+            description
+        };
+        
+        if (format) {
+            schema.format = format;
         }
         
-        // If the property is defined in the schema, validate it
-        if (schema.properties[propName]) {
-            const propSchema = schema.properties[propName];
-            const propErrors = validateProperty(propValue, propSchema, propName);
-            errors.push(...propErrors);
+        return schema;
+    }
+    
+    /**
+     * Create a number type definition
+     * @param description Field description
+     * @param minimum Optional minimum value
+     * @param maximum Optional maximum value
+     * @returns JSON Schema type definition
+     */
+    static number(description: string, minimum?: number, maximum?: number): any {
+        const schema: any = {
+            type: 'number',
+            description
+        };
+        
+        if (minimum !== undefined) {
+            schema.minimum = minimum;
         }
+        
+        if (maximum !== undefined) {
+            schema.maximum = maximum;
+        }
+        
+        return schema;
     }
     
-    return errors;
+    /**
+     * Create an integer type definition
+     * @param description Field description
+     * @param minimum Optional minimum value
+     * @param maximum Optional maximum value
+     * @returns JSON Schema type definition
+     */
+    static integer(description: string, minimum?: number, maximum?: number): any {
+        const schema: any = {
+            type: 'integer',
+            description
+        };
+        
+        if (minimum !== undefined) {
+            schema.minimum = minimum;
+        }
+        
+        if (maximum !== undefined) {
+            schema.maximum = maximum;
+        }
+        
+        return schema;
+    }
+    
+    /**
+     * Create a boolean type definition
+     * @param description Field description
+     * @returns JSON Schema type definition
+     */
+    static boolean(description: string): any {
+        return {
+            type: 'boolean',
+            description
+        };
+    }
+    
+    /**
+     * Create an array type definition
+     * @param items Schema for array items
+     * @param description Field description
+     * @param minItems Optional minimum number of items
+     * @param maxItems Optional maximum number of items
+     * @returns JSON Schema type definition
+     */
+    static array(items: any, description: string, minItems?: number, maxItems?: number): any {
+        const schema: any = {
+            type: 'array',
+            items,
+            description
+        };
+        
+        if (minItems !== undefined) {
+            schema.minItems = minItems;
+        }
+        
+        if (maxItems !== undefined) {
+            schema.maxItems = maxItems;
+        }
+        
+        return schema;
+    }
+    
+    /**
+     * Create an object type definition
+     * @param properties Object properties
+     * @param required Required property names
+     * @param description Field description
+     * @returns JSON Schema type definition
+     */
+    static object(properties: Record<string, any>, required: string[] = [], description: string): any {
+        return {
+            type: 'object',
+            properties,
+            required,
+            additionalProperties: false,
+            description
+        };
+    }
+    
+    /**
+     * Create an enum type definition
+     * @param values Enum values
+     * @param description Field description
+     * @returns JSON Schema type definition
+     */
+    static enum(values: any[], description: string): any {
+        return {
+            enum: values,
+            description
+        };
+    }
+    
+    /**
+     * Create an email type definition
+     * @param description Field description
+     * @returns JSON Schema type definition
+     */
+    static email(description: string): any {
+        return {
+            type: 'string',
+            format: 'email',
+            description
+        };
+    }
+    
+    /**
+     * Create a URI type definition
+     * @param description Field description
+     * @returns JSON Schema type definition
+     */
+    static uri(description: string): any {
+        return {
+            type: 'string',
+            format: 'uri',
+            description
+        };
+    }
+    
+    /**
+     * Create a date type definition
+     * @param description Field description
+     * @returns JSON Schema type definition
+     */
+    static date(description: string): any {
+        return {
+            type: 'string',
+            format: 'date',
+            description
+        };
+    }
+    
+    /**
+     * Create a date-time type definition
+     * @param description Field description
+     * @returns JSON Schema type definition
+     */
+    static dateTime(description: string): any {
+        return {
+            type: 'string',
+            format: 'date-time',
+            description
+        };
+    }
+}
+
+// Singleton instance of AJV for schema validation
+// @ts-ignore
+const ajvInstance = new Ajv({
+    allErrors: true,
+    useDefaults: true
+});
+// @ts-ignore
+addFormats(ajvInstance);
+
+/**
+ * Validates data against a JSON schema
+ * @param data Data to validate
+ * @param schema JSON schema to validate against
+ * @returns Array of error messages (empty if valid)
+ */
+export function validateAgainstSchema(data: any, schema: any): string[] {
+    try {
+        const validate = ajvInstance.compile(schema);
+        const valid = validate(data);
+        
+        if (valid) {
+            return [];
+        }
+        
+        // Format error messages
+        return (validate.errors || []).map(error => {
+            // Type assertion to handle AJV error object
+            const err = error as unknown as ErrorObjectWithParams;
+            const path = err.instancePath || '';
+            const property = err.params.missingProperty || err.params.additionalProperty || '';
+            const formattedPath = path + (property ? `/${property}` : '');
+            
+            switch (err.keyword) {
+                case 'required':
+                    return `Missing required property: ${err.params.missingProperty}`;
+                case 'type':
+                    return `Invalid type at ${formattedPath}: expected ${err.params.type}`;
+                case 'format':
+                    return `Invalid format at ${formattedPath}: expected ${err.params.format}`;
+                case 'enum':
+                    return `Invalid value at ${formattedPath}: must be one of the allowed values`;
+                case 'pattern':
+                    return `Invalid pattern at ${formattedPath}: value does not match required pattern`;
+                case 'minimum':
+                case 'maximum':
+                case 'minLength':
+                case 'maxLength':
+                case 'minItems':
+                case 'maxItems':
+                    return `Invalid value at ${formattedPath}: ${err.message}`;
+                default:
+                    return `Validation error at ${formattedPath}: ${err.message || 'Unknown error'}`;
+            }
+        });
+    } catch (error: any) {
+        return [`Schema validation error: ${error.message || 'Unknown error'}`];
+    }
 }
 
 /**
- * Validates a property against a property schema
- * @param value The value to validate
- * @param schema The property schema
- * @param path The current property path
- * @returns Array of validation errors, empty if valid
+ * Validates an object against a schema
+ * @param obj Object to validate
+ * @param schemaId Schema ID
+ * @param schema JSON schema
+ * @param options Validation options
+ * @returns Validation result
  */
-function validateProperty(value: any, schema: MCPToolProperty, path: string): ValidationError[] {
-    const errors: ValidationError[] = [];
-    
-    // Check if value is null or undefined
-    if (value === null || value === undefined) {
-        return errors; // Null/undefined values are handled by required check
+export function validateObject<T = any>(
+    obj: any,
+    schemaId: string,
+    schema: any,
+    options: ValidationOptions = {}
+): ValidationResult<T> {
+    try {
+        // Configure Ajv instance with options
+        // @ts-ignore
+        const ajv = new Ajv({
+            allErrors: true,
+            useDefaults: true,
+            coerceTypes: options.coerceTypes || false
+        });
+        // @ts-ignore
+        addFormats(ajv);
+        
+        // Add schema
+        ajv.addSchema(schema, schemaId);
+        
+        // Get validation function
+        const validate = ajv.getSchema(schemaId);
+        if (!validate) {
+            return {
+                valid: false,
+                value: null,
+                errors: [`Schema with ID ${schemaId} not found`]
+            };
+        }
+        
+        // Validate object
+        const valid = validate(obj);
+        
+        if (valid) {
+            return {
+                valid: true,
+                value: obj as T,
+                errors: []
+            };
+        }
+        
+        // Format error messages
+        const errors = (validate.errors || []).map(error => {
+            // Type assertion to handle AJV error object
+            const err = error as unknown as ErrorObjectWithParams;
+            const path = err.instancePath || '';
+            const property = err.params.missingProperty || err.params.additionalProperty || '';
+            const formattedPath = path + (property ? `/${property}` : '');
+            
+            switch (err.keyword) {
+                case 'required':
+                    return `Missing required property: ${err.params.missingProperty}`;
+                case 'type':
+                    return `Invalid type at ${formattedPath}: expected ${err.params.type}`;
+                case 'format':
+                    return `Invalid format at ${formattedPath}: expected ${err.params.format}`;
+                case 'enum':
+                    return `Invalid value at ${formattedPath}: must be one of the allowed values`;
+                case 'pattern':
+                    return `Invalid pattern at ${formattedPath}: value does not match required pattern`;
+                case 'minimum':
+                case 'maximum':
+                case 'minLength':
+                case 'maxLength':
+                case 'minItems':
+                case 'maxItems':
+                    return `Invalid value at ${formattedPath}: ${err.message}`;
+                default:
+                    return `Validation error at ${formattedPath}: ${err.message || 'Unknown error'}`;
+            }
+        });
+        
+        return {
+            valid: false,
+            value: null,
+            errors
+        };
+    } catch (error: any) {
+        return {
+            valid: false,
+            value: null,
+            errors: [`Schema validation error: ${error.message || 'Unknown error'}`]
+        };
     }
-    
-    // Check type
-    switch (schema.type) {
-        case 'string':
-            if (typeof value !== 'string') {
-                errors.push({
-                    path,
-                    message: `Expected type "string", got "${typeof value}"`
-                });
-                return errors; // Return early as other validations don't apply
-            }
-            
-            // Check pattern
-            if (schema.pattern && !new RegExp(schema.pattern).test(value)) {
-                errors.push({
-                    path,
-                    message: `Value does not match pattern "${schema.pattern}"`
-                });
-            }
-            
-            // Check min/max length
-            if (schema.minLength !== undefined && value.length < schema.minLength) {
-                errors.push({
-                    path,
-                    message: `Value length ${value.length} is less than minimum length ${schema.minLength}`
-                });
-            }
-            
-            if (schema.maxLength !== undefined && value.length > schema.maxLength) {
-                errors.push({
-                    path,
-                    message: `Value length ${value.length} is greater than maximum length ${schema.maxLength}`
-                });
-            }
-            
-            // Check enum
-            if (schema.enum && !schema.enum.includes(value)) {
-                errors.push({
-                    path,
-                    message: `Value "${value}" is not one of the allowed values: ${schema.enum.join(', ')}`
-                });
-            }
-            
-            break;
-            
-        case 'number':
-        case 'integer':
-            if (typeof value !== 'number') {
-                errors.push({
-                    path,
-                    message: `Expected type "${schema.type}", got "${typeof value}"`
-                });
-                return errors;
-            }
-            
-            if (schema.type === 'integer' && !Number.isInteger(value)) {
-                errors.push({
-                    path,
-                    message: `Expected integer, got ${value}`
-                });
-            }
-            
-            // Check min/max
-            if (schema.minimum !== undefined && value < schema.minimum) {
-                errors.push({
-                    path,
-                    message: `Value ${value} is less than minimum ${schema.minimum}`
-                });
-            }
-            
-            if (schema.maximum !== undefined && value > schema.maximum) {
-                errors.push({
-                    path,
-                    message: `Value ${value} is greater than maximum ${schema.maximum}`
-                });
-            }
-            
-            break;
-            
-        case 'boolean':
-            if (typeof value !== 'boolean') {
-                errors.push({
-                    path,
-                    message: `Expected type "boolean", got "${typeof value}"`
-                });
-            }
-            break;
-            
-        case 'array':
-            if (!Array.isArray(value)) {
-                errors.push({
-                    path,
-                    message: `Expected type "array", got "${typeof value}"`
-                });
-                return errors;
-            }
-            
-            // Check min/max items
-            if (schema.minItems !== undefined && value.length < schema.minItems) {
-                errors.push({
-                    path,
-                    message: `Array length ${value.length} is less than minimum length ${schema.minItems}`
-                });
-            }
-            
-            if (schema.maxItems !== undefined && value.length > schema.maxItems) {
-                errors.push({
-                    path,
-                    message: `Array length ${value.length} is greater than maximum length ${schema.maxItems}`
-                });
-            }
-            
-            // Check items
-            if (schema.items) {
-                // If items is an array, validate each item against the corresponding schema
-                if (Array.isArray(schema.items)) {
-                    for (let i = 0; i < Math.min(value.length, schema.items.length); i++) {
-                        const itemErrors = validateProperty(value[i], schema.items[i], `${path}[${i}]`);
-                        errors.push(...itemErrors);
-                    }
-                } else {
-                    // If items is a single schema, validate all items against it
-                    for (let i = 0; i < value.length; i++) {
-                        const itemErrors = validateProperty(value[i], schema.items, `${path}[${i}]`);
-                        errors.push(...itemErrors);
-                    }
-                }
-            }
-            
-            break;
-            
-        case 'object':
-            if (typeof value !== 'object' || Array.isArray(value) || value === null) {
-                errors.push({
-                    path,
-                    message: `Expected type "object", got "${typeof value}"`
-                });
-                return errors;
-            }
-            
-            // For object properties, we would need the sub-schema to validate
-            // This would require a recursive validation approach
-            // For now, we'll just do a basic type check
-            
-            break;
-            
-        default:
-            errors.push({
-                path,
-                message: `Unknown type "${schema.type}"`
-            });
-    }
-    
-    return errors;
 }
 
 /**
- * Formats validation errors into a human-readable string
- * @param errors Array of validation errors
- * @returns Human-readable error message
+ * Creates a JSON schema from an interface definition
+ * @param name Interface name
+ * @param properties Interface properties
+ * @param required Required property names
+ * @returns JSON schema
  */
-export function formatValidationErrors(errors: ValidationError[]): string {
-    if (errors.length === 0) {
-        return '';
-    }
-    
-    return errors.map(error => {
-        const path = error.path ? error.path : 'input';
-        return `${path}: ${error.message}`;
-    }).join('\n');
+export function createSchemaFromInterface(
+    name: string,
+    properties: Record<string, any>,
+    required: string[] = []
+): any {
+    return {
+        $id: `schema:${name}`,
+        type: 'object',
+        title: name,
+        properties,
+        required,
+        additionalProperties: false
+    };
 }

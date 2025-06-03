@@ -1,183 +1,392 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as PizZipModule from 'pizzip';
-const PizZip = PizZipModule.default || PizZipModule;
-import * as DocxtemplaterModule from 'docxtemplater';
-const Docxtemplater = DocxtemplaterModule.default || DocxtemplaterModule;
-import { DocumentFormat, DocumentTemplate } from '../models/documentTemplate';
+import { promisify } from 'util';
+
+// Promisify fs functions
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const mkdir = promisify(fs.mkdir);
+const stat = promisify(fs.stat);
 
 /**
- * Service responsible for document generation and manipulation
+ * Document metadata interface
+ */
+export interface DocumentMetadata {
+    path: string;
+    title?: string;
+    type?: string;
+    dateCreated?: Date;
+    dateModified?: Date;
+    tags?: string[];
+    author?: string;
+    properties?: Record<string, any>;
+}
+
+/**
+ * Document interface
+ */
+export interface Document extends DocumentMetadata {
+    content: string;
+}
+
+/**
+ * DocumentService handles document operations
  */
 export class DocumentService {
-    private _extensionContext: vscode.ExtensionContext;
+    private _documentsCache: Map<string, Document> = new Map();
     
-    constructor(context: vscode.ExtensionContext) {
-        this._extensionContext = context;
-    }
-
     /**
-     * Generate a document from a template with the provided data
-     * @param template The document template to use
-     * @param data The data to fill into the template
-     * @param outputPath The path to save the generated document to
-     * @returns The path to the generated document
+     * Constructor
      */
-    public async generateDocument(
-        template: DocumentTemplate, 
-        data: Record<string, any>,
-        outputPath: string
-    ): Promise<string> {
-        try {
-            switch (template.format) {
-                case DocumentFormat.DOCX:
-                    return await this.generateDocxDocument(template, data, outputPath);
-                case DocumentFormat.MARKDOWN:
-                    return await this.generateMarkdownDocument(template, data, outputPath);
-                case DocumentFormat.HTML:
-                    return await this.generateHtmlDocument(template, data, outputPath);
-                case DocumentFormat.PDF:
-                    return await this.generatePdfDocument(template, data, outputPath);
-                default:
-                    throw new Error(`Unsupported document format: ${template.format}`);
-            }
-        } catch (error) {
-            vscode.window.showErrorMessage(`Error generating document: ${error instanceof Error ? error.message : String(error)}`);
-            throw error;
-        }
+    constructor() {
+        // Initialize any required resources
     }
     
     /**
-     * Generate a DOCX document from a template
+     * Get a document by path
+     * @param documentPath The document path
+     * @returns The document
      */
-    private async generateDocxDocument(
-        template: DocumentTemplate, 
-        data: Record<string, any>,
-        outputPath: string
-    ): Promise<string> {
-        // Ensure the output directory exists
-        await this.ensureDirectoryExists(outputPath);
-        
-        // Construct the output file path
-        const filename = `${this.sanitizeFilename(template.name)}_${new Date().toISOString().replace(/:/g, '-')}.docx`;
-        const fullOutputPath = path.join(outputPath, filename);
-        
+    public async getDocument(documentPath: string): Promise<Document> {
         try {
-            // Read the template
-            const templatePath = template.templatePath;
-            const templateContent = fs.readFileSync(templatePath, 'binary');
-            
-            // Create a new zip from the template
-            const zip = new PizZip(templateContent);
-            
-            // Create a new Docxtemplater instance
-            const doc = new Docxtemplater(zip, {
-                paragraphLoop: true,
-                linebreaks: true,
-            });
-            
-            // Set the data
-            doc.setData(data);
-            
-            // Render the document
-            doc.render();
-            
-            // Get the zip document and generate the output
-            const buffer = doc.getZip().generate({
-                type: 'nodebuffer',
-                compression: 'DEFLATE',
-            });
-            
-            // Write the output
-            fs.writeFileSync(fullOutputPath, buffer);
-            
-            return fullOutputPath;
-        } catch (error) {
-            console.error('Error generating DOCX document:', error);
-            throw error;
-        }
-    }
-    
-    /**
-     * Generate a Markdown document from a template
-     */
-    private async generateMarkdownDocument(
-        template: DocumentTemplate, 
-        data: Record<string, any>,
-        outputPath: string
-    ): Promise<string> {
-        // Ensure the output directory exists
-        await this.ensureDirectoryExists(outputPath);
-        
-        // Construct the output file path
-        const filename = `${this.sanitizeFilename(template.name)}_${new Date().toISOString().replace(/:/g, '-')}.md`;
-        const fullOutputPath = path.join(outputPath, filename);
-        
-        try {
-            // Read the template
-            const templateContent = fs.readFileSync(template.templatePath, 'utf-8');
-            
-            // Simple template replacement for now - can be replaced with a more robust solution
-            let result = templateContent;
-            
-            // Replace all placeholders
-            for (const [key, value] of Object.entries(data)) {
-                const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-                result = result.replace(regex, String(value));
+            // Check if document is in cache
+            const cachedDocument = this._documentsCache.get(documentPath);
+            if (cachedDocument) {
+                return cachedDocument;
             }
             
-            // Write the output
-            fs.writeFileSync(fullOutputPath, result);
+            // Get file stats
+            const stats = await stat(documentPath);
             
-            return fullOutputPath;
+            // Read file content
+            const content = await readFile(documentPath, 'utf-8');
+            
+            // Create document object
+            const document: Document = {
+                path: documentPath,
+                title: path.basename(documentPath, path.extname(documentPath)),
+                type: path.extname(documentPath).slice(1),
+                content,
+                dateCreated: stats.birthtime,
+                dateModified: stats.mtime
+            };
+            
+            // Cache document
+            this._documentsCache.set(documentPath, document);
+            
+            return document;
         } catch (error) {
-            console.error('Error generating Markdown document:', error);
-            throw error;
+            console.error(`Error getting document ${documentPath}:`, error);
+            throw new Error(`Failed to get document: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
     
     /**
-     * Generate an HTML document from a template
+     * Save a document
+     * @param document The document to save
+     * @returns The saved document
      */
-    private async generateHtmlDocument(
-        template: DocumentTemplate, 
-        data: Record<string, any>,
-        outputPath: string
-    ): Promise<string> {
-        // Implementation will be added in Phase 2
-        throw new Error('HTML document generation not yet implemented');
-    }
-    
-    /**
-     * Generate a PDF document from a template
-     */
-    private async generatePdfDocument(
-        template: DocumentTemplate, 
-        data: Record<string, any>,
-        outputPath: string
-    ): Promise<string> {
-        // Implementation will be added in Phase 2
-        throw new Error('PDF document generation not yet implemented');
-    }
-    
-    /**
-     * Ensure that a directory exists, creating it if necessary
-     */
-    private async ensureDirectoryExists(directoryPath: string): Promise<void> {
+    public async saveDocument(document: Document): Promise<Document> {
         try {
-            await fs.promises.mkdir(directoryPath, { recursive: true });
+            // Create directory if it doesn't exist
+            const directory = path.dirname(document.path);
+            await mkdir(directory, { recursive: true });
+            
+            // Write file content
+            await writeFile(document.path, document.content, 'utf-8');
+            
+            // Update metadata
+            document.dateModified = new Date();
+            
+            // Update cache
+            this._documentsCache.set(document.path, document);
+            
+            return document;
         } catch (error) {
-            console.error('Error creating directory:', error);
-            throw error;
+            console.error(`Error saving document ${document.path}:`, error);
+            throw new Error(`Failed to save document: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
     
     /**
-     * Sanitize a filename to ensure it's valid
+     * Delete a document
+     * @param documentPath The document path
+     * @returns True if the document was deleted
      */
-    private sanitizeFilename(filename: string): string {
-        // Replace invalid characters and spaces with underscores
-        return filename.replace(/[/\\?%*:|"<>\s]/g, '_');
+    public async deleteDocument(documentPath: string): Promise<boolean> {
+        try {
+            // Check if document exists
+            await stat(documentPath);
+            
+            // Delete file
+            await promisify(fs.unlink)(documentPath);
+            
+            // Remove from cache
+            this._documentsCache.delete(documentPath);
+            
+            return true;
+        } catch (error) {
+            console.error(`Error deleting document ${documentPath}:`, error);
+            throw new Error(`Failed to delete document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    
+    /**
+     * Get document metadata
+     * @param documentPath The document path
+     * @returns The document metadata
+     */
+    public async getDocumentMetadata(documentPath: string): Promise<DocumentMetadata> {
+        try {
+            // Check if document is in cache
+            const cachedDocument = this._documentsCache.get(documentPath);
+            if (cachedDocument) {
+                // Return metadata without content
+                const { content, ...metadata } = cachedDocument;
+                return metadata;
+            }
+            
+            // Get file stats
+            const stats = await stat(documentPath);
+            
+            // Create metadata object
+            const metadata: DocumentMetadata = {
+                path: documentPath,
+                title: path.basename(documentPath, path.extname(documentPath)),
+                type: path.extname(documentPath).slice(1),
+                dateCreated: stats.birthtime,
+                dateModified: stats.mtime
+            };
+            
+            return metadata;
+        } catch (error) {
+            console.error(`Error getting document metadata ${documentPath}:`, error);
+            throw new Error(`Failed to get document metadata: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    
+    /**
+     * Get all documents in a directory
+     * @param directoryPath The directory path
+     * @returns Array of document metadata
+     */
+    public async getDocumentsInDirectory(directoryPath: string): Promise<DocumentMetadata[]> {
+        try {
+            // Get all files in directory
+            const files = await promisify(fs.readdir)(directoryPath);
+            
+            // Get metadata for each file
+            const metadataPromises = files.map(async (file) => {
+                const filePath = path.join(directoryPath, file);
+                
+                try {
+                    const fileStats = await stat(filePath);
+                    
+                    // Skip directories
+                    if (fileStats.isDirectory()) {
+                        return null;
+                    }
+                    
+                    const metadata: DocumentMetadata = {
+                        path: filePath,
+                        title: path.basename(filePath, path.extname(filePath)),
+                        type: path.extname(filePath).slice(1),
+                        dateCreated: fileStats.birthtime,
+                        dateModified: fileStats.mtime
+                    };
+                    
+                    return metadata;
+                } catch (error) {
+                    console.error(`Error getting metadata for ${filePath}:`, error);
+                    return null;
+                }
+            });
+            
+            // Filter out nulls - explicitly casting to satisfy TypeScript
+            const metadataArray = (await Promise.all(metadataPromises)).filter((item): item is DocumentMetadata => item !== null);
+            
+            return metadataArray;
+        } catch (error) {
+            console.error(`Error getting documents in directory ${directoryPath}:`, error);
+            throw new Error(`Failed to get documents in directory: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    
+    /**
+     * Search for documents by content
+     * @param searchQuery The search query
+     * @param directoryPath The directory path to search in
+     * @returns Array of document metadata
+     */
+    public async searchDocuments(searchQuery: string, directoryPath: string): Promise<DocumentMetadata[]> {
+        try {
+            // Get all documents in directory
+            const documents = await this.getDocumentsInDirectory(directoryPath);
+            
+            // Search each document
+            const results: DocumentMetadata[] = [];
+            
+            for (const metadata of documents) {
+                try {
+                    // Get document content
+                    const document = await this.getDocument(metadata.path);
+                    
+                    // Check if content contains search query
+                    if (document.content.toLowerCase().includes(searchQuery.toLowerCase())) {
+                        results.push(metadata);
+                    }
+                } catch (error) {
+                    console.error(`Error searching document ${metadata.path}:`, error);
+                    // Skip this document
+                }
+            }
+            
+            return results;
+        } catch (error) {
+            console.error(`Error searching documents in ${directoryPath}:`, error);
+            throw new Error(`Failed to search documents: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    
+    /**
+     * Create a new document
+     * @param title The document title
+     * @param type The document type
+     * @param directoryPath The directory path
+     * @param content The document content
+     * @returns The created document
+     */
+    public async createDocument(
+        title: string,
+        type: string,
+        directoryPath: string,
+        content: string = ''
+    ): Promise<Document> {
+        try {
+            // Create file path
+            const fileName = `${title}${type.startsWith('.') ? type : `.${type}`}`;
+            const filePath = path.join(directoryPath, fileName);
+            
+            // Create document
+            const document: Document = {
+                path: filePath,
+                title,
+                type: type.startsWith('.') ? type.slice(1) : type,
+                content,
+                dateCreated: new Date(),
+                dateModified: new Date()
+            };
+            
+            // Save document
+            return await this.saveDocument(document);
+        } catch (error) {
+            console.error(`Error creating document ${title}:`, error);
+            throw new Error(`Failed to create document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    
+    /**
+     * Rename a document
+     * @param documentPath The document path
+     * @param newTitle The new title
+     * @returns The renamed document
+     */
+    public async renameDocument(documentPath: string, newTitle: string): Promise<Document> {
+        try {
+            // Get document
+            const document = await this.getDocument(documentPath);
+            
+            // Create new path
+            const directory = path.dirname(documentPath);
+            const extension = path.extname(documentPath);
+            const newPath = path.join(directory, `${newTitle}${extension}`);
+            
+            // Rename file
+            await promisify(fs.rename)(documentPath, newPath);
+            
+            // Update document
+            document.path = newPath;
+            document.title = newTitle;
+            document.dateModified = new Date();
+            
+            // Update cache
+            this._documentsCache.delete(documentPath);
+            this._documentsCache.set(newPath, document);
+            
+            return document;
+        } catch (error) {
+            console.error(`Error renaming document ${documentPath}:`, error);
+            throw new Error(`Failed to rename document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    
+    /**
+     * Export a document to a different format
+     * @param document The document to export
+     * @param targetFormat The target format
+     * @param outputPath The output path
+     * @returns The exported document path
+     */
+    public async exportDocument(
+        document: Document,
+        targetFormat: string,
+        outputPath?: string
+    ): Promise<string> {
+        try {
+            // If no output path, create one
+            if (!outputPath) {
+                const directory = path.dirname(document.path);
+                const baseName = path.basename(document.path, path.extname(document.path));
+                outputPath = path.join(directory, `${baseName}.${targetFormat}`);
+            }
+            
+            // In a real implementation, we would use a format processor to convert the content
+            // For now, we'll just write the content as is
+            await writeFile(outputPath, document.content, 'utf-8');
+            
+            return outputPath;
+        } catch (error) {
+            console.error(`Error exporting document ${document.path}:`, error);
+            throw new Error(`Failed to export document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    
+    /**
+     * Update document metadata
+     * @param documentPath The document path
+     * @param metadata The metadata to update
+     * @returns The updated document metadata
+     */
+    public async updateDocumentMetadata(
+        documentPath: string,
+        metadata: Partial<DocumentMetadata>
+    ): Promise<DocumentMetadata> {
+        try {
+            // Get document
+            const document = await this.getDocument(documentPath);
+            
+            // Update metadata
+            Object.assign(document, metadata, { dateModified: new Date() });
+            
+            // If path changed, handle rename
+            if (metadata.path && metadata.path !== document.path) {
+                await promisify(fs.rename)(document.path, metadata.path);
+                
+                // Update cache
+                this._documentsCache.delete(document.path);
+                this._documentsCache.set(metadata.path, document);
+                
+                document.path = metadata.path;
+            }
+            
+            // Return metadata
+            const { content, ...updatedMetadata } = document;
+            
+            return updatedMetadata;
+        } catch (error) {
+            console.error(`Error updating document metadata ${documentPath}:`, error);
+            throw new Error(`Failed to update document metadata: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
     }
 }

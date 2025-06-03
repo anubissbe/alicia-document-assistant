@@ -14,6 +14,69 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "documentWriter.documentAssistant",
+          "name": "Document Assistant",
+          "icon": "$(assistant)",
+          "contextualTitle": "Document Assistant"
+        },
+        {
+          "id": "documentWriter.documentExplorer",
+          "name": "Document Explorer",
+          "icon": "$(file-text)",
+          "contextualTitle": "Document Explorer"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "document-writer.refreshTreeView",
+          "when": "view == documentWriter.documentExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "document-writer.createDocument",
+          "when": "view == documentWriter.documentExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "document-writer.addTemplate",
+          "when": "view == documentWriter.documentExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "document-writer.openTemplate",
+          "when": "view == documentWriter.documentExplorer && viewItem == template",
+          "group": "1_open"
+        },
+        {
+          "command": "document-writer.editTemplate",
+          "when": "view == documentWriter.documentExplorer && viewItem == template",
+          "group": "2_edit"
+        },
+        {
+          "command": "document-writer.cloneTemplate",
+          "when": "view == documentWriter.documentExplorer && viewItem == template",
+          "group": "2_edit"
+        },
+        {
+          "command": "document-writer.deleteTemplate",
+          "when": "view == documentWriter.documentExplorer && viewItem == template",
+          "group": "3_manage"
+        },
+        {
+          "command": "document-writer.openDocument",
+          "when": "view == documentWriter.documentExplorer && viewItem == document",
+          "group": "1_open"
+        }
+      ]
+    },
     "modelContextProtocol": {
       "servers": [
         {
@@ -29,12 +92,55 @@
       {
         "command": "document-writer.createDocument",
         "title": "Create New Document",
-        "category": "Document Writer"
+        "category": "Document Writer",
+        "icon": "$(add)"
       },
       {
         "command": "document-writer.generateFromTemplate",
         "title": "Generate from Template",
         "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.refreshTreeView",
+        "title": "Refresh",
+        "category": "Document Writer",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "document-writer.addTemplate",
+        "title": "Add Template",
+        "category": "Document Writer",
+        "icon": "$(file-add)"
+      },
+      {
+        "command": "document-writer.openTemplate",
+        "title": "Open Template",
+        "category": "Document Writer",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "document-writer.editTemplate",
+        "title": "Edit Template",
+        "category": "Document Writer",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "document-writer.cloneTemplate",
+        "title": "Clone Template",
+        "category": "Document Writer",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "document-writer.deleteTemplate",
+        "title": "Delete Template",
+        "category": "Document Writer",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "document-writer.openDocument",
+        "title": "Open Document",
+        "category": "Document Writer",
+        "icon": "$(open-preview)"
       }
     ],
     "configuration": {
@@ -70,6 +176,7 @@
     "@types/jest": "^29.5.12",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/showdown": "^2.0.6",
     "@types/vscode": "^1.100.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
@@ -84,11 +191,19 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/marked": "^5.0.2",
+    "@types/turndown": "^5.0.5",
     "canvas": "^3.1.0",
     "chokidar": "^3.5.3",
     "docxtemplater": "^3.45.0",
     "express": "^4.18.2",
     "handlebars": "^4.7.8",
-    "pizzip": "^3.1.4"
+    "jsdom": "^26.1.0",
+    "marked": "^15.0.12",
+    "pizzip": "^3.1.4",
+    "puppeteer": "^24.10.0",
+    "showdown": "^2.1.0",
+    "turndown": "^7.2.0"
   }
 }
