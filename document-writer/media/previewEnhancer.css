@@ -1,0 +1,496 @@
+/**
+ * previewEnhancer.css
+ * Styles for document preview with annotations, code highlighting, 
+ * and interactive controls
+ */
+
+/* Preview container and content */
+.preview-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--vscode-editor-font-family);
+  font-size: var(--vscode-editor-font-size);
+  line-height: 1.5;
+}
+
+.preview-content {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+}
+
+/* Document preview toolbar */
+.document-preview-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: var(--vscode-editor-background);
+  border-bottom: 1px solid var(--vscode-panel-border);
+  z-index: 10;
+}
+
+/* Toolbar buttons and controls */
+.toolbar-button {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: 2px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-button:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.toolbar-button:active {
+  background-color: var(--vscode-button-pressedBackground, var(--vscode-button-hoverBackground));
+}
+
+.toolbar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Toolbar groups */
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.5rem;
+  border-right: 1px solid var(--vscode-panel-border);
+}
+
+.toolbar-group:last-child {
+  border-right: none;
+}
+
+/* Zoom level display */
+.zoom-level {
+  min-width: 3.5rem;
+  text-align: center;
+  padding: 0.25rem;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border-radius: 2px;
+}
+
+/* Page indicator */
+.page-indicator {
+  min-width: 6rem;
+  text-align: center;
+  padding: 0.25rem;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border-radius: 2px;
+}
+
+/* Format selector */
+.format-selector {
+  background-color: var(--vscode-dropdown-background);
+  color: var(--vscode-dropdown-foreground);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 2px;
+  padding: 0.25rem;
+  font-size: 0.9rem;
+}
+
+/* Annotations panel */
+.document-annotations {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--vscode-editor-background);
+  border-left: 1px solid var(--vscode-panel-border);
+  z-index: 20;
+  transition: transform 0.3s ease;
+}
+
+.document-annotations.hidden {
+  transform: translateX(100%);
+}
+
+.annotations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.annotations-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: normal;
+}
+
+.close-annotations {
+  background: none;
+  border: none;
+  color: var(--vscode-editor-foreground);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.annotations-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.annotations-footer {
+  padding: 0.5rem;
+  border-top: 1px solid var(--vscode-panel-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-annotation-button {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: 2px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+/* Individual annotation styles */
+.annotation {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 3px;
+  background-color: var(--vscode-editor-inactiveSelectionBackground);
+  transition: background-color 0.2s ease;
+}
+
+.annotation:hover {
+  background-color: var(--vscode-editor-hoverHighlightBackground);
+}
+
+.annotation.active {
+  background-color: var(--vscode-editor-selectionBackground);
+}
+
+.annotation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.annotation-type {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.annotation-author {
+  font-style: italic;
+  margin-right: 0.5rem;
+  opacity: 0.8;
+}
+
+.annotation-date {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.annotation-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.edit-annotation,
+.delete-annotation {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.edit-annotation:hover,
+.delete-annotation:hover {
+  opacity: 1;
+}
+
+.annotation-content {
+  margin-bottom: 0.5rem;
+}
+
+.annotation-selected-text {
+  font-style: italic;
+  opacity: 0.8;
+  padding: 0.25rem;
+  background-color: var(--vscode-editor-lineHighlightBackground);
+  border-left: 2px solid var(--vscode-editor-selectionBackground);
+  margin-top: 0.5rem;
+}
+
+/* Annotation types */
+.annotation.comment {
+  border-left: 3px solid #4b9bff;
+}
+
+.annotation.suggestion {
+  border-left: 3px solid #73c991;
+}
+
+.annotation.question {
+  border-left: 3px solid #e2c08d;
+}
+
+.annotation.issue {
+  border-left: 3px solid #f14c4c;
+}
+
+/* Highlighted text in document */
+.annotated-text {
+  position: relative;
+  cursor: pointer;
+  border-bottom: 1px dashed;
+}
+
+.annotation-type-comment {
+  border-bottom-color: #4b9bff;
+  background-color: rgba(75, 155, 255, 0.1);
+}
+
+.annotation-type-suggestion {
+  border-bottom-color: #73c991;
+  background-color: rgba(115, 201, 145, 0.1);
+}
+
+.annotation-type-question {
+  border-bottom-color: #e2c08d;
+  background-color: rgba(226, 192, 141, 0.1);
+}
+
+.annotation-type-issue {
+  border-bottom-color: #f14c4c;
+  background-color: rgba(241, 76, 76, 0.1);
+}
+
+/* No annotations message */
+.no-annotations {
+  padding: 1rem;
+  text-align: center;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Code blocks styling */
+.preview-code-container {
+  margin: 1rem 0;
+  border-radius: 3px;
+  overflow: hidden;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+}
+
+.preview-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: var(--vscode-tab-activeBackground);
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.preview-code-language {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.preview-code-copy {
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: none;
+  border-radius: 2px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.preview-code-copy:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.preview-code-container pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.preview-code-container code {
+  font-family: var(--vscode-editor-font-family);
+  font-size: var(--vscode-editor-font-size);
+  tab-size: 2;
+}
+
+/* Table styling with sorting controls */
+.preview-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.preview-content th {
+  text-align: left;
+  padding: 0.5rem;
+  background-color: var(--vscode-editorWidget-background);
+  border-bottom: 2px solid var(--vscode-panel-border);
+  position: relative;
+}
+
+.preview-content th[data-sort-direction] {
+  background-color: var(--vscode-tab-activeBackground);
+}
+
+.preview-content th[data-sort-direction="asc"] .sort-indicator {
+  opacity: 1;
+  content: " ↑";
+}
+
+.preview-content th[data-sort-direction="desc"] .sort-indicator {
+  opacity: 1;
+  content: " ↓";
+}
+
+.preview-content td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.preview-content tr:nth-child(even) {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.preview-content tr:hover {
+  background-color: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+}
+
+/* Math blocks */
+.preview-math {
+  overflow-x: auto;
+  padding: 1rem;
+  background-color: var(--vscode-editor-inactiveSelectionBackground);
+  border-radius: 3px;
+  margin: 1rem 0;
+}
+
+.preview-math-inline {
+  padding: 0 0.25rem;
+}
+
+/* Diagram blocks */
+.preview-diagram {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: var(--vscode-editor-inactiveSelectionBackground);
+  border-radius: 3px;
+  overflow: auto;
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1000;
+}
+
+.toast {
+  padding: 0.75rem 1rem;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: toast-slide-in 0.3s ease-out;
+  max-width: 300px;
+}
+
+.toast-hide {
+  animation: toast-slide-out 0.3s ease-out forwards;
+}
+
+.toast-success {
+  background-color: var(--vscode-terminal-ansiGreen, #73c991);
+  color: var(--vscode-input-foreground);
+}
+
+.toast-error {
+  background-color: var(--vscode-terminal-ansiRed, #f14c4c);
+  color: var(--vscode-input-foreground);
+}
+
+.toast-info {
+  background-color: var(--vscode-terminal-ansiBlue, #4b9bff);
+  color: var(--vscode-input-foreground);
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Pagination styles */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
+  gap: 0.5rem;
+}
+
+.page {
+  break-after: always;
+  margin-bottom: 2rem;
+}
+
+.page:last-child {
+  break-after: auto;
+  margin-bottom: 0;
+}
+
+/* Print styles are in responsive.css */

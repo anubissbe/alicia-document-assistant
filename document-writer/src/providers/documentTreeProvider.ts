@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { TemplateManagerService } from '../services/templateManagerService';
 import { DocumentService } from '../services/documentService';
+import { CategoryOrganizer, CategoryNode } from '../utils/categoryOrganizer';
 
 /**
  * Interface for document template category
@@ -155,6 +156,7 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
     private readonly _maxRecentItems: number = 5;
     private _documentService: DocumentService;
     private _dragAndDropEnabled: boolean = true;
+    private _categoryOrganizer: CategoryOrganizer;
     
     /**
      * Constructor
@@ -163,11 +165,22 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
      */
     constructor(
         templateManager: TemplateManagerService,
-        documentService: DocumentService
+        documentService: DocumentService,
+        storage?: vscode.Memento
     ) {
         this._templateManager = templateManager;
         this._documentService = documentService;
+        
+        // Initialize category organizer
+        this._categoryOrganizer = new CategoryOrganizer(storage);
+        
+        // Initialize categories
         this._initializeCategories();
+        
+        // Listen for category changes
+        this._categoryOrganizer.onDidChangeCategories(() => {
+            this.refresh();
+        });
         
         // Set up auto refresh if enabled
         if (this._autoRefreshEnabled) {
@@ -416,7 +429,7 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
         try {
             // In a real implementation, we would get categories from the template manager
             // For now, we'll create some sample categories
-            this._categories = [
+            const sampleCategories: TemplateCategory[] = [
                 {
                     id: 'business',
                     name: 'Business Documents',
@@ -493,15 +506,21 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                 }
             ];
             
-            // Initialize recently used templates (would normally be loaded from storage)
+            // Initialize the category organizer with legacy categories
+            this._categoryOrganizer.initializeFromLegacyCategories(sampleCategories);
+            
+            // Keep a reference to the categories in the legacy format for compatibility
+            this._categories = this._categoryOrganizer.exportToLegacyFormat();
+            
+            // Initialize recently used templates
             this._recentlyUsedTemplates = [
-                this._categories[0].templates[0], // Business Report
-                this._categories[1].templates[0]  // Technical Specification
+                this._categoryOrganizer.getTemplate('business-report')!, // Business Report
+                this._categoryOrganizer.getTemplate('technical-spec')!   // Technical Specification
             ];
             
-            // Initialize favorite templates (would normally be loaded from storage)
+            // Initialize favorite templates
             this._favoriteTemplates = [
-                this._categories[1].templates[1], // User Manual
+                this._categoryOrganizer.getTemplate('user-manual')!, // User Manual
             ];
             
             // Mark templates as favorites
@@ -566,74 +585,63 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
         return element;
     }
     
-    /**
-     * Get children of a given element
-     * @param element The parent element
-     * @returns Array of child tree items
-     */
-    getChildren(element?: DocumentTreeItem): Thenable<DocumentTreeItem[]> {
-        // If search is active, return search results
-        if (this._isSearchActive && !element) {
-            // Group search results by category
-            const categorizedResults = new Map<string, DocumentTemplate[]>();
+/**
+ * Get children of a given element
+ * @param element The parent element
+ * @returns Array of child tree items
+ */
+getChildren(element?: DocumentTreeItem): Thenable<DocumentTreeItem[]> {
+    // If search is active, return search results
+    if (this._isSearchActive && !element) {
+        // Use the category organizer to organize search results by category
+        const categorizedItems: CategorizedItem[] = this._searchResults.map(template => ({
+            id: template.id,
+            label: template.name,
+            description: template.description,
+            category: this._categoryOrganizer.getItemCategory(template.id, 'Other'),
+            template: template
+        }));
+        
+        // Organize items into categories
+        const organizedCategories = this._categoryOrganizer.organizeIntoCategories(categorizedItems);
+        
+        // Create tree items
+        const items: DocumentTreeItem[] = [];
+        
+        for (const category of organizedCategories) {
+            // Add the category
+            const categoryItem = new DocumentTreeItem(
+                category.id,
+                `${category.label} (${category.items.length})`,
+                vscode.TreeItemCollapsibleState.Expanded,
+                TreeItemType.Category
+            );
             
-            for (const template of this._searchResults) {
-                // Find the category
-                let categoryName = 'Other';
-                let categoryId = 'other';
-                
-                for (const category of this._categories) {
-                    if (category.templates.some(t => t.id === template.id)) {
-                        categoryName = category.name;
-                        categoryId = category.id;
-                        break;
-                    }
-                }
-                
-                // Add to the category
-                if (!categorizedResults.has(categoryId)) {
-                    categorizedResults.set(categoryId, []);
-                }
-                
-                categorizedResults.get(categoryId)?.push(template);
+            // Set the icon if available
+            if (category.iconPath) {
+                categoryItem.iconPath = category.iconPath;
             }
             
-            // Create tree items for each category with results
-            const items: DocumentTreeItem[] = [];
+            items.push(categoryItem);
             
-            for (const [categoryId, templates] of categorizedResults.entries()) {
-                // Find the category name
-                const category = this._categories.find(c => c.id === categoryId);
-                const categoryName = category?.name || 'Other';
-                
-                // Add the category
-                const categoryItem = new DocumentTreeItem(
-                    categoryId,
-                    `${categoryName} (${templates.length})`,
-                    vscode.TreeItemCollapsibleState.Expanded,
-                    TreeItemType.Category
-                );
-                
-                items.push(categoryItem);
-                
-                // Add the templates
-                items.push(
-                    ...templates.map(template => 
-                        new DocumentTreeItem(
-                            template.id,
-                            template.name,
-                            vscode.TreeItemCollapsibleState.None,
-                            TreeItemType.Template,
-                            template
-                        )
+            // Add the templates
+            items.push(
+                ...category.items.map(item => 
+                    new DocumentTreeItem(
+                        item.id,
+                        item.label,
+                        vscode.TreeItemCollapsibleState.None,
+                        TreeItemType.Template,
+                        item.template
                     )
-                );
-            }
-            
-            return Promise.resolve(items);
+                )
+            );
         }
         
-        if (!element) {
+        return Promise.resolve(items);
+    }
+        
+if (!element) {
             // Root level - return special categories and regular categories
             const items: DocumentTreeItem[] = [];
             
@@ -661,23 +669,50 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                 );
             }
             
-            // Add regular categories, sorted by sortOrder if available
-            const sortedCategories = [...this._categories].sort((a, b) => {
-                const aOrder = a.sortOrder !== undefined ? a.sortOrder : Number.MAX_SAFE_INTEGER;
-                const bOrder = b.sortOrder !== undefined ? b.sortOrder : Number.MAX_SAFE_INTEGER;
-                return aOrder - bOrder;
-            });
+            // Get all categories from the category organizer
+            const allCategories = this._categoryOrganizer.getAllCategories();
             
-            items.push(
-                ...sortedCategories.map(category => 
-                    new DocumentTreeItem(
-                        category.id,
-                        category.name,
-                        vscode.TreeItemCollapsibleState.Collapsed,
-                        TreeItemType.Category
-                    )
-                )
-            );
+            // Create tree items for each category
+            const categoryItems = allCategories.map(categoryName => {
+                // Get the templates in this category
+                const templatesInCategory = this.getAllTemplates().filter(template => 
+                    this._categoryOrganizer.getItemCategory(template.id) === categoryName
+                );
+                
+                // Only include non-empty categories
+                if (templatesInCategory.length === 0) {
+                    return null;
+                }
+                
+                // Create a tree item for the category
+                const item = new DocumentTreeItem(
+                    `category-${categoryName.toLowerCase().replace(/\s+/g, '-')}`,
+                    categoryName,
+                    vscode.TreeItemCollapsibleState.Collapsed,
+                    TreeItemType.Category
+                );
+                
+                // Set appropriate icon based on category name
+                if (categoryName === 'Business') {
+                    item.iconPath = new vscode.ThemeIcon('briefcase');
+                } else if (categoryName === 'Academic') {
+                    item.iconPath = new vscode.ThemeIcon('mortar-board');
+                } else if (categoryName === 'Technical') {
+                    item.iconPath = new vscode.ThemeIcon('gear');
+                } else if (categoryName === 'Personal') {
+                    item.iconPath = new vscode.ThemeIcon('person');
+                } else {
+                    item.iconPath = new vscode.ThemeIcon('folder');
+                }
+                
+                // Add count to the description
+                item.description = `(${templatesInCategory.length})`;
+                
+                return item;
+            }).filter((item): item is DocumentTreeItem => item !== null);
+            
+            // Add category items to the result
+            items.push(...categoryItems);
             
             return Promise.resolve(items);
         } else if (element.type === TreeItemType.RecentlyUsed) {
@@ -706,13 +741,21 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                     )
                 )
             );
-        } else if (element.type === TreeItemType.Category) {
-            // Category level - return templates in the category
-            const category = this._categories.find(c => c.id === element.id);
+} else if (element.type === TreeItemType.Category) {
+            // Check if this is a regular category
+            const categoryId = element.id;
             
-            if (category) {
+            if (categoryId.startsWith('category-')) {
+                // Extract the category name from the ID
+                const categoryName = element.label as string;
+                
+                // Get all templates in this category
+                const templatesInCategory = this.getAllTemplates().filter(template => 
+                    this._categoryOrganizer.getItemCategory(template.id) === categoryName
+                );
+                
                 // Sort templates by name
-                const sortedTemplates = [...category.templates].sort((a, b) => 
+                const sortedTemplates = [...templatesInCategory].sort((a, b) => 
                     a.name.localeCompare(b.name)
                 );
                 
@@ -727,6 +770,28 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                         )
                     )
                 );
+            } else {
+                // Legacy category support
+                const category = this._categories.find(c => c.id === element.id);
+                
+                if (category) {
+                    // Sort templates by name
+                    const sortedTemplates = [...category.templates].sort((a, b) => 
+                        a.name.localeCompare(b.name)
+                    );
+                    
+                    return Promise.resolve(
+                        sortedTemplates.map(template => 
+                            new DocumentTreeItem(
+                                template.id,
+                                template.name,
+                                vscode.TreeItemCollapsibleState.None,
+                                TreeItemType.Template,
+                                template
+                            )
+                        )
+                    );
+                }
             }
         }
         
@@ -894,17 +959,17 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
      * @param categoryId The category ID
      */
     public addTemplate(template: DocumentTemplate, categoryId: string): void {
-        // Find the category
-        const category = this._categories.find(c => c.id === categoryId);
-        
-        if (category) {
-            // Add the template to the category
-            category.templates.push(template);
+        try {
+            // Use the category organizer to add the template
+            this._categoryOrganizer.addTemplate(template, categoryId);
+            
+            // Update our local cache of categories for compatibility
+            this._categories = this._categoryOrganizer.exportToLegacyFormat();
             
             // Notify the tree view that data has changed
             this.refresh();
-        } else {
-            throw new Error(`Category with ID ${categoryId} not found`);
+        } catch (error) {
+            throw new Error(`Failed to add template: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
     
@@ -913,14 +978,12 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
      * @param templateId The template ID
      */
     public removeTemplate(templateId: string): void {
-        // Find the category containing the template
-        const category = this._categories.find(c => 
-            c.templates.some(t => t.id === templateId)
-        );
-        
-        if (category) {
-            // Remove the template from the category
-            category.templates = category.templates.filter(t => t.id !== templateId);
+        try {
+            // Use the category organizer to remove the template
+            this._categoryOrganizer.removeTemplate(templateId);
+            
+            // Update our local cache of categories for compatibility
+            this._categories = this._categoryOrganizer.exportToLegacyFormat();
             
             // Also remove from recently used and favorites
             this._recentlyUsedTemplates = this._recentlyUsedTemplates.filter(t => t.id !== templateId);
@@ -932,8 +995,8 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
             
             // Notify the tree view that data has changed
             this.refresh();
-        } else {
-            throw new Error(`Template with ID ${templateId} not found`);
+        } catch (error) {
+            throw new Error(`Failed to remove template: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
     
@@ -942,16 +1005,24 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
      * @param category The category to add
      */
     public addCategory(category: TemplateCategory): void {
-        // Check if a category with the same ID already exists
-        if (this._categories.some(c => c.id === category.id)) {
-            throw new Error(`Category with ID ${category.id} already exists`);
+        try {
+            // Use the category organizer to create the category
+            this._categoryOrganizer.createCategory(
+                category.name,
+                null, // Add as root category
+                category.description,
+                category.iconPath,
+                category.sortOrder
+            );
+            
+            // Update our local cache of categories for compatibility
+            this._categories = this._categoryOrganizer.exportToLegacyFormat();
+            
+            // Notify the tree view that data has changed
+            this.refresh();
+        } catch (error) {
+            throw new Error(`Failed to add category: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-        
-        // Add the category
-        this._categories.push(category);
-        
-        // Notify the tree view that data has changed
-        this.refresh();
     }
     
     /**
@@ -959,16 +1030,18 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
      * @param categoryId The category ID
      */
     public removeCategory(categoryId: string): void {
-        // Check if the category exists
-        if (!this._categories.some(c => c.id === categoryId)) {
-            throw new Error(`Category with ID ${categoryId} not found`);
+        try {
+            // Use the category organizer to delete the category
+            this._categoryOrganizer.deleteCategory(categoryId);
+            
+            // Update our local cache of categories for compatibility
+            this._categories = this._categoryOrganizer.exportToLegacyFormat();
+            
+            // Notify the tree view that data has changed
+            this.refresh();
+        } catch (error) {
+            throw new Error(`Failed to remove category: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-        
-        // Remove the category
-        this._categories = this._categories.filter(c => c.id !== categoryId);
-        
-        // Notify the tree view that data has changed
-        this.refresh();
     }
     
     /**
@@ -977,17 +1050,17 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
      * @param newName The new name for the category
      */
     public renameCategory(categoryId: string, newName: string): void {
-        // Find the category
-        const category = this._categories.find(c => c.id === categoryId);
-        
-        if (category) {
-            // Update the name
-            category.name = newName;
+        try {
+            // Use the category organizer to rename the category
+            this._categoryOrganizer.renameCategory(categoryId, newName);
+            
+            // Update our local cache of categories for compatibility
+            this._categories = this._categoryOrganizer.exportToLegacyFormat();
             
             // Notify the tree view that data has changed
             this.refresh();
-        } else {
-            throw new Error(`Category with ID ${categoryId} not found`);
+        } catch (error) {
+            throw new Error(`Failed to rename category: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
     
@@ -1135,5 +1208,40 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
     public get dragAndDropController(): vscode.TreeDragAndDropController<DocumentTreeItem> {
         // This property is defined in _registerDragAndDropHandler
         return {} as vscode.TreeDragAndDropController<DocumentTreeItem>;
+    }
+    
+    /**
+     * Determine the category for a template based on its type and tags
+     * @param template The template
+     * @returns The category name
+     */
+    private _getCategoryForTemplate(template: DocumentTemplate): string {
+        // Check if the template has category-related tags
+        if (template.tags) {
+            if (template.tags.includes('business')) {
+                return 'Business';
+            } else if (template.tags.includes('academic')) {
+                return 'Academic';
+            } else if (template.tags.includes('technical')) {
+                return 'Technical';
+            } else if (template.tags.includes('personal')) {
+                return 'Personal';
+            }
+        }
+        
+        // Determine category based on template type
+        const type = template.type.toLowerCase();
+        if (type.includes('business') || type.includes('letter') || type.includes('memo') || type.includes('proposal')) {
+            return 'Business';
+        } else if (type.includes('academic') || type.includes('research') || type.includes('thesis')) {
+            return 'Academic';
+        } else if (type.includes('technical') || type.includes('manual') || type.includes('documentation')) {
+            return 'Technical';
+        } else if (type.includes('personal') || type.includes('resume') || type.includes('cv')) {
+            return 'Personal';
+        }
+        
+        // Default to Other if no category determined
+        return 'Other';
     }
 }

@@ -1,0 +1,209 @@
+/* Responsive styles for document preview */
+
+:root {
+    --responsive-font-size-adjustment: 1;
+}
+
+/* Base responsive container */
+.preview-container {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 40px); /* Adjust for toolbar height */
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Content area */
+.preview-content {
+    flex: 1;
+    padding: var(--margin-top) var(--margin-right) var(--margin-bottom) var(--margin-left);
+    overflow: auto;
+    font-family: var(--font-family);
+    font-size: calc(var(--font-size) * var(--responsive-font-size-adjustment));
+    line-height: var(--line-height);
+    text-align: var(--text-align);
+}
+
+/* Toolbar responsiveness */
+.preview-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 8px;
+    gap: 8px;
+    background-color: var(--vscode-editor-background);
+    border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Annotations panel */
+.annotations-panel {
+    width: 300px;
+    height: 100%;
+    overflow: auto;
+    background-color: var(--vscode-editor-background);
+    border-left: 1px solid var(--vscode-panel-border);
+    transition: transform 0.3s ease;
+}
+
+.annotations-panel.hidden {
+    display: none;
+}
+
+.annotations-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.annotations-content {
+    padding: 8px;
+}
+
+.add-annotation {
+    margin-top: 16px;
+}
+
+.add-annotation textarea {
+    width: 100%;
+    min-height: 80px;
+    margin-bottom: 8px;
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border: 1px solid var(--vscode-input-border);
+    padding: 4px;
+    resize: vertical;
+}
+
+.add-button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: none;
+    padding: 4px 12px;
+    cursor: pointer;
+}
+
+.add-button:hover {
+    background-color: var(--vscode-button-hoverBackground);
+}
+
+/* Responsive breakpoints */
+
+/* Extra small devices (phones) */
+@media (max-width: 480px) {
+    .preview-toolbar {
+        flex-direction: column;
+        padding: 4px;
+    }
+    
+    .toolbar-group {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .annotations-panel {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        z-index: 10;
+    }
+    
+    .preview-content {
+        padding: 10px;
+    }
+}
+
+/* Small devices (tablets) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .preview-toolbar {
+        flex-wrap: wrap;
+    }
+    
+    .annotations-panel {
+        width: 250px;
+    }
+    
+    .preview-content {
+        padding: 15px;
+    }
+}
+
+/* Medium devices (laptops, desktops) */
+@media (min-width: 769px) and (max-width: 992px) {
+    .annotations-panel {
+        width: 280px;
+    }
+}
+
+/* Large devices (large desktops) */
+@media (min-width: 993px) {
+    .preview-toolbar {
+        padding: 10px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .preview-toolbar, .annotations-panel {
+        display: none !important;
+    }
+    
+    .preview-container {
+        height: auto;
+        overflow: visible;
+    }
+    
+    .preview-content {
+        overflow: visible;
+        zoom: 1 !important; /* Reset zoom for printing */
+    }
+    
+    body {
+        background-color: white;
+    }
+}
+
+/* Data-attribute based responsive adjustments */
+body[data-breakpoint="xs"] .toolbar-group:not(.zoom-controls):not(.format-selector) {
+    display: none;
+}
+
+body[data-breakpoint="xs"] .preview-content {
+    font-size: calc(var(--font-size) * 0.8);
+}
+
+body[data-breakpoint="sm"] .preview-content {
+    font-size: calc(var(--font-size) * 0.9);
+}
+
+body[data-breakpoint="lg"] .preview-content {
+    font-size: calc(var(--font-size) * 1.1);
+}
+
+/* Adjust layout when annotations are visible */
+body.annotations-visible .preview-container {
+    flex-direction: row;
+}
+
+body.annotations-visible .preview-content {
+    flex: 1;
+}
+
+/* Ensure high contrast compatibility */
+@media (forced-colors: active) {
+    .preview-toolbar, .annotations-panel {
+        border-color: CanvasText;
+    }
+    
+    .toolbar-button {
+        border: 1px solid CanvasText;
+    }
+}

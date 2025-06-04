@@ -6,6 +6,10 @@ import { EntityExtractor, MessageIntent } from '../core/entityExtractor';
 import { ContentSuggestionEngine } from '../core/contentSuggestionEngine';
 import { FeedbackLearningEngine } from '../core/feedbackLearningEngine';
 import { SentimentAnalyzer, SentimentResult } from '../core/sentimentAnalyzer';
+import { DocumentAnalyzer, DocumentAnalysisResult } from '../core/documentAnalyzer';
+import { DocumentFormat } from '../core/formatProcessor';
+import { DocumentPreviewProvider } from './documentPreviewProvider';
+import { DocumentFormatConverter } from '../utils/documentFormatConverter';
 
 /**
  * Get a nonce to use in HTML to avoid script injection attacks
@@ -229,46 +233,114 @@ export class DocumentAssistant {
             // Save message to conversation history
             this._conversationHistory.addMessage(analysisMessage);
             
-            // TODO: Implement actual document analysis
-            // For now, we'll just simulate it with a timeout
-            setTimeout(() => {
-                if (!this._panel) return;
+            // Determine document format based on file extension
+            let format = DocumentFormat.TEXT; // Changed from PLAIN_TEXT to TEXT to match the enum
+            const extension = path.extname(documentName).toLowerCase();
+            
+            if (extension === '.md') {
+                format = DocumentFormat.MARKDOWN;
+            } else if (extension === '.html' || extension === '.htm') {
+                format = DocumentFormat.HTML;
+            } else if (extension === '.docx') {
+                format = DocumentFormat.DOCX;
+            } else if (extension === '.pdf') {
+                format = DocumentFormat.PDF;
+            }
+            
+            // Create DocumentAnalyzer instance
+            const documentAnalyzer = new DocumentAnalyzer(this._sentimentAnalyzer);
+            
+            // Perform the analysis
+            const analysisResult = await documentAnalyzer.analyzeDocument(content, documentName, format);
+            
+            // Format the analysis result as a message
+            let analysisContent = `
+                ## Analysis of ${documentName}
                 
-                // Create a sample analysis result
-                const result: AssistantMessage = {
-                    id: crypto.randomUUID(),
-                    content: `
-                        I've analyzed your document **${documentName}**. Here's what I found:
-                        
-                        - **Document Type**: ${this._detectDocumentType(content)}
-                        - **Word Count**: ${this._countWords(content)} words
-                        - **Reading Time**: ${Math.ceil(this._countWords(content) / 200)} minutes
-                        - **Readability**: Good
-                        
-                        Would you like me to suggest any improvements to the document?
-                    `,
-                    timestamp: new Date(),
-                    type: 'assistant',
-                    suggestions: [
-                        'Suggest improvements',
-                        'Check grammar and spelling',
-                        'Help me with citations',
-                        'Generate a summary'
-                    ]
-                };
+                ### Document Overview
+                - **Document Type**: ${analysisResult.documentType}
+                - **Word Count**: ${analysisResult.wordCount} words
+                - **Reading Time**: ${analysisResult.readingTime} minutes
+                - **Readability**: ${analysisResult.readabilityLevel} (score: ${analysisResult.readabilityScore}/100)
                 
-                // Add the message to the UI
-                this._panel.webview.postMessage({
-                    command: 'addMessage',
-                    message: result
-                });
+                ### Structure
+                - **Sections**: ${analysisResult.structure.hasSections ? `Yes (${analysisResult.structure.sectionCount})` : 'No'}
+                - **Paragraphs**: ${analysisResult.statistics.paragraphCount}
+                - **Sentences**: ${analysisResult.statistics.sentenceCount}
+                - **Average Sentence Length**: ${analysisResult.statistics.averageSentenceLength.toFixed(1)} words
+            `;
+            
+            // Add sentiment analysis if available
+            if (analysisResult.sentimentScore !== undefined && analysisResult.sentimentLabel !== undefined) {
+                analysisContent += `
                 
-                // Save message to conversation history
-                this._conversationHistory.addMessage(result);
-            }, 1500);
+                ### Sentiment
+                - **Overall Tone**: ${analysisResult.sentimentLabel.charAt(0).toUpperCase() + analysisResult.sentimentLabel.slice(1)}
+                - **Sentiment Score**: ${analysisResult.sentimentScore.toFixed(2)}
+                `;
+            }
+            
+            // Add key topics
+            if (analysisResult.keyTopics.length > 0) {
+                analysisContent += `
+                
+                ### Key Topics
+                - ${analysisResult.keyTopics.join('\n- ')}
+                `;
+            }
+            
+            // Add suggestions if available
+            if (analysisResult.suggestions.length > 0) {
+                analysisContent += `
+                
+                ### Suggestions for Improvement
+                - ${analysisResult.suggestions.join('\n- ')}
+                `;
+            }
+            
+            // Create the final message
+            const result: AssistantMessage = {
+                id: crypto.randomUUID(),
+                content: analysisContent,
+                timestamp: new Date(),
+                type: 'assistant',
+                suggestions: [
+                    'Suggest improvements',
+                    'Check grammar and spelling',
+                    'Help me with the document structure',
+                    'Generate a summary'
+                ]
+            };
+            
+            // Add the message to the UI
+            this._panel.webview.postMessage({
+                command: 'addMessage',
+                message: result
+            });
+            
+            // Save message to conversation history
+            this._conversationHistory.addMessage(result);
         } catch (error) {
             console.error('Error analyzing document:', error);
             vscode.window.showErrorMessage('Error analyzing document');
+            
+            if (this._panel) {
+                // Send error message to the chat
+                const errorMessage: AssistantMessage = {
+                    id: crypto.randomUUID(),
+                    content: 'I encountered an error while analyzing your document. Please try again or check the document format.',
+                    timestamp: new Date(),
+                    type: 'assistant'
+                };
+                
+                this._panel.webview.postMessage({
+                    command: 'addMessage',
+                    message: errorMessage
+                });
+                
+                // Save to conversation history
+                this._conversationHistory.addMessage(errorMessage);
+            }
         }
     }
     
@@ -298,6 +370,325 @@ export class DocumentAssistant {
             return 'Markdown Document';
         } else {
             return 'General Document';
+        }
+    }
+    
+    /**
+     * Get a basic intent from message text using simple keyword matching
+     * @param message The message text to analyze
+     * @returns The detected intent or undefined
+     */
+    private _getBasicIntent(message: string): MessageIntent | undefined {
+        const lowerMessage = message.toLowerCase();
+        
+        if (lowerMessage.includes('analyze') || lowerMessage.includes('check') || lowerMessage.includes('review')) {
+            return 'analyze_document';
+        } else if (lowerMessage.includes('improve') || lowerMessage.includes('suggestion') || lowerMessage.includes('better')) {
+            return 'suggest_improvements';
+        } else if (lowerMessage.includes('format') || lowerMessage.includes('style') || lowerMessage.includes('layout')) {
+            return 'help_formatting';
+        } else if (lowerMessage.includes('section') || lowerMessage.includes('create') || lowerMessage.includes('add')) {
+            return 'create_section';
+        } else {
+            return 'general_question';
+        }
+    }
+    
+    /**
+     * Export the document to a specified format
+     * @param format The target format
+     */
+    private async _exportDocument(format: string): Promise<void> {
+        if (!this._panel || !this._activeDocumentUri) {
+            return;
+        }
+        
+        try {
+            // Show typing indicator
+            this._panel.webview.postMessage({
+                command: 'showTypingIndicator'
+            });
+            
+            // Get preview provider
+            const previewProvider = DocumentPreviewProvider.getProvider();
+            
+            if (!previewProvider) {
+                throw new Error('Preview provider is not available');
+            }
+            
+            // Use the preview provider's export functionality
+            vscode.commands.executeCommand('document-writer.exportDocument', format);
+            
+            // Hide typing indicator
+            this._panel.webview.postMessage({
+                command: 'hideTypingIndicator'
+            });
+            
+            // Create response message
+            const exportMessage: AssistantMessage = {
+                id: crypto.randomUUID(),
+                content: `I've initiated the export process for your document to ${format} format. Please select a location to save the exported file.`,
+                timestamp: new Date(),
+                type: 'assistant',
+                suggestions: [
+                    'Show document preview',
+                    'Export to another format',
+                    'Analyze document'
+                ]
+            };
+            
+            // Send the message
+            this._panel.webview.postMessage({
+                command: 'addMessage',
+                message: exportMessage
+            });
+            
+            // Save to conversation history
+            this._conversationHistory.addMessage(exportMessage);
+        } catch (error) {
+            console.error('Error exporting document:', error);
+            
+            if (this._panel) {
+                // Hide typing indicator
+                this._panel.webview.postMessage({
+                    command: 'hideTypingIndicator'
+                });
+                
+                // Send error message
+                const errorMessage: AssistantMessage = {
+                    id: crypto.randomUUID(),
+                    content: `I'm sorry, but I encountered an error while exporting the document: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    timestamp: new Date(),
+                    type: 'assistant'
+                };
+                
+                this._panel.webview.postMessage({
+                    command: 'addMessage',
+                    message: errorMessage
+                });
+                
+                // Save to conversation history
+                this._conversationHistory.addMessage(errorMessage);
+            }
+        }
+    }
+    
+    /**
+     * Print the current document
+     */
+    private async _printDocument(): Promise<void> {
+        if (!this._panel || !this._activeDocumentUri) {
+            return;
+        }
+        
+        try {
+            // Show typing indicator
+            this._panel.webview.postMessage({
+                command: 'showTypingIndicator'
+            });
+            
+            // Get preview provider
+            const previewProvider = DocumentPreviewProvider.getProvider();
+            
+            if (!previewProvider) {
+                throw new Error('Preview provider is not available');
+            }
+            
+            // Use the preview provider's print functionality
+            vscode.commands.executeCommand('document-writer.printDocument');
+            
+            // Hide typing indicator
+            this._panel.webview.postMessage({
+                command: 'hideTypingIndicator'
+            });
+            
+            // Create response message
+            const printMessage: AssistantMessage = {
+                id: crypto.randomUUID(),
+                content: 'I\'ve sent your document to the printer. Please check your system print dialog.',
+                timestamp: new Date(),
+                type: 'assistant'
+            };
+            
+            // Send the message
+            this._panel.webview.postMessage({
+                command: 'addMessage',
+                message: printMessage
+            });
+            
+            // Save to conversation history
+            this._conversationHistory.addMessage(printMessage);
+        } catch (error) {
+            console.error('Error printing document:', error);
+            
+            if (this._panel) {
+                // Hide typing indicator
+                this._panel.webview.postMessage({
+                    command: 'hideTypingIndicator'
+                });
+                
+                // Send error message
+                const errorMessage: AssistantMessage = {
+                    id: crypto.randomUUID(),
+                    content: `I'm sorry, but I encountered an error while trying to print the document: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    timestamp: new Date(),
+                    type: 'assistant'
+                };
+                
+                this._panel.webview.postMessage({
+                    command: 'addMessage',
+                    message: errorMessage
+                });
+                
+                // Save to conversation history
+                this._conversationHistory.addMessage(errorMessage);
+            }
+        }
+    }
+    
+    /**
+     * Show document preview in chat
+     * @param format Optional target format for the preview
+     */
+    private async _showDocumentPreview(format?: DocumentFormat): Promise<void> {
+        if (!this._panel || !this._activeDocumentUri) {
+            return;
+        }
+        
+        try {
+            // Get the document content
+            const document = await vscode.workspace.openTextDocument(this._activeDocumentUri);
+            const content = document.getText();
+            const documentName = path.basename(this._activeDocumentUri.fsPath);
+            
+            // Show typing indicator
+            this._panel.webview.postMessage({
+                command: 'showTypingIndicator'
+            });
+            
+            // Get preview provider
+            const previewProvider = DocumentPreviewProvider.getProvider();
+            
+            if (!previewProvider) {
+                throw new Error('Preview provider is not available');
+            }
+            
+            // Determine source format based on file extension
+            let sourceFormat = DocumentFormat.TEXT;
+            const extension = path.extname(documentName).toLowerCase();
+            
+            if (extension === '.md') {
+                sourceFormat = DocumentFormat.MARKDOWN;
+            } else if (extension === '.html' || extension === '.htm') {
+                sourceFormat = DocumentFormat.HTML;
+            } else if (extension === '.docx') {
+                sourceFormat = DocumentFormat.DOCX;
+            } else if (extension === '.pdf') {
+                sourceFormat = DocumentFormat.PDF;
+            }
+            
+            // Set target format (default to HTML if not specified)
+            const targetFormat = format || DocumentFormat.HTML;
+            
+            // Create a converter
+            const converter = new DocumentFormatConverter();
+            
+            // Generate preview content
+            const previewContent = await converter.generatePreview(
+                content,
+                sourceFormat,
+                {
+                    targetFormat,
+                    preview: {
+                        interactive: true,
+                        renderMath: true,
+                        renderDiagrams: true,
+                        highlightSyntax: true,
+                        showAnnotations: true
+                    },
+                    preserveFormatting: true,
+                    includeStyles: true
+                }
+            );
+            
+            // Create a response message with the preview
+            let responseContent = `## Preview of ${documentName}\n\n`;
+            
+            if (targetFormat === DocumentFormat.HTML) {
+                // For HTML, embed a snippet of the HTML preview
+                const htmlSnippet = previewContent.length > 500 
+                    ? previewContent.substring(0, 500) + '...' 
+                    : previewContent;
+                
+                responseContent += `
+                    A preview of your document has been generated in HTML format.
+                    
+                    \`\`\`html
+                    ${htmlSnippet}
+                    \`\`\`
+                    
+                    I've also opened the document in the preview panel for better viewing.
+                `;
+                
+                // Update the preview panel
+                vscode.commands.executeCommand('document-writer.refreshPreview');
+            } else {
+                // For other formats, include the preview content directly
+                responseContent += previewContent;
+            }
+            
+            // Hide typing indicator
+            this._panel.webview.postMessage({
+                command: 'hideTypingIndicator'
+            });
+            
+            // Create response message
+            const previewMessage: AssistantMessage = {
+                id: crypto.randomUUID(),
+                content: responseContent,
+                timestamp: new Date(),
+                type: 'assistant',
+                suggestions: [
+                    'Export as PDF',
+                    'Export as DOCX',
+                    'Show in Markdown format',
+                    'Print document'
+                ]
+            };
+            
+            // Send the message
+            this._panel.webview.postMessage({
+                command: 'addMessage',
+                message: previewMessage
+            });
+            
+            // Save to conversation history
+            this._conversationHistory.addMessage(previewMessage);
+        } catch (error) {
+            console.error('Error generating preview:', error);
+            
+            if (this._panel) {
+                // Hide typing indicator
+                this._panel.webview.postMessage({
+                    command: 'hideTypingIndicator'
+                });
+                
+                // Send error message
+                const errorMessage: AssistantMessage = {
+                    id: crypto.randomUUID(),
+                    content: `I'm sorry, but I encountered an error while generating the preview: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    timestamp: new Date(),
+                    type: 'assistant'
+                };
+                
+                this._panel.webview.postMessage({
+                    command: 'addMessage',
+                    message: errorMessage
+                });
+                
+                // Save to conversation history
+                this._conversationHistory.addMessage(errorMessage);
+            }
         }
     }
     
@@ -385,11 +776,15 @@ export class DocumentAssistant {
         timestamp: number;
         intent?: MessageIntent;
     }[] {
-        return historyMessages.map(message => ({
+        return historyMessages.map((message, index) => ({
             content: message.content,
             sender: message.role,
-            timestamp: Date.now(),
-            intent: undefined
+            // Use incrementing timestamps to preserve message order
+            timestamp: Date.now() - (historyMessages.length - index) * 1000,
+            // Try to determine basic intent for user messages
+            intent: message.role === 'user' ? 
+                this._getBasicIntent(message.content) : 
+                undefined
         }));
     }
     
@@ -402,21 +797,75 @@ export class DocumentAssistant {
         });
         
         try {
+            // Analyze message sentiment
+            const sentiment = this._sentimentAnalyzer.analyzeSentiment(message);
+            
             // Generate a response using the content suggestion engine
             const messages = this._conversationHistory.getMessages().slice(-5);
             const historyMessages = this._conversationHistory.convertToHistoryMessages(messages);
             const contentSuggestionHistory = this._convertToContentSuggestionHistoryMessages(historyMessages);
-            const response = await this._contentSuggestionEngine.generateResponse(message, contentSuggestionHistory, entities);
             
-            // Generate suggestions based on the conversation context
-            const suggestions = await this._contentSuggestionEngine.generateSuggestions(message, contentSuggestionHistory);
+            // Add sentiment context to improve response generation
+            let sentimentContext = '';
+            if (sentiment.label === 'negative' && sentiment.score < -0.5) {
+                sentimentContext = 'The user seems frustrated or concerned. Be empathetic and provide clear, helpful information.';
+            } else if (sentiment.label === 'positive' && sentiment.score > 0.5) {
+                sentimentContext = 'The user seems enthusiastic. Match their positive tone while providing information.';
+            } else if (sentiment.label === 'mixed') {
+                sentimentContext = 'The user has mixed feelings. Address their concerns while highlighting positive aspects.';
+            }
             
-            // Create a response message
+            // Generate response with sentiment context
+            // We need to pass entities directly as the third parameter
+            const response = await this._contentSuggestionEngine.generateResponse(
+                message, 
+                contentSuggestionHistory, 
+                entities || [] // Pass entities directly
+            );
+            
+            // If we have sentiment context, we can use it to adjust the response or learn from it
+            if (sentimentContext) {
+                console.log(`Using sentiment context: ${sentimentContext}`);
+                // In a full implementation, we might use this for feedback learning
+            }
+            
+            // Adapt suggestions based on sentiment
+            let suggestions: string[] = [];
+            
+            if (sentiment.label === 'negative') {
+                // For negative sentiment, focus on supportive and problem-solving suggestions
+                suggestions = [
+                    'Show me how to fix this issue',
+                    'What are best practices for this?',
+                    'Can you explain this in simpler terms?',
+                    'Let me see an example'
+                ];
+            } else if (sentiment.label === 'positive') {
+                // For positive sentiment, focus on exploration and enhancement
+                suggestions = [
+                    'What else can I improve?',
+                    'Show me advanced techniques',
+                    'How can I make this even better?',
+                    'What are other options?'
+                ];
+            } else {
+                // For neutral or mixed sentiment, generate general suggestions
+                suggestions = await this._contentSuggestionEngine.generateSuggestions(
+                    message, 
+                    contentSuggestionHistory
+                );
+            }
+            
+            // Create a response message with sentiment information
             const responseMessage: AssistantMessage = {
                 id: crypto.randomUUID(),
                 content: response,
                 timestamp: new Date(),
                 type: 'assistant',
+                sentiment: {
+                    score: sentiment.score,
+                    label: sentiment.label
+                },
                 suggestions
             };
             
@@ -434,7 +883,48 @@ export class DocumentAssistant {
             this._conversationHistory.addMessage(responseMessage);
             
             // Learn from this interaction to improve future responses
-            this._feedbackLearningEngine.learnFromInteraction(message, response);
+            // Store additional context for learning
+            const feedbackContext = {
+                userSentiment: sentiment.score,
+                hasActiveDocument: !!this._activeDocumentUri,
+                documentType: this._activeDocumentUri ? 
+                    path.extname(this._activeDocumentUri.fsPath).toLowerCase() : 
+                    undefined
+            };
+            
+            this._feedbackLearningEngine.learnFromInteraction(
+                message, 
+                response, 
+                sentiment.score // Use the sentiment score as the numeric feedback value
+            );
+            
+            // If user sentiment is very negative, offer additional help
+            if (sentiment.label === 'negative' && sentiment.score < -0.7) {
+                setTimeout(() => {
+                    if (!this._panel) return;
+                    
+                    const followUpMessage: AssistantMessage = {
+                        id: crypto.randomUUID(),
+                        content: "I notice you might be experiencing some difficulty. Is there something specific about the document you're struggling with that I can help clarify or explain better?",
+                        timestamp: new Date(),
+                        type: 'assistant',
+                        suggestions: [
+                            'Show me documentation',
+                            'Walk me through this step by step',
+                            'Show me an example',
+                            'No thanks, I\'m fine'
+                        ]
+                    };
+                    
+                    this._panel.webview.postMessage({
+                        command: 'addMessage',
+                        message: followUpMessage
+                    });
+                    
+                    // Save to conversation history
+                    this._conversationHistory.addMessage(followUpMessage);
+                }, 3000);
+            }
         } catch (error) {
             console.error('Error generating response:', error);
             
@@ -464,45 +954,179 @@ export class DocumentAssistant {
     /**
      * Suggest improvements for the current document
      */
-    private _suggestImprovements(): void {
-        // This would be implemented with actual document analysis
-        if (!this._panel) return;
+    private async _suggestImprovements(): Promise<void> {
+        if (!this._panel || !this._activeDocumentUri) {
+            if (this._panel) {
+                const noDocumentMessage: AssistantMessage = {
+                    id: crypto.randomUUID(),
+                    content: "I don't see an active document to analyze. Please open a document first or let me know which document you'd like me to help with.",
+                    timestamp: new Date(),
+                    type: 'assistant'
+                };
+                
+                this._panel.webview.postMessage({
+                    command: 'addMessage',
+                    message: noDocumentMessage
+                });
+                
+                this._conversationHistory.addMessage(noDocumentMessage);
+            }
+            return;
+        }
         
         // Show typing indicator
         this._panel.webview.postMessage({
             command: 'showTypingIndicator'
         });
         
-        // Simulate processing time
-        setTimeout(() => {
-            if (!this._panel) return;
+        try {
+            // Get the document content
+            const document = await vscode.workspace.openTextDocument(this._activeDocumentUri);
+            const content = document.getText();
+            const documentName = path.basename(this._activeDocumentUri.fsPath);
             
-            // Hide typing indicator
+            // Determine document format based on file extension
+            let format = DocumentFormat.TEXT;
+            const extension = path.extname(documentName).toLowerCase();
+            
+            if (extension === '.md') {
+                format = DocumentFormat.MARKDOWN;
+            } else if (extension === '.html' || extension === '.htm') {
+                format = DocumentFormat.HTML;
+            } else if (extension === '.docx') {
+                format = DocumentFormat.DOCX;
+            } else if (extension === '.pdf') {
+                format = DocumentFormat.PDF;
+            }
+            
+            // Create DocumentAnalyzer instance
+            const documentAnalyzer = new DocumentAnalyzer(this._sentimentAnalyzer);
+            
+            // Perform the analysis
+            const analysisResult = await documentAnalyzer.analyzeDocument(content, documentName, format);
+            
+            // Generate dynamic improvement suggestions based on analysis
+            let improvementContent = `## Suggested Improvements for ${documentName}\n\n`;
+            
+            // Add improvement suggestions based on document type and analysis results
+            if (analysisResult.suggestions.length > 0) {
+                improvementContent += `### Key Recommendations\n`;
+                analysisResult.suggestions.forEach((suggestion, index) => {
+                    improvementContent += `${index + 1}. **${suggestion}**\n`;
+                });
+                improvementContent += '\n';
+            }
+            
+            // Add readability suggestions
+            if (analysisResult.readabilityLevel === 'Hard') {
+                improvementContent += `### Readability Improvements\n`;
+                improvementContent += `- Your document has a complex readability level (score: ${analysisResult.readabilityScore}/100)\n`;
+                improvementContent += `- Consider simplifying language and using shorter sentences\n`;
+                improvementContent += `- Break complex ideas into smaller, more digestible points\n\n`;
+            }
+            
+            // Add structure suggestions
+            if (!analysisResult.structure.hasSections || analysisResult.structure.sectionCount < 3) {
+                improvementContent += `### Structure Improvements\n`;
+                improvementContent += `- Your document ${!analysisResult.structure.hasSections ? 'lacks clear sections' : 'has only ' + analysisResult.structure.sectionCount + ' sections'}\n`;
+                improvementContent += `- Consider adding ${!analysisResult.structure.hasSections ? 'section headings' : 'more section headings'} to organize your content\n`;
+                
+                // Suggest missing sections based on document type
+                if (analysisResult.documentType === 'Academic Paper') {
+                    const existingSections = analysisResult.structure.sectionTitles.map(title => title.toLowerCase());
+                    const recommendedSections = ['abstract', 'introduction', 'methodology', 'results', 'discussion', 'conclusion', 'references'];
+                    const missingSections = recommendedSections.filter(section => !existingSections.some(title => title.includes(section)));
+                    
+                    if (missingSections.length > 0) {
+                        improvementContent += `- Consider adding these standard sections: **${missingSections.join(', ')}**\n`;
+                    }
+                } else if (analysisResult.documentType === 'Business Report') {
+                    const existingSections = analysisResult.structure.sectionTitles.map(title => title.toLowerCase());
+                    const recommendedSections = ['executive summary', 'introduction', 'findings', 'recommendations', 'conclusion'];
+                    const missingSections = recommendedSections.filter(section => !existingSections.some(title => title.includes(section)));
+                    
+                    if (missingSections.length > 0) {
+                        improvementContent += `- Consider adding these standard sections: **${missingSections.join(', ')}**\n`;
+                    }
+                }
+                improvementContent += '\n';
+            }
+            
+            // Add statistical suggestions
+            if (analysisResult.statistics.averageSentenceLength > 25 || analysisResult.statistics.longSentences > 3) {
+                improvementContent += `### Sentence Structure Improvements\n`;
+                if (analysisResult.statistics.averageSentenceLength > 25) {
+                    improvementContent += `- Your average sentence length is ${analysisResult.statistics.averageSentenceLength.toFixed(1)} words (ideal: 15-20 words)\n`;
+                    improvementContent += `- Consider breaking long sentences into shorter ones\n`;
+                }
+                if (analysisResult.statistics.longSentences > 3) {
+                    improvementContent += `- You have ${analysisResult.statistics.longSentences} very long sentences (>30 words)\n`;
+                    improvementContent += `- Review these sentences to improve clarity\n`;
+                }
+                improvementContent += '\n';
+            }
+            
+            // Add call to action
+            improvementContent += `Would you like me to help implement any of these suggestions? I can assist with restructuring your document, improving readability, or enhancing specific sections.`;
+            
+            // Generate dynamic suggestions based on document analysis
+            const dynamicSuggestions: string[] = [];
+            
+            // Add document-type specific suggestions
+            if (analysisResult.documentType === 'Academic Paper') {
+                dynamicSuggestions.push('Help me improve the abstract');
+                dynamicSuggestions.push('Suggest a better methodology section');
+            } else if (analysisResult.documentType === 'Business Report') {
+                dynamicSuggestions.push('Enhance my executive summary');
+                dynamicSuggestions.push('Improve the recommendations section');
+            } else {
+                dynamicSuggestions.push('Help me with the introduction');
+                dynamicSuggestions.push('Create a conclusion section');
+            }
+            
+            // Add general suggestions based on analysis
+            if (analysisResult.readabilityLevel === 'Hard') {
+                dynamicSuggestions.push('Simplify complex language');
+            }
+            if (analysisResult.statistics.averageSentenceLength > 25) {
+                dynamicSuggestions.push('Break down long sentences');
+            }
+            if (!analysisResult.structure.hasSections || analysisResult.structure.sectionCount < 3) {
+                dynamicSuggestions.push('Add section headings');
+            }
+            
+            // Ensure we have at least 4 suggestions
+            while (dynamicSuggestions.length < 4) {
+                const generalSuggestions = [
+                    'Improve overall document structure',
+                    'Check grammar and spelling',
+                    'Review for clarity and conciseness',
+                    'Help me with formatting',
+                    'Enhance document readability'
+                ];
+                
+                // Add a general suggestion that's not already in dynamicSuggestions
+                const availableSuggestions = generalSuggestions.filter(s => !dynamicSuggestions.includes(s));
+                if (availableSuggestions.length > 0) {
+                    dynamicSuggestions.push(availableSuggestions[0]);
+                } else {
+                    break; // No more suggestions to add
+                }
+            }
+            
+            // Create response message
+            const improvementsMessage: AssistantMessage = {
+                id: crypto.randomUUID(),
+                content: improvementContent,
+                timestamp: new Date(),
+                type: 'assistant',
+                suggestions: dynamicSuggestions
+            };
+            
+            // Hide typing indicator and send message
             this._panel.webview.postMessage({
                 command: 'hideTypingIndicator'
             });
-            
-            const improvementsMessage: AssistantMessage = {
-                id: crypto.randomUUID(),
-                content: `
-                    Based on my analysis, here are some suggested improvements:
-                    
-                    1. **Add a clear introduction** at the beginning to set the context
-                    2. **Break up long paragraphs** to improve readability
-                    3. **Use more headings** to structure your document
-                    4. **Add a conclusion section** to summarize key points
-                    
-                    Would you like me to help implement any of these suggestions?
-                `,
-                timestamp: new Date(),
-                type: 'assistant',
-                suggestions: [
-                    'Help me with the introduction',
-                    'Show me how to structure headings',
-                    'Create a conclusion section',
-                    'No thanks, I will do it myself'
-                ]
-            };
             
             this._panel.webview.postMessage({
                 command: 'addMessage',
@@ -511,13 +1135,38 @@ export class DocumentAssistant {
             
             // Save to conversation history
             this._conversationHistory.addMessage(improvementsMessage);
-        }, 1500);
+        } catch (error) {
+            console.error('Error suggesting improvements:', error);
+            
+            if (this._panel) {
+                // Hide typing indicator
+                this._panel.webview.postMessage({
+                    command: 'hideTypingIndicator'
+                });
+                
+                // Send error message
+                const errorMessage: AssistantMessage = {
+                    id: crypto.randomUUID(),
+                    content: `I'm sorry, but I encountered an error while analyzing your document for improvements: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    timestamp: new Date(),
+                    type: 'assistant'
+                };
+                
+                this._panel.webview.postMessage({
+                    command: 'addMessage',
+                    message: errorMessage
+                });
+                
+                // Save to conversation history
+                this._conversationHistory.addMessage(errorMessage);
+            }
+        }
     }
     
     /**
-     * Provide help with formatting
+     * Provide help with formatting based on the active document type
      */
-    private _provideFormattingHelp(): void {
+    private async _provideFormattingHelp(): Promise<void> {
         if (!this._panel) return;
         
         // Show typing indicator
@@ -525,48 +1174,192 @@ export class DocumentAssistant {
             command: 'showTypingIndicator'
         });
         
-        // Simulate processing time
-        setTimeout(() => {
-            if (!this._panel) return;
+        try {
+            // Get the active document information if available
+            let documentType = 'Markdown';
+            let formatSpecificTips = '';
+            let formatSpecificSuggestions: string[] = [];
+            
+            if (this._activeDocumentUri) {
+                const document = await vscode.workspace.openTextDocument(this._activeDocumentUri);
+                const documentName = path.basename(this._activeDocumentUri.fsPath);
+                const extension = path.extname(documentName).toLowerCase();
+                
+                // Determine document format based on file extension
+                if (extension === '.md') {
+                    documentType = 'Markdown';
+                    formatSpecificTips = `
+                        ## Markdown-Specific Formatting
+                        
+                        ### Tables
+                        \`\`\`markdown
+                        | Header 1 | Header 2 | Header 3 |
+                        |----------|----------|----------|
+                        | Cell 1   | Cell 2   | Cell 3   |
+                        | Cell 4   | Cell 5   | Cell 6   |
+                        \`\`\`
+                        
+                        ### Code Blocks
+                        \`\`\`markdown
+                        \`\`\`javascript
+                        function example() {
+                            console.log("Hello, world!");
+                        }
+                        \`\`\`
+                        \`\`\`
+                        
+                        ### Math Equations (using LaTeX syntax)
+                        \`\`\`markdown
+                        $E = mc^2$
+                        
+                        $$
+                        \\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}
+                        $$
+                        \`\`\`
+                    `;
+                    
+                    formatSpecificSuggestions = [
+                        'Help me with Markdown tables',
+                        'How to add math equations',
+                        'Show me how to create diagrams',
+                        'How to add footnotes'
+                    ];
+                } else if (extension === '.html' || extension === '.htm') {
+                    documentType = 'HTML';
+                    formatSpecificTips = `
+                        ## HTML-Specific Formatting
+                        
+                        ### Basic Structure
+                        \`\`\`html
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Page Title</title>
+                            <style>
+                                /* CSS styles here */
+                            </style>
+                        </head>
+                        <body>
+                            <h1>Main Heading</h1>
+                            <p>Paragraph text</p>
+                        </body>
+                        </html>
+                        \`\`\`
+                        
+                        ### Common Elements
+                        \`\`\`html
+                        <!-- Headings -->
+                        <h1>Heading 1</h1>
+                        <h2>Heading 2</h2>
+                        
+                        <!-- Lists -->
+                        <ul>
+                            <li>Unordered item</li>
+                        </ul>
+                        
+                        <ol>
+                            <li>Ordered item</li>
+                        </ol>
+                        
+                        <!-- Links -->
+                        <a href="https://example.com">Link text</a>
+                        
+                        <!-- Images -->
+                        <img src="image.jpg" alt="Description">
+                        \`\`\`
+                    `;
+                    
+                    formatSpecificSuggestions = [
+                        'Help me with HTML tables',
+                        'How to use CSS styling',
+                        'Show me form element examples',
+                        'How to add responsive design'
+                    ];
+                } else if (extension === '.docx') {
+                    documentType = 'Word Document';
+                    formatSpecificTips = `
+                        ## Word Document Formatting
+                        
+                        For DOCX documents, I recommend using MS Word or an equivalent editor for detailed formatting.
+                        However, here are some guidelines for when your document is exported:
+                        
+                        ### Styles
+                        - Use consistent heading styles for document structure
+                        - Apply paragraph styles for consistent formatting
+                        - Use list styles for ordered and unordered lists
+                        
+                        ### Document Elements
+                        - Include a table of contents for longer documents
+                        - Use page breaks to control content flow
+                        - Add headers and footers for professional documents
+                        - Insert cross-references for internal navigation
+                    `;
+                    
+                    formatSpecificSuggestions = [
+                        'How to structure a Word document',
+                        'Tips for professional formatting',
+                        'Help me with section breaks',
+                        'How to use styles effectively'
+                    ];
+                }
+            }
+            
+            // General formatting tips for all document types
+            const generalTips = `
+                # Formatting Guide for ${documentType} Documents
+                
+                ## General Formatting Tips
+                
+                ### Headings
+                - Use headings to create a clear document structure
+                - Maintain a logical hierarchy (don't skip levels)
+                - Keep headings concise and descriptive
+                
+                ### Text Formatting
+                - Use **bold** for emphasis
+                - Use *italic* for terms or titles
+                - Use consistent formatting throughout the document
+                
+                ### Lists
+                - Use bullet points for unrelated items
+                - Use numbered lists for sequential steps
+                - Keep list items parallel in structure
+                
+                ### Spacing
+                - Use consistent spacing between sections
+                - Add blank lines between paragraphs
+                - Keep paragraph length manageable (5-7 lines maximum)
+            `;
+            
+            // Combine general and format-specific tips
+            const content = generalTips + (formatSpecificTips ? '\n' + formatSpecificTips : '');
+            
+            // Default suggestions if no format-specific ones are available
+            const defaultSuggestions = [
+                'Help me with tables',
+                'How do I add images?',
+                'Show me code block formatting',
+                'How to create a table of contents'
+            ];
+            
+            // Choose which suggestions to use
+            const suggestions = formatSpecificSuggestions.length > 0 ? formatSpecificSuggestions : defaultSuggestions;
+            
+            // Create the formatting message
+            const formattingMessage: AssistantMessage = {
+                id: crypto.randomUUID(),
+                content: content,
+                timestamp: new Date(),
+                type: 'assistant',
+                suggestions: suggestions
+            };
             
             // Hide typing indicator
             this._panel.webview.postMessage({
                 command: 'hideTypingIndicator'
             });
             
-            const formattingMessage: AssistantMessage = {
-                id: crypto.randomUUID(),
-                content: `
-                    Here are some formatting tips for your document:
-                    
-                    ## Headings
-                    - Use # for main headings
-                    - Use ## for subheadings
-                    - Use ### for sub-subheadings
-                    
-                    ## Emphasis
-                    - Use *italic* or _italic_ for italic text
-                    - Use **bold** or __bold__ for bold text
-                    
-                    ## Lists
-                    - Use - or * for bullet points
-                    - Use 1. 2. 3. for numbered lists
-                    
-                    ## Links
-                    - Use [link text](URL) for links
-                    
-                    What specific formatting would you like help with?
-                `,
-                timestamp: new Date(),
-                type: 'assistant',
-                suggestions: [
-                    'Help me with tables',
-                    'How do I add images?',
-                    'Show me code block formatting',
-                    'How to create a table of contents'
-                ]
-            };
-            
+            // Send the message
             this._panel.webview.postMessage({
                 command: 'addMessage',
                 message: formattingMessage
@@ -574,7 +1367,32 @@ export class DocumentAssistant {
             
             // Save to conversation history
             this._conversationHistory.addMessage(formattingMessage);
-        }, 1000);
+        } catch (error) {
+            console.error('Error providing formatting help:', error);
+            
+            if (this._panel) {
+                // Hide typing indicator
+                this._panel.webview.postMessage({
+                    command: 'hideTypingIndicator'
+                });
+                
+                // Send error message
+                const errorMessage: AssistantMessage = {
+                    id: crypto.randomUUID(),
+                    content: 'I apologize, but I encountered an error while providing formatting help. Let me know if you have specific formatting questions.',
+                    timestamp: new Date(),
+                    type: 'assistant'
+                };
+                
+                this._panel.webview.postMessage({
+                    command: 'addMessage',
+                    message: errorMessage
+                });
+                
+                // Save to conversation history
+                this._conversationHistory.addMessage(errorMessage);
+            }
+        }
     }
     
     /**
@@ -723,6 +1541,21 @@ export class DocumentAssistant {
                     case 'insertSection':
                         // Insert a new section into the document
                         this._insertSectionIntoDocument(message.section);
+                        break;
+                        
+                    case 'showPreview':
+                        // Show document preview
+                        this._showDocumentPreview(message.format);
+                        break;
+                        
+                    case 'exportDocument':
+                        // Export document to the specified format
+                        this._exportDocument(message.format);
+                        break;
+                        
+                    case 'printDocument':
+                        // Print the document
+                        this._printDocument();
                         break;
                         
                     case 'requestHistory':

@@ -200,6 +200,7 @@
     "express": "^4.18.2",
     "handlebars": "^4.7.8",
     "jsdom": "^26.1.0",
+    "mammoth": "^1.9.1",
     "marked": "^15.0.12",
     "pizzip": "^3.1.4",
     "puppeteer": "^24.10.0",

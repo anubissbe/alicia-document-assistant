@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { DocumentService } from '../services/documentService';
 import { FormatProcessor, DocumentFormat } from '../core/formatProcessor';
+import { PreviewEnhancer } from '../utils/previewEnhancer';
 
 /**
  * Get a nonce to use in HTML to avoid script injection attacks
@@ -24,6 +25,21 @@ interface DocumentEditorState {
     viewMode: 'edit' | 'preview';
     previewFormat?: string;
     previewContent?: string;
+    lastEdited?: number;
+}
+
+/**
+ * Webview persistent state
+ */
+interface WebviewPersistentState {
+    documentPath?: string;
+    documentTitle?: string;
+    documentType?: string;
+    content?: string;
+    viewMode: 'edit' | 'preview';
+    previewFormat?: string;
+    previewContent?: string;
+    lastEdited?: number;
 }
 
 /**
@@ -36,10 +52,15 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
     private _extensionUri: vscode.Uri;
     private _documentService: DocumentService;
     private _formatProcessor: FormatProcessor;
+    private _previewEnhancer: PreviewEnhancer;
     private _state: DocumentEditorState = {
         isModified: false,
         viewMode: 'edit'
     };
+    
+    // Static storage for persisting state across extension restarts
+    private static readonly _stateStorage = new Map<string, WebviewPersistentState>();
+    private _storageKey: string = 'default';
     
     /**
      * Constructor
@@ -55,6 +76,10 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
         this._extensionUri = extensionUri;
         this._documentService = documentService;
         this._formatProcessor = formatProcessor;
+        this._previewEnhancer = PreviewEnhancer.getInstance(extensionUri);
+        
+        // Generate a unique storage key for this instance
+        this._storageKey = `documentEditor_${Date.now()}`;
         
         // Register commands
         this._registerCommands();
@@ -110,6 +135,9 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             ]
         };
         
+        // Try to restore persistent state
+        this._tryRestorePersistentState();
+        
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
         
         this._setWebviewMessageListener(webviewView.webview);
@@ -119,14 +147,24 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             if (webviewView.visible) {
                 webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
                 
-                // Update document content if available
+                // Request state restoration from webview
+                setTimeout(() => {
+                    if (webviewView.webview) {
+                        webviewView.webview.postMessage({
+                            command: 'restoreState'
+                        });
+                    }
+                }, 200);
+                
+                // As fallback, also send our version of state
                 if (this._state.documentContent) {
                     webviewView.webview.postMessage({
                         command: 'updateContent',
                         content: this._state.documentContent,
                         title: this._state.documentTitle,
                         type: this._state.documentType,
-                        viewMode: this._state.viewMode
+                        viewMode: this._state.viewMode,
+                        path: this._state.documentPath
                     });
                 }
             }
@@ -148,6 +186,15 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             vscode.Uri.joinPath(this._extensionUri, 'media', 'documentEditor.css')
         );
         
+        // Get responsive styles and preview enhancer script
+        const responsiveStyleUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'media', 'responsive.css')
+        );
+        
+        const previewEnhancerUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'media', 'previewEnhancer.js')
+        );
+        
         // Use a nonce to whitelist which scripts can be run
         const nonce = getNonce();
         
@@ -158,6 +205,7 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} https: data:;">
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
             <link href="${styleUri}" rel="stylesheet">
+            <link href="${responsiveStyleUri}" rel="stylesheet">
             <title>Document Editor</title>
         </head>
         <body>
@@ -227,6 +275,7 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             </div>
             
             <script nonce="${nonce}" src="${scriptUri}"></script>
+            <script nonce="${nonce}" src="${previewEnhancerUri}"></script>
         </body>
         </html>`;
     }
@@ -243,6 +292,7 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
                         // Update the content in state
                         this._state.documentContent = message.content;
                         this._state.isModified = true;
+                        this._state.lastEdited = Date.now();
                         break;
                         
                     case 'saveDocument':
@@ -269,11 +319,138 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
                     case 'refreshPreview':
                         await this._refreshPreview(message.format);
                         break;
+                        
+                    case 'persistState':
+                        // Handle state persistence from webview
+                        if (message.state) {
+                            this._persistWebviewState(message.state);
+                        }
+                        break;
+                        
+                    case 'stateRestored':
+                        // Webview has restored its state, synchronize with our state
+                        if (message.state) {
+                            this._synchronizeStateFromWebview(message.state);
+                        }
+                        break;
                 }
             },
             undefined,
             []
         );
+    }
+    
+    /**
+     * Persist webview state for restoration across sessions
+     * @param state The state to persist
+     */
+    private _persistWebviewState(state: WebviewPersistentState): void {
+        // Update our local state
+        if (state.content) {
+            this._state.documentContent = state.content;
+        }
+        
+        if (state.documentTitle) {
+            this._state.documentTitle = state.documentTitle;
+        }
+        
+        if (state.documentPath) {
+            this._state.documentPath = state.documentPath;
+        }
+        
+        if (state.documentType) {
+            this._state.documentType = state.documentType;
+        }
+        
+        this._state.viewMode = state.viewMode;
+        this._state.previewFormat = state.previewFormat;
+        this._state.previewContent = state.previewContent;
+        this._state.lastEdited = state.lastEdited;
+        
+        // Store in the static map for persistence across extension restarts
+        DocumentWebviewProvider._stateStorage.set(this._storageKey, {
+            documentPath: state.documentPath,
+            documentTitle: state.documentTitle,
+            documentType: state.documentType,
+            content: state.content,
+            viewMode: state.viewMode,
+            previewFormat: state.previewFormat,
+            previewContent: state.previewContent,
+            lastEdited: state.lastEdited
+        });
+        
+        // Consider also using VSCode's ExtensionContext.globalState or workspaceState
+        // for persistent storage across VS Code restarts
+    }
+    
+    /**
+     * Synchronize state from webview
+     * @param state The state from webview
+     */
+    private _synchronizeStateFromWebview(state: WebviewPersistentState): void {
+        // Compare timestamps to decide which state is more recent
+        const currentTimestamp = this._state.lastEdited || 0;
+        const webviewTimestamp = state.lastEdited || 0;
+        
+        if (webviewTimestamp > currentTimestamp) {
+            // Webview state is more recent, update our state
+            this._persistWebviewState(state);
+        } else if (webviewTimestamp < currentTimestamp && this._view) {
+            // Our state is more recent, update webview
+            this._view.webview.postMessage({
+                command: 'updateContent',
+                content: this._state.documentContent,
+                title: this._state.documentTitle,
+                type: this._state.documentType,
+                viewMode: this._state.viewMode,
+                path: this._state.documentPath
+            });
+            
+            // If in preview mode, also update preview content
+            if (this._state.viewMode === 'preview' && this._state.previewContent) {
+                this._view.webview.postMessage({
+                    command: 'updatePreview',
+                    content: this._state.previewContent,
+                    format: this._state.previewFormat,
+                    viewMode: this._state.viewMode
+                });
+            }
+        }
+    }
+    
+    /**
+     * Try to restore persistent state
+     */
+    private _tryRestorePersistentState(): void {
+        // Try to get saved state from static storage
+        const savedState = DocumentWebviewProvider._stateStorage.get(this._storageKey);
+        
+        if (savedState) {
+            // Update our state with saved values
+            if (savedState.content) {
+                this._state.documentContent = savedState.content;
+            }
+            
+            if (savedState.documentTitle) {
+                this._state.documentTitle = savedState.documentTitle;
+            }
+            
+            if (savedState.documentPath) {
+                this._state.documentPath = savedState.documentPath;
+            }
+            
+            if (savedState.documentType) {
+                this._state.documentType = savedState.documentType;
+            }
+            
+            this._state.viewMode = savedState.viewMode;
+            this._state.previewFormat = savedState.previewFormat;
+            this._state.previewContent = savedState.previewContent;
+            this._state.lastEdited = savedState.lastEdited;
+            
+            // Document is not modified after restoration
+            this._state.isModified = false;
+        }
     }
     
     /**
@@ -316,59 +493,98 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
     }
     
     /**
-     * Create a new document
+     * Generate preview content in the specified format
+     * @param format The format to preview
      */
-    private _createNewDocument(): void {
-        if (!this._view) {
+    private async _generatePreview(format: string): Promise<void> {
+        if (!this._view || !this._state.documentContent) {
             return;
         }
         
-        // Check if there are unsaved changes
-        if (this._state.isModified) {
-            vscode.window.showWarningMessage(
-                'You have unsaved changes. Do you want to save them before creating a new document?',
-                'Save',
-                'Discard',
-                'Cancel'
-            ).then(async (selection) => {
-                if (selection === 'Save') {
-                    await this._saveDocument();
-                    this._initNewDocument();
-                } else if (selection === 'Discard') {
-                    this._initNewDocument();
-                }
-                // If 'Cancel', do nothing
+        try {
+            // Show loading indicator with animation
+            const loadingHtml = this._view.webview ? this._previewEnhancer.getPreviewLoadingHtml(
+                this._view.webview,
+                `Generating ${format.toUpperCase()} preview...`
+            ) : `<div>Loading...</div>`;
+            
+            this._view.webview.postMessage({
+                command: 'updatePreview',
+                content: loadingHtml,
+                viewMode: this._state.viewMode,
+                documentType: this._state.documentType
             });
-        } else {
-            this._initNewDocument();
+            
+            // Process the content based on document type and target format
+            const sourceFormat = this._getDocumentFormatEnum(this._state.documentType || 'markdown');
+            const targetFormat = this._getDocumentFormatEnum(format);
+            
+            // Add timeout handling for preview generation
+            const timeoutPromise = new Promise<string>((_, reject) => {
+                setTimeout(() => reject(new Error('Preview generation timed out')), 10000);
+            });
+            
+            const conversionPromise = this._formatProcessor.processContent(
+                this._state.documentContent,
+                sourceFormat,
+                targetFormat
+            );
+            
+            // Race between conversion and timeout
+            let previewContent = await Promise.race([conversionPromise, timeoutPromise]) as string;
+            
+            // Apply additional processing based on format
+            if (format.toLowerCase() === 'pdf') {
+                previewContent = this._enhancePdfPreview(previewContent);
+            } else if (format.toLowerCase() === 'docx') {
+                previewContent = this._enhanceDocxPreview(previewContent);
+            }
+            
+            // Apply format-specific wrapping and styling
+            const formattedContent = this._formatPreviewContent(previewContent, format);
+            
+            // Update webview with the formatted content
+            this._view.webview.postMessage({
+                command: 'updatePreview',
+                content: formattedContent,
+                viewMode: this._state.viewMode,
+                documentType: this._state.documentType,
+                format: format
+            });
+            
+            // Save preview state
+            this._state.previewFormat = format;
+            this._state.previewContent = formattedContent;
+            
+            // Persist state with preview content
+            this._persistWebviewState({
+                documentPath: this._state.documentPath,
+                documentTitle: this._state.documentTitle,
+                documentType: this._state.documentType,
+                content: this._state.documentContent,
+                viewMode: this._state.viewMode,
+                previewFormat: format,
+                previewContent: formattedContent,
+                lastEdited: Date.now()
+            });
+            
+        } catch (error) {
+            console.error('Error generating preview:', error);
+            
+            // Create error message with the PreviewEnhancer
+            const errorHtml = this._view.webview ? this._previewEnhancer.getPreviewErrorHtml(
+                this._view.webview,
+                `Preview Error`,
+                `Error generating ${format} preview: ${error instanceof Error ? error.message : 'Unknown error'}. 
+                Try a different format or check your document structure.`
+            ) : `<div>Error generating preview</div>`;
+            
+            // Send error message to webview
+            this._view.webview.postMessage({
+                command: 'previewError',
+                error: errorHtml
+            });
         }
-    }
-    
-    /**
-     * Initialize a new document
-     */
-    private _initNewDocument(): void {
-        if (!this._view) {
-            return;
-        }
-        
-        // Create new document state
-        this._state = {
-            documentContent: '',
-            documentTitle: 'Untitled Document',
-            documentType: 'markdown',
-            isModified: false,
-            viewMode: 'edit'
-        };
-        
-        // Update webview
-        this._view.webview.postMessage({
-            command: 'updateContent',
-            content: '',
-            title: this._state.documentTitle,
-            type: this._state.documentType,
-            viewMode: 'edit'
-        });
     }
     
     /**
@@ -380,14 +596,14 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
         }
         
         try {
-            // If no document path, prompt for save location
+            // If documentPath is not set, prompt for save location
             if (!this._state.documentPath) {
                 const fileUri = await vscode.window.showSaveDialog({
-                    defaultUri: vscode.Uri.file(this._state.documentTitle || 'Untitled Document'),
+                    defaultUri: vscode.Uri.file(`${this._state.documentTitle || 'Untitled Document'}.md`),
                     filters: {
                         'Markdown': ['md'],
-                        'Text': ['txt'],
-                        'All Files': ['*']
+                        'HTML': ['html'],
+                        'Text': ['txt']
                     },
                     title: 'Save Document'
                 });
@@ -397,8 +613,7 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
                 }
                 
                 this._state.documentPath = fileUri.fsPath;
-                this._state.documentTitle = path.basename(fileUri.fsPath, path.extname(fileUri.fsPath));
-                this._state.documentType = path.extname(fileUri.fsPath).slice(1);
+                this._state.documentType = path.extname(fileUri.fsPath).slice(1) || 'md';
             }
             
             // Save the document
@@ -417,6 +632,21 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
                 command: 'documentSaved',
                 path: this._state.documentPath,
                 title: this._state.documentTitle
+            });
+            
+            // Update last edited timestamp
+            this._state.lastEdited = Date.now();
+            
+            // Update persistent state
+            this._persistWebviewState({
+                documentPath: this._state.documentPath,
+                documentTitle: this._state.documentTitle,
+                documentType: this._state.documentType,
+                content: this._state.documentContent,
+                viewMode: this._state.viewMode,
+                previewFormat: this._state.previewFormat,
+                previewContent: this._state.previewContent,
+                lastEdited: this._state.lastEdited
             });
             
             vscode.window.showInformationMessage(`Saved ${this._state.documentTitle}`);
@@ -466,135 +696,131 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
     }
     
     /**
-     * Generate preview content in the specified format
-     * @param format The target format for preview
+     * Create a new empty document
      */
-    private async _generatePreview(format: string): Promise<void> {
-        if (!this._view || !this._state.documentContent) {
+    private _createNewDocument(): void {
+        if (!this._view) {
             return;
         }
         
-        try {
-            // Show loading indicator
-            this._view.webview.postMessage({
-                command: 'updatePreview',
-                content: '<div class="preview-loading">Generating preview...</div>',
-                viewMode: this._state.viewMode,
-                documentType: this._state.documentType
+        // Check if there are unsaved changes
+        if (this._state.isModified) {
+            vscode.window.showWarningMessage(
+                'You have unsaved changes. Do you want to save them before creating a new document?',
+                'Save', 'Discard', 'Cancel'
+            ).then(async (selection) => {
+                if (selection === 'Save') {
+                    await this._saveDocument();
+                    this._resetDocument();
+                } else if (selection === 'Discard') {
+                    this._resetDocument();
+                }
+                // If 'Cancel', do nothing
             });
-            
-            // Process the content based on document type and target format
-            const sourceFormat = this._getDocumentFormatEnum(this._state.documentType || 'markdown');
-            const targetFormat = this._getDocumentFormatEnum(format);
-            
-            // Get the raw converted content
-            let previewContent = await this._formatProcessor.processContent(
-                this._state.documentContent,
-                sourceFormat,
-                targetFormat
-            );
-            
-            // Apply format-specific wrapping and styling
-            const formattedContent = this._formatPreviewContent(previewContent, format);
-            
-            // Update webview with the formatted content
-            this._view.webview.postMessage({
-                command: 'updatePreview',
-                content: formattedContent,
-                viewMode: this._state.viewMode,
-                documentType: this._state.documentType,
-                format: format
-            });
-            
-            // Save preview state
-            this._state.previewFormat = format;
-            this._state.previewContent = formattedContent;
-        } catch (error) {
-            console.error('Error generating preview:', error);
-            
-            // Send error message to webview
-            this._view.webview.postMessage({
-                command: 'previewError',
-                error: error instanceof Error ? error.message : 'Unknown error generating preview'
-            });
+        } else {
+            this._resetDocument();
         }
     }
     
     /**
-     * Format preview content based on document format
-     * @param content The raw content
+     * Reset the document to an empty state
+     */
+    private _resetDocument(): void {
+        if (!this._view) {
+            return;
+        }
+        
+        // Reset state to a new document
+        this._state = {
+            documentContent: '',
+            documentTitle: 'Untitled Document',
+            documentType: 'markdown', // Default to markdown
+            isModified: false,
+            viewMode: 'edit'
+        };
+        
+        // Update webview
+        this._view.webview.postMessage({
+            command: 'updateContent',
+            content: '',
+            title: this._state.documentTitle,
+            type: this._state.documentType,
+            viewMode: this._state.viewMode
+        });
+        
+        // Update persistent state
+        this._persistWebviewState({
+            documentTitle: this._state.documentTitle,
+            documentType: this._state.documentType,
+            content: this._state.documentContent,
+            viewMode: this._state.viewMode,
+            lastEdited: Date.now()
+        });
+    }
+    
+    /**
+     * Format preview content with appropriate styling
+     * @param content Raw HTML content
      * @param format The target format
-     * @returns Formatted HTML content for the preview
+     * @returns Formatted HTML content
      */
     private _formatPreviewContent(content: string, format: string): string {
-        // Format-specific classes and styling
-        const formatClass = `preview-format-${format.toLowerCase()}`;
+        // Create a temporary panel for preview
+        let formattedContent = content;
         
-        switch (format.toLowerCase()) {
-            case 'pdf':
-                // For PDF format, display a PDF-like container
-                return `<div class="${formatClass}">
-                    <div class="preview-content">
-                        ${this._enhancePreviewContent(content)}
-                    </div>
-                </div>`;
-                
-            case 'docx':
-                // For DOCX format, display a Word-like container
-                return `<div class="${formatClass}">
-                    <div class="preview-content">
-                        ${this._enhancePreviewContent(content)}
-                    </div>
-                </div>`;
-                
-            case 'html':
-                // For HTML, render the content directly with enhancement
-                return `<div class="${formatClass}">
-                    ${this._enhancePreviewContent(content)}
-                </div>`;
-                
-            case 'markdown':
-                // For Markdown in preview mode, render as HTML with proper styling
-                const htmlContent = this._formatProcessor.processContent(
-                    content,
-                    DocumentFormat.MARKDOWN,
-                    DocumentFormat.HTML
-                );
-                return `<div class="${formatClass}">
-                    ${this._enhancePreviewContent(htmlContent)}
-                </div>`;
-                
-            default:
-                // For other formats like plain text, display in a pre tag
-                return `<div class="${formatClass}">
-                    <pre class="preview-content-raw">${this._escapeHtml(content)}</pre>
-                </div>`;
+        // For responsive container, we need the webview
+        if (this._view) {
+            // Get format-specific title and class
+            const formatTitle = `${format.charAt(0).toUpperCase() + format.slice(1)} Preview`;
+            const formatClass = `${format.toLowerCase()}-preview`;
+            
+            // Wrap in responsive container
+            formattedContent = this._previewEnhancer.getResponsivePreviewContainer(
+                content,
+                { 
+                    className: formatClass,
+                    title: formatTitle,
+                    showHeader: true
+                }
+            );
         }
+        
+        return formattedContent;
     }
     
     /**
-     * Change the preview format
-     * @param format The new format to preview
+     * Enhance PDF preview with specific styling
+     * @param content HTML content for the PDF preview
+     * @returns Enhanced HTML content
      */
-    private async _changePreviewFormat(format: string): Promise<void> {
-        if (!this._view || !this._state.documentContent || this._state.viewMode !== 'preview') {
-            return;
-        }
-        
-        try {
-            await this._generatePreview(format);
-            
-            // Update the format selector
-            this._view.webview.postMessage({
-                command: 'previewFormatChanged',
-                format: format,
-                content: this._state.previewContent
-            });
-        } catch (error) {
-            console.error('Error changing preview format:', error);
-            vscode.window.showErrorMessage(`Error changing preview format: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        }
+    private _enhancePdfPreview(content: string): string {
+        // Add PDF-specific page styling
+        return `<div class="pdf-preview">
+            <div class="pdf-page">
+                <div class="pdf-content">
+                    ${content}
+                </div>
+                <div class="pdf-page-number">1</div>
+            </div>
+        </div>`;
     }
+    
+    /**
+     * Enhance DOCX preview with Word-like styling
+     * @param content HTML content for the DOCX preview
+     * @returns Enhanced HTML content
+     */
+    private _enhanceDocxPreview(content: string): string {
+        // Add Word-like styling
+        return `<div class="docx-preview">
+            <div class="docx-page">
+                <div class="docx-content">
+                    ${content}
+                </div>
+            </div>
+        </div>`;
+    }
+    
     
     /**
      * Refresh the preview with the current content
@@ -612,63 +838,6 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             console.error('Error refreshing preview:', error);
             vscode.window.showErrorMessage(`Error refreshing preview: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-    }
-    
-    /**
-     * Enhance preview content with additional styling and features
-     * @param content The HTML content to enhance
-     * @returns Enhanced HTML content
-     */
-    private _enhancePreviewContent(content: string): string {
-        // Add syntax highlighting for code blocks
-        let enhancedContent = content.replace(
-            /<pre><code class="language-([a-zA-Z0-9]+)">([\s\S]*?)<\/code><\/pre>/g,
-            '<pre class="code-block language-$1"><code>$2</code></pre>'
-        );
-        
-        // Wrap tables in a container for better responsive behavior
-        enhancedContent = enhancedContent.replace(
-            /(<table[\s\S]*?<\/table>)/g,
-            '<div class="table-container">$1</div>'
-        );
-        
-        // Add image responsive behavior
-        enhancedContent = enhancedContent.replace(
-            /(<img[^>]*)(>)/g,
-            '$1 class="responsive-image"$2'
-        );
-        
-        // Add anchor styling
-        enhancedContent = enhancedContent.replace(
-            /(<a[^>]*)(>)/g,
-            '$1 class="preview-link"$2'
-        );
-        
-        // Process mathematical expressions if present (e.g., LaTeX)
-        enhancedContent = this._processMathExpressions(enhancedContent);
-        
-        return enhancedContent;
-    }
-    
-    /**
-     * Process mathematical expressions in content
-     * @param content HTML content that may contain math expressions
-     * @returns Content with properly formatted math expressions
-     */
-    private _processMathExpressions(content: string): string {
-        // Detect and format inline math expressions $...$
-        let processedContent = content.replace(
-            /\$([^$\n]+)\$/g,
-            '<span class="math-inline">$1</span>'
-        );
-        
-        // Detect and format block math expressions $$...$$
-        processedContent = processedContent.replace(
-            /\$\$([^$]+)\$\$/g,
-            '<div class="math-block">$1</div>'
-        );
-        
-        return processedContent;
     }
     
     /**
@@ -755,9 +924,14 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
         
         try {
             // Show a notification that format is changing
+            const loadingHtml = this._view.webview ? this._previewEnhancer.getPreviewLoadingHtml(
+                this._view.webview,
+                `Changing preview to ${format.toUpperCase()} format...`
+            ) : `<div>Loading...</div>`;
+            
             this._view.webview.postMessage({
                 command: 'updatePreview',
-                content: `<div class="preview-loading">Changing preview to ${format.toUpperCase()} format...</div>`,
+                content: loadingHtml,
                 viewMode: this._state.viewMode,
                 documentType: this._state.documentType
             });
@@ -778,42 +952,6 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             console.error('Error changing preview format:', error);
             vscode.window.showErrorMessage(`Error changing preview format: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-    }
-    
-    /**
-     * Update the document content
-     * @param content The new content
-     */
-    public updateContent(content: string): void {
-        if (!this._view) {
-            return;
-        }
-        
-        this._state.documentContent = content;
-        this._state.isModified = true;
-        
-        // Update editor content
-        this._view.webview.postMessage({
-            command: 'updateContent',
-            content: content,
-            title: this._state.documentTitle,
-            type: this._state.documentType,
-            viewMode: this._state.viewMode
-        });
-        
-        // If in preview mode, update the preview as well
-        if (this._state.viewMode === 'preview' && this._state.previewFormat) {
-            // Don't wait for the promise to resolve
-            this._refreshPreview(this._state.previewFormat);
-        }
-    }
-    
-    /**
-     * Get the current document content
-     * @returns The document content
-     */
-    public getContent(): string | undefined {
-        return this._state.documentContent;
     }
     
     /**
