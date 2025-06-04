@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { BaseMCPTool, MCPToolResponse } from '../mcpTool';
-import { ChartGenerator, ChartConfig } from '../../core/chartGenerator';
+import { ChartGenerator, ChartData, ChartOptions } from '../../core/chartGenerator';
 
 /**
  * Tool to generate charts for documents
@@ -103,20 +103,22 @@ export class GenerateChartTool extends BaseMCPTool {
         height?: number;
     }): Promise<MCPToolResponse> {
         try {
-            // Create chart configuration
-            const config: ChartConfig = {
+            // Create chart data
+            const chartData: ChartData = {
+                labels: args.labels,
+                datasets: args.datasets
+            };
+
+            // Create chart options
+            const chartOptions: ChartOptions = {
                 type: args.chartType,
-                data: {
-                    labels: args.labels,
-                    datasets: args.datasets
-                },
                 title: args.title,
                 width: args.width,
                 height: args.height
             };
 
             // Generate the chart
-            const chartPath = await this.chartGenerator.generateChart(config);
+            const chartPath = await this.chartGenerator.generateChart(chartData, chartOptions);
 
             // Return the chart information
             return {

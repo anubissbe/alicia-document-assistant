@@ -109,7 +109,7 @@ export class FormatProcessor {
         }
     }
 
-    private async formatMarkdown(content: string, options: FormatOptions): Promise<string> {
+    private async formatMarkdown(content: string, _options: FormatOptions): Promise<string> {
         // Apply markdown-specific formatting
         let formatted = content;
 

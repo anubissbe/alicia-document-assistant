@@ -776,7 +776,7 @@ export class AIDocumentGenerator {
 
             // Check if any tags match keywords
             if (template.metadata && template.metadata.tags) {
-                const matchingTags = template.metadata.tags.filter(tag => 
+                const matchingTags = template.metadata.tags.filter((tag: string) => 
                     documentType.keywords.includes(tag.toLowerCase()));
                 
                 if (matchingTags.length > 0) {
@@ -843,10 +843,11 @@ export class AIDocumentGenerator {
     public generateSectionContent(
         documentType: DocumentType, 
         sectionName: string,
-        context?: { [key: string]: any }
+        _context?: { [key: string]: any }
     ): string {
         // This is a simplified implementation - in a real application, this would use
         // AI APIs like OpenAI to generate more sophisticated content
+        // Context parameter is available for future enhancement
         
         // For Phase 1, return placeholder content based on section name and document type
         const placeholders: Record<string, Record<string, string>> = {

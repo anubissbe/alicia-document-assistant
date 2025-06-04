@@ -75,8 +75,8 @@ export class MCPServerConfigManager {
             host: config.get<string>('host', DEFAULT_MCP_SERVER_CONFIG.host),
             authToken: config.get<string>('authToken'),
             env: config.get<Record<string, string>>('env'),
-            maxConcurrentRequests: config.get<number>('maxConcurrentRequests', DEFAULT_MCP_SERVER_CONFIG.maxConcurrentRequests),
-            requestTimeout: config.get<number>('requestTimeout', DEFAULT_MCP_SERVER_CONFIG.requestTimeout),
+            maxConcurrentRequests: config.get<number>('maxConcurrentRequests') ?? DEFAULT_MCP_SERVER_CONFIG.maxConcurrentRequests,
+            requestTimeout: config.get<number>('requestTimeout') ?? DEFAULT_MCP_SERVER_CONFIG.requestTimeout,
             pluginsPath: config.get<string>('pluginsPath')
         };
     }

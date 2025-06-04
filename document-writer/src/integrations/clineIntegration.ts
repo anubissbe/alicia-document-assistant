@@ -51,7 +51,7 @@ export class ClineIntegration implements vscode.Disposable {
         // Create service instances
         const documentService = new DocumentService();
         const templateEngine = new TemplateEngine(this.context);
-        const chartGenerator = new ChartGenerator(this.context);
+        const chartGenerator = new ChartGenerator();
 
         // Register the document analysis tool
         this.registerTool(new AnalyzeDocumentTool());
@@ -170,7 +170,7 @@ export class ClineIntegration implements vscode.Disposable {
      * @param req HTTP request
      * @param res HTTP response
      */
-    private async handleListTools(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+    private async handleListTools(_req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
         // Collect information about registered tools
         const toolsInfo = Array.from(this.tools.values()).map(tool => ({
             name: tool.name,

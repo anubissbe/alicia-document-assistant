@@ -80,7 +80,7 @@ export class ContentSuggestionEngine {
     }
 
     private async generateSuggestions(
-        prompt: string,
+        _prompt: string,
         entities: Map<string, string>,
         keywords: string[],
         sentiment: string,
@@ -130,7 +130,7 @@ export class ContentSuggestionEngine {
     private async generateDocumentTypeSuggestions(
         documentType: string,
         entities: Map<string, string>,
-        options: SuggestionOptions
+        _options: SuggestionOptions
     ): Promise<ContentSuggestion[]> {
         const suggestions: ContentSuggestion[] = [];
 
@@ -192,8 +192,8 @@ export class ContentSuggestionEngine {
 
     private async generatePurposeSuggestions(
         purpose: string,
-        keywords: string[],
-        options: SuggestionOptions
+        _keywords: string[],
+        _options: SuggestionOptions
     ): Promise<ContentSuggestion[]> {
         const suggestions: ContentSuggestion[] = [];
 
@@ -237,8 +237,8 @@ export class ContentSuggestionEngine {
 
     private async generateToneSuggestions(
         tone: string,
-        sentiment: string,
-        options: SuggestionOptions
+        _sentiment: string,
+        _options: SuggestionOptions
     ): Promise<ContentSuggestion[]> {
         const suggestions: ContentSuggestion[] = [];
 
@@ -282,8 +282,8 @@ export class ContentSuggestionEngine {
 
     private async generateContextSuggestions(
         context: string,
-        keywords: string[],
-        options: SuggestionOptions
+        _keywords: string[],
+        _options: SuggestionOptions
     ): Promise<ContentSuggestion[]> {
         // Generate suggestions based on provided context
         const suggestions: ContentSuggestion[] = [];
@@ -330,5 +330,84 @@ export class ContentSuggestionEngine {
 
         // Limit number of suggestions
         return filtered.slice(0, options.maxSuggestions || this.defaultOptions.maxSuggestions);
+    }
+
+    /**
+     * Generate a response based on a message and conversation history
+     * @param message The user message
+     * @param historyMessages Previous conversation messages
+     * @param entities Optional extracted entities
+     * @returns Generated response
+     */
+    async generateResponse(
+        message: string,
+        _historyMessages: HistoryMessage[] = [],
+        entities?: Array<{name: string, value: string, type: string}>
+    ): Promise<string> {
+        // Simple response generation based on message content
+        // In a real implementation, this would use an AI model
+        const lowerMessage = message.toLowerCase();
+        
+        // Check if entities provide context for the response
+        const entityContext = entities && entities.length > 0 
+            ? ` I can see you're referring to ${entities.map(e => e.value).join(', ')}.`
+            : '';
+        
+        // Generate response based on message content
+        if (lowerMessage.includes('help') || lowerMessage.includes('how')) {
+            return `I'm here to help! ${entityContext} What specific assistance do you need with your document?`;
+        } else if (lowerMessage.includes('error') || lowerMessage.includes('problem')) {
+            return `I understand you're experiencing difficulties.${entityContext} Let me help you resolve this issue. Can you provide more details about what's happening?`;
+        } else if (lowerMessage.includes('thank')) {
+            return `You're welcome!${entityContext} I'm glad I could help. Is there anything else you'd like assistance with?`;
+        } else if (lowerMessage.includes('improve') || lowerMessage.includes('better')) {
+            return `Great question about improvements!${entityContext} I can suggest several ways to enhance your document. Would you like me to analyze specific aspects like structure, readability, or content?`;
+        } else {
+            return `I understand your question.${entityContext} Let me provide you with helpful information and suggestions.`;
+        }
+    }
+
+    /**
+     * Generate suggestions for a given message and context
+     * @param message The user message
+     * @param historyMessages Previous conversation messages
+     * @returns Array of suggestion strings
+     */
+    public async generateSuggestions(
+        message: string,
+        _historyMessages: HistoryMessage[] = []
+    ): Promise<string[]> {
+        const lowerMessage = message.toLowerCase();
+        
+        // Generate suggestions based on message content
+        if (lowerMessage.includes('analyze') || lowerMessage.includes('check')) {
+            return [
+                'Show document statistics',
+                'Check readability score',
+                'Review document structure',
+                'Analyze writing style'
+            ];
+        } else if (lowerMessage.includes('improve') || lowerMessage.includes('better')) {
+            return [
+                'Suggest better word choices',
+                'Improve sentence structure',
+                'Enhance document flow',
+                'Add missing sections'
+            ];
+        } else if (lowerMessage.includes('format') || lowerMessage.includes('style')) {
+            return [
+                'Fix paragraph spacing',
+                'Improve heading structure',
+                'Adjust font styles',
+                'Standardize formatting'
+            ];
+        } else {
+            return [
+                'Analyze this document',
+                'Suggest improvements',
+                'Help with formatting',
+                'Create a new section'
+            ];
+        }
     }
 }

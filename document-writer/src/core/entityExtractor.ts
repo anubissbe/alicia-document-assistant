@@ -1,3 +1,5 @@
+export type MessageIntent = 'analyze_document' | 'suggest_improvements' | 'help_formatting' | 'create_section' | 'general_question';
+
 export class EntityExtractor {
     private readonly intents = new Set([
         'create',
@@ -37,7 +39,7 @@ export class EntityExtractor {
         /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s\d{1,2},\s\d{4}/i   // Mon DD, YYYY
     ];
 
-    async extractIntent(text: string): Promise<string> {
+    async extractIntent(text: string): Promise<MessageIntent> {
         try {
             if (!text || typeof text !== 'string') {
                 throw new Error('Invalid input: text must be a non-empty string');
@@ -45,33 +47,18 @@ export class EntityExtractor {
 
             const lowercaseText = text.toLowerCase();
             
-            // Check for explicit intent keywords
-            for (const intent of this.intents) {
-                if (lowercaseText.includes(intent)) {
-                    return intent;
-                }
+            // Map text patterns to MessageIntent values
+            if (lowercaseText.includes('analyze') || lowercaseText.includes('check') || lowercaseText.includes('review')) {
+                return 'analyze_document';
+            } else if (lowercaseText.includes('improve') || lowercaseText.includes('suggestion') || lowercaseText.includes('better')) {
+                return 'suggest_improvements';
+            } else if (lowercaseText.includes('format') || lowercaseText.includes('style') || lowercaseText.includes('layout')) {
+                return 'help_formatting';
+            } else if (lowercaseText.includes('section') || lowercaseText.includes('create') || lowercaseText.includes('add')) {
+                return 'create_section';
+            } else {
+                return 'general_question';
             }
-
-            // Infer intent from context with expanded keywords
-            const intentPatterns = {
-                create: ['new', 'write', 'start', 'generate', 'make', 'compose'],
-                update: ['edit', 'modify', 'revise', 'change', 'update', 'amend'],
-                delete: ['remove', 'erase', 'delete', 'destroy', 'clear'],
-                view: ['show', 'display', 'open', 'see', 'read', 'preview'],
-                export: ['export', 'download', 'save', 'extract'],
-                import: ['import', 'upload', 'load'],
-                share: ['share', 'send', 'distribute', 'publish'],
-                print: ['print', 'output', 'render']
-            };
-
-            for (const [intent, patterns] of Object.entries(intentPatterns)) {
-                if (patterns.some(pattern => lowercaseText.includes(pattern))) {
-                    return intent;
-                }
-            }
-
-            // Default to 'view' if no intent is detected
-            return 'view';
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
             throw new Error(`Failed to extract intent: ${errorMessage}`);
@@ -307,6 +294,31 @@ export class EntityExtractor {
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
             throw new Error(`Failed to analyze complexity: ${errorMessage}`);
+        }
+    }
+
+    /**
+     * Extract simplified entities that return an array instead of a Map
+     * @param text The text to extract entities from
+     * @returns Array of entities
+     */
+    async extractSimplifiedEntities(text: string): Promise<Array<{name: string, value: string, type: string}>> {
+        try {
+            const entitiesMap = await this.extractEntities(text);
+            const entities: Array<{name: string, value: string, type: string}> = [];
+            
+            for (const [name, value] of entitiesMap.entries()) {
+                entities.push({
+                    name,
+                    value,
+                    type: name
+                });
+            }
+            
+            return entities;
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new Error(`Failed to extract simplified entities: ${errorMessage}`);
         }
     }
 }

@@ -523,7 +523,7 @@ export class PreviewOptionsManager {
      */
     public async resetOptionsForDocument(
         documentUri: vscode.Uri,
-        format: DocumentFormat
+        _format: DocumentFormat
     ): Promise<boolean> {
         const uriString = documentUri.toString();
         

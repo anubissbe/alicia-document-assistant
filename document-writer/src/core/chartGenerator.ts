@@ -1,21 +1,18 @@
-// Types only imports
-import type { Chart, ChartConfiguration } from 'chart.js';
-import type { Canvas, CanvasRenderingContext2D } from 'canvas';
-import type PDFKit from 'pdfkit';
-import type { Canvg } from 'canvg';
+// Basic type interfaces for charting functionality
 
 export interface ChartData {
     labels: string[];
     datasets: {
         label: string;
         data: number[];
-        backgroundColor?: string[];
-        borderColor?: string;
+        backgroundColor?: string | string[];
+        borderColor?: string | string[];
         borderWidth?: number;
+        fill?: boolean;
     }[];
 }
 
-export type ChartType = 'bar' | 'line' | 'pie' | 'doughnut' | 'radar';
+export type ChartType = 'bar' | 'line' | 'pie' | 'doughnut' | 'radar' | 'scatter';
 
 export interface ChartOptions {
     type: ChartType;
@@ -125,7 +122,7 @@ export class ChartGenerator {
         return [this.defaultColors[datasetIndex % this.defaultColors.length]];
     }
 
-    private generateChartConfig(data: ChartData, options: ChartOptions): ChartConfiguration<ChartType> {
+    private generateChartConfig(data: ChartData, options: ChartOptions): any {
         const mergedOptions = { ...this.defaultOptions, ...options };
         return {
             type: options.type, // Always use provided type, not from defaults
@@ -152,7 +149,7 @@ export class ChartGenerator {
         };
     }
 
-    private generateChartMarkup(config: ChartConfiguration<ChartType>): string {
+    private generateChartMarkup(config: any): string {
         const chartId = `chart-${Date.now()}`;
         const width = (config as any).width || 600;
         const height = (config as any).height || 400;
@@ -216,7 +213,7 @@ export class ChartGenerator {
         }
     }
 
-    private async convertToPNG(markup: string, config: ChartConfiguration<ChartType> & { width?: number; height?: number }): Promise<Buffer> {
+    private async convertToPNG(_markup: string, config: any): Promise<Buffer> {
         try {
             // Dynamic imports
             const { createCanvas } = await import('canvas');
@@ -236,7 +233,7 @@ export class ChartGenerator {
             
             // Create and render chart
             const ctx = canvas.getContext('2d');
-            const chart = new Chart(ctx as unknown as CanvasRenderingContext2D, config);
+            const chart = new Chart(ctx as any, config);
             
             // Wait for any animations to complete
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -249,7 +246,7 @@ export class ChartGenerator {
         }
     }
 
-    private async convertToSVG(markup: string, config: ChartConfiguration<ChartType> & { width?: number; height?: number }): Promise<Buffer> {
+    private async convertToSVG(_markup: string, config: any): Promise<Buffer> {
         try {
             // Dynamic imports
             const { createCanvas } = await import('canvas');
@@ -270,7 +267,7 @@ export class ChartGenerator {
             
             // Create and render chart
             const ctx = canvas.getContext('2d');
-            const chart = new Chart(ctx as unknown as CanvasRenderingContext2D, config);
+            const chart = new Chart(ctx as any, config);
             
             // Wait for any animations to complete
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -291,7 +288,7 @@ export class ChartGenerator {
         }
     }
 
-    private async convertToPDF(markup: string, config: ChartConfiguration<ChartType> & { width?: number; height?: number }): Promise<Buffer> {
+    private async convertToPDF(markup: string, config: any): Promise<Buffer> {
         try {
             const { default: PDFDocument } = await import('pdfkit');
             

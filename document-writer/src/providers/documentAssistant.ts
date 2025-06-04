@@ -6,7 +6,7 @@ import { EntityExtractor, MessageIntent } from '../core/entityExtractor';
 import { ContentSuggestionEngine } from '../core/contentSuggestionEngine';
 import { FeedbackLearningEngine } from '../core/feedbackLearningEngine';
 import { SentimentAnalyzer, SentimentResult } from '../core/sentimentAnalyzer';
-import { DocumentAnalyzer, DocumentAnalysisResult } from '../core/documentAnalyzer';
+import { DocumentAnalyzer, AnalysisResult } from '../core/documentAnalyzer';
 import { DocumentFormat } from '../models/documentFormat';
 import { DocumentPreviewProvider } from './documentPreviewProvider';
 import { DocumentFormatConverter } from '../utils/documentFormatConverter';
@@ -248,10 +248,10 @@ export class DocumentAssistant {
             }
             
             // Create DocumentAnalyzer instance
-            const documentAnalyzer = new DocumentAnalyzer(this._sentimentAnalyzer);
+            const documentAnalyzer = new DocumentAnalyzer();
             
             // Perform the analysis
-            const analysisResult = await documentAnalyzer.analyzeDocument(content, documentName, format);
+            const analysisResult = await documentAnalyzer.analyzeDocument(content);
             
             // Format the analysis result as a message
             let analysisContent = `
@@ -1000,10 +1000,10 @@ export class DocumentAssistant {
             }
             
             // Create DocumentAnalyzer instance
-            const documentAnalyzer = new DocumentAnalyzer(this._sentimentAnalyzer);
+            const documentAnalyzer = new DocumentAnalyzer();
             
             // Perform the analysis
-            const analysisResult = await documentAnalyzer.analyzeDocument(content, documentName, format);
+            const analysisResult = await documentAnalyzer.analyzeDocument(content);
             
             // Generate dynamic improvement suggestions based on analysis
             let improvementContent = `## Suggested Improvements for ${documentName}\n\n`;

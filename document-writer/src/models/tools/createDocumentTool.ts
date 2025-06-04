@@ -128,7 +128,6 @@ export class CreateDocumentTool extends BaseMCPTool {
                 id: args.templateType,
                 name: args.templateType,
                 description: `Template for ${args.templateType}`,
-                templatePath: templatePath,
                 format: this.getFormatFromPath(templatePath),
                 metadata: {
                     author: 'Document Writer',
@@ -136,17 +135,17 @@ export class CreateDocumentTool extends BaseMCPTool {
                     tags: [args.templateType],
                     category: 'generated'
                 },
-                sections: [],
                 createdAt: new Date(),
                 updatedAt: new Date()
             };
 
             // Generate the document
-            const outputFilePath = await this.documentService.generateDocument(
-                template,
-                documentData,
-                args.outputPath
-            );
+            const outputFilePath = await this.documentService.generateDocument({
+                title: template.name,
+                type: template.format.toLowerCase(),
+                content: JSON.stringify(documentData, null, 2),
+                outputPath: args.outputPath
+            });
 
             // Return the result
             return {
