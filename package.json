@@ -1,0 +1,27 @@
+{
+  "name": "document-writer",
+  "version": "1.0.0",
+  "description": "A tool for managing document formats",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "webpack serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/document-writer/project.git"
+  },
+  "keywords": ["document", "format", "management"],
+  "author": "Cline AI",
+  "license": "MIT",
+  "dependencies": {
+    "jest": "^29.0.0",
+    "webpack": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^18.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^4.0.0"
+  }
+}

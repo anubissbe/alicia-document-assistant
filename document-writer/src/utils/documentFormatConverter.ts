@@ -1,82 +1,105 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
 import { promisify } from 'util';
-import { DocumentFormat, FormatProcessor, FormatConversionOptions } from '../core/formatProcessor';
-import { PathSafetyUtils } from './pathSafetyUtils';
+import { DocumentFormat } from '../core/formatProcessor';
 import { SecurityManager } from './securityManager';
-import { PDFPreviewProvider, PDFPreviewOptions } from './pdfPreviewProvider';
+import { PathSafetyUtils } from './pathSafetyUtils';
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
-const mkdir = promisify(fs.mkdir);
 
 /**
- * Preview options for document formats
+ * Preview options for document rendering
  */
 export interface PreviewOptions {
     /**
-     * Whether to make the preview interactive
+     * Whether the preview should be interactive
      */
-    interactive?: boolean;
+    interactive: boolean;
     
     /**
      * Whether to render mathematical expressions
      */
-    renderMath?: boolean;
+    renderMath: boolean;
     
     /**
-     * Whether to render diagrams (e.g., Mermaid)
+     * Whether to render diagrams (mermaid, etc.)
      */
-    renderDiagrams?: boolean;
+    renderDiagrams: boolean;
     
     /**
      * Whether to highlight syntax in code blocks
      */
-    highlightSyntax?: boolean;
+    highlightSyntax: boolean;
     
     /**
-     * Whether to show annotations
+     * Whether to show annotations in the document
      */
-    showAnnotations?: boolean;
+    showAnnotations: boolean;
 }
 
 /**
- * Document preview options
+ * Options for document preview generation
  */
-export interface DocumentPreviewOptions extends FormatConversionOptions {
+export interface DocumentPreviewOptions {
     /**
-     * Target format for the preview
+     * The target format for the preview
      */
-    targetFormat?: DocumentFormat;
+    targetFormat: DocumentFormat;
     
     /**
-     * Preview-specific options
+     * Preview rendering options
      */
-    preview?: PreviewOptions;
+    preview: PreviewOptions;
     
     /**
-     * Whether to open the file after export
+     * Whether to preserve original formatting when converting
+     */
+    preserveFormatting?: boolean;
+    
+    /**
+     * Whether to include styles in the output
+     */
+    includeStyles?: boolean;
+}
+
+/**
+ * Options for document export
+ */
+export interface DocumentExportOptions {
+    /**
+     * The output file path
+     */
+    outputPath: string;
+    
+    /**
+     * Whether to open the document after export
      */
     openAfterExport?: boolean;
     
     /**
-     * Output path for export operations
+     * Whether to preserve original formatting when converting
      */
-    outputPath?: string;
+    preserveFormatting?: boolean;
+    
+    /**
+     * Whether to include styles in the output
+     */
+    includeStyles?: boolean;
 }
 
 /**
- * Export result
+ * Result of a document export operation
  */
-export interface ExportResult {
+export interface DocumentExportResult {
     /**
      * Whether the export was successful
      */
     success: boolean;
     
     /**
-     * Path to the exported file
+     * The path to the exported file
      */
     filePath?: string;
     
@@ -87,159 +110,126 @@ export interface ExportResult {
 }
 
 /**
- * Format detection result
+ * Result of a format detection operation
  */
 export interface FormatDetectionResult {
     /**
-     * Detected format
+     * The detected format
      */
     format: DocumentFormat;
     
     /**
-     * Confidence level (0-1)
+     * Confidence level of the detection (0-1)
      */
     confidence: number;
 }
 
 /**
- * DocumentFormatConverter handles conversion between different document formats
+ * Utility class for converting between document formats
+ * and generating previews for different document types.
  */
 export class DocumentFormatConverter {
-    private _formatProcessor: FormatProcessor;
+    private _securityManager: SecurityManager;
     private _pathSafetyUtils: PathSafetyUtils;
     
     /**
      * Constructor
      */
     constructor() {
-        this._formatProcessor = new FormatProcessor();
-        const securityManager = new SecurityManager();
-        this._pathSafetyUtils = new PathSafetyUtils(securityManager);
+        this._securityManager = new SecurityManager();
+        this._pathSafetyUtils = new PathSafetyUtils(this._securityManager);
     }
     
     /**
-     * Generate preview for document content
-     * @param content Document content
-     * @param sourceFormat Source format
+     * Generate a preview of the document in the target format
+     * @param content The document content
+     * @param sourceFormat The source format
      * @param options Preview options
-     * @returns Preview content
+     * @returns The preview content
      */
     public async generatePreview(
         content: string,
         sourceFormat: DocumentFormat,
-        options: DocumentPreviewOptions = {}
+        options: DocumentPreviewOptions
     ): Promise<string> {
         try {
-            // Default to HTML as target format for previews
-            const targetFormat = options.targetFormat || DocumentFormat.HTML;
+        f source and target formats are the same, no conversion needed
+        sourceFormat === options.targetFormat) {
+            rn this._enhancePreview(content, sourceFormat, options.preview ||  || { 
+                interactive: false,
+                renderMath: false,
+                renderDiagrams: false,
+                highlightSyntax: true,
+                showAnnotations: false
+             );   interactive: false,
+        }
+                renderMath: false,
+                renderDiagrams: false,
+                highlightSyntax: true,
+                showAnnotations: false
+            });
+        }
             
-            // Convert content to target format
-            let previewContent = await this._formatProcessor.processContent(
+            // Convert to target format
+            const convertedContent = await this._convertFormat(
                 content,
                 sourceFormat,
-                targetFormat,
-                options
+                options.targetFormat,
+                options.preserveFormatting ?? true
             );
             
-            // Apply preview enhancements if needed
-            if (targetFormat === DocumentFormat.HTML && options.preview) {
-                previewContent = this._enhanceHtmlPreview(previewContent, options.preview);
-            }
-            
-            return previewContent;
+            // Enhance the preview
+            return this._enhancePreview(convertedContent, options.targetFormat, options.preview);
         } catch (error) {
             console.error('Error generating preview:', error);
-            return this._createErrorPreview(error);
+            throw new Error(`Failed to generate preview: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
     
     /**
-     * Export document to file
-     * @param content Document content
-     * @param sourceFormat Source format
-     * @param targetFormat Target format
+     * Export the document to a file
+     * @param content The document content
+     * @param sourceFormat The source format
+     * @param targetFormat The target format
      * @param options Export options
      * @returns Export result
      */
     public async exportToFile(
-        content: string,
+        cont    ent: string,
         sourceFormat: DocumentFormat,
         targetFormat: DocumentFormat,
-        options: DocumentPreviewOptions = {}
-    ): Promise<ExportResult> {
+        options: DocumentExportOptions
+    ): Promise<DocumentExportResult> {
         try {
-            // Make sure we have an output path
-            if (!options.outputPath) {
-                throw new Error('Output path is required for export');
-            }
-            
-            // Validate output path (security check)
-            const validatedPath = this._pathSafetyUtils.resolveDocumentPath(options.outputPath, 'export operation');
-            if (!validatedPath) {
-                throw new Error('Invalid output path');
-            }
-            
-            // Create directory if it doesn't exist
-            const outputDir = path.dirname(validatedPath);
-            await mkdir(outputDir, { recursive: true });
-            
-            // Determine if we need to process content or just write it directly
-            if (sourceFormat === targetFormat) {
-                // Write directly for same format
-                await writeFile(validatedPath, content);
-                
-                // Open the file if requested
-                if (options.openAfterExport) {
-                    await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(validatedPath));
-                }
-                
+                // Validate output path
+            const validPath = this._pathSafetyUtils.resolveDocumentPath(options.outputPath, 'document export');
+            if (!validPath) {
                 return {
-                    success: true,
-                    filePath: validatedPath
+                    success: false,
+                    error: 'Invalid export path'
                 };
-            } else {
-                // Process content for format conversion
-                const processedContent = await this._formatProcessor.processContent(
-                    content,
-                    sourceFormat,
-                    targetFormat,
-                    {
-                        ...options,
-                        outputPath: validatedPath
-                    }
-                );
-                
-                // For some formats (like DOCX, PDF), the result is the file path
-                // For text-based formats, we need to write the content to the file
-                if (processedContent.startsWith('/') || 
-                    processedContent.match(/^[a-zA-Z]:\\/)) {
-                    // Result is a file path, no need to write
-                    const resultPath = processedContent;
-                    
-                    // Open the file if requested
-                    if (options.openAfterExport && resultPath !== validatedPath) {
-                        await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(resultPath));
-                    }
-                    
-                    return {
-                        success: true,
-                        filePath: resultPath
-                    };
-                } else {
-                    // Result is content, write to file
-                    await writeFile(validatedPath, processedContent);
-                    
-                    // Open the file if requested
-                    if (options.openAfterExport) {
-                        await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(validatedPath));
-                    }
-                    
-                    return {
-                        success: true,
-                        filePath: validatedPath
-                    };
-                }
             }
+            
+            // Convert to target format
+            const convertedContent = await this._convertFormat(
+                content,
+                sourceFormat,
+                targetFormat,
+                options.preserveFormatting ?? true
+            );
+            
+            // Write to file
+            await writeFile(validPath, convertedContent);
+            
+            // Open file if requested
+            if (options.openAfterExport) {
+                await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(validPath));
+            }
+            
+            return {
+                success: true,
+                filePath: validPath
+            };
         } catch (error) {
             console.error('Error exporting document:', error);
             return {
@@ -250,296 +240,220 @@ export class DocumentFormatConverter {
     }
     
     /**
-     * Detect format from content
-     * @param content Content to analyze
-     * @param filePath Optional file path for additional hints
+     * Detect the format of the document content
+     * @param content The document content
+     * @param fileName Optional file name for context
      * @returns Format detection result
      */
-    public detectFormat(content = '', filePath?: string): FormatDetectionResult {
-        try {
-            // Try to detect from file extension if available
-            if (filePath) {
-                const extension = path.extname(filePath).toLowerCase();
-                
-                if (extension === '.md' || extension === '.markdown') {
-                    return { format: DocumentFormat.MARKDOWN, confidence: 0.9 };
-                } else if (extension === '.html' || extension === '.htm') {
-                    return { format: DocumentFormat.HTML, confidence: 0.9 };
-                } else if (extension === '.txt') {
-                    return { format: DocumentFormat.TEXT, confidence: 0.9 };
-                } else if (extension === '.docx' || extension === '.doc') {
-                    return { format: DocumentFormat.DOCX, confidence: 0.9 };
-                } else if (extension === '.pdf') {
-                    return { format: DocumentFormat.PDF, confidence: 0.9 };
-                }
-            }
+    public detectFormat(content: string, fileName?: string): FormatDetectionResult {
+        // Ensure content is a string
+        if (content === null || content === undefined) {
+            content = "";
+        }
+        
+        // Try to detect from file extension first
+        if (fileName) {
+            const extension = path.extname(fileName).toLowerCase();
             
-            // Make sure we have content to analyze
-            if (!content || content.trim() === '') {
-                return { format: DocumentFormat.TEXT, confidence: 0.5 };
-            }
-            
-            // Use content-based detection from the FormatProcessor
-            // FormatProcessor.detectFormat requires a string parameter
-            const format = this._formatProcessor.detectFormat(content || '');
-            return {
-                format: format,
-                confidence: 0.7 // Lower confidence for content-based detection
-            };
-        } catch (error) {
-            console.error('Error detecting format:', error);
-            // Default to TEXT format if detection fails
-            return { format: DocumentFormat.TEXT, confidence: 0.5 };
-        }
-    }
-    
-    /**
-     * Get available target formats for a source format
-     * @param sourceFormat Source format
-     * @returns Array of available target formats
-     */
-    public getAvailableTargetFormats(sourceFormat: DocumentFormat): DocumentFormat[] {
-        // Define available conversions for each format
-        const availableConversions: Record<DocumentFormat, DocumentFormat[]> = {
-            [DocumentFormat.TEXT]: [
-                DocumentFormat.MARKDOWN,
-                DocumentFormat.HTML,
-                DocumentFormat.DOCX,
-                DocumentFormat.PDF
-            ],
-            [DocumentFormat.MARKDOWN]: [
-                DocumentFormat.TEXT,
-                DocumentFormat.HTML,
-                DocumentFormat.DOCX,
-                DocumentFormat.PDF
-            ],
-            [DocumentFormat.HTML]: [
-                DocumentFormat.TEXT,
-                DocumentFormat.MARKDOWN,
-                DocumentFormat.DOCX,
-                DocumentFormat.PDF
-            ],
-            [DocumentFormat.DOCX]: [
-                DocumentFormat.TEXT,
-                DocumentFormat.MARKDOWN,
-                DocumentFormat.HTML,
-                DocumentFormat.PDF
-            ],
-            [DocumentFormat.PDF]: [
-                DocumentFormat.TEXT,
-                DocumentFormat.MARKDOWN,
-                DocumentFormat.HTML,
-                DocumentFormat.DOCX
-            ]
-        };
-        
-        return availableConversions[sourceFormat] || [];
-    }
-    
-    /**
-     * Enhance HTML preview with interactive features
-     * @param html HTML content
-     * @param options Preview options
-     * @returns Enhanced HTML
-     */
-    private _enhanceHtmlPreview(html: string, options: PreviewOptions): string {
-        let enhanced = html;
-        
-        // Add class to body for styling
-        if (enhanced.includes('<body>')) {
-            enhanced = enhanced.replace('<body>', '<body class="vscode-preview-enhance">');
-        }
-        
-        // Add libraries based on options
-        const headAdditions: string[] = [];
-        const bodyAdditions: string[] = [];
-        
-        // Add math rendering (KaTeX)
-        if (options.renderMath) {
-            headAdditions.push(`
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script>
-`);
-            bodyAdditions.push(`
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        renderMathInElement(document.body, {
-            delimiters: [
-                {left: "$$", right: "$$", display: true},
-                {left: "$", right: "$", display: false}
-            ]
-        });
-    });
-</script>
-`);
-        }
-        
-        // Add diagram rendering (Mermaid)
-        if (options.renderDiagrams) {
-            headAdditions.push(`
-<script src="https://cdn.jsdelivr.net/npm/mermaid@9.1.7/dist/mermaid.min.js"></script>
-`);
-            bodyAdditions.push(`
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: document.body.classList.contains('vscode-dark') ? 'dark' : 'default'
-        });
-    });
-</script>
-`);
-        }
-        
-        // Add syntax highlighting (Highlight.js)
-        if (options.highlightSyntax) {
-            headAdditions.push(`
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/github.min.css">
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/highlight.min.js"></script>
-`);
-            bodyAdditions.push(`
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll('pre code').forEach((el) => {
-            hljs.highlightElement(el);
-        });
-    });
-</script>
-`);
-        }
-        
-        // Add head content
-        if (headAdditions.length > 0) {
-            if (enhanced.includes('</head>')) {
-                enhanced = enhanced.replace('</head>', headAdditions.join('') + '</head>');
-            } else if (enhanced.includes('<body>')) {
-                enhanced = enhanced.replace('<body>', '<head>' + headAdditions.join('') + '</head><body>');
-            } else {
-                enhanced = '<head>' + headAdditions.join('') + '</head>' + enhanced;
+            if (extension === '.md' || extension === '.markdown') {
+                return { format: DocumentFormat.MARKDOWN, confidence: 0.9 };
+            } else if (extension === '.html' || extension === '.htm') {
+                return { format: DocumentFormat.HTML, confidence: 0.9 };
+            } else if (extension === '.txt') {
+                return { format: DocumentFormat.TEXT, confidence: 0.9 };
+            } else if (extension === '.docx' || extension === '.doc') {
+                return { format: DocumentFormat.DOCX, confidence: 0.9 };
+            } else if (extension === '.pdf') {
+                return { format: DocumentFormat.PDF, confidence: 0.9 };
             }
         }
         
-        // Add body content
-        if (bodyAdditions.length > 0) {
-            if (enhanced.includes('</body>')) {
-                enhanced = enhanced.replace('</body>', bodyAdditions.join('') + '</body>');
-            } else {
-                enhanced = enhanced + bodyAdditions.join('');
-            }
+        // Try to detect from content
+        const contentSample = content.slice(0, 1000).toLowerCase();
+        
+        // Check for HTML
+        if (contentSample.includes('<!doctype html>') || contentSample.includes('<html') || 
+            (contentSample.includes('<body') && contentSample.includes('</body>'))) {
+            return { format: DocumentFormat.HTML, confidence: 0.8 };
         }
         
-        return enhanced;
+        // Check for Markdown
+        if (contentSample.includes('# ') || contentSample.includes('## ') || 
+            contentSample.includes('```') || contentSample.includes('![') ||
+            contentSample.includes('[](') || contentSample.match(/\*\*.+\*\*/)) {
+            return { format: DocumentFormat.MARKDOWN, confidence: 0.7 };
+        }
+        
+        // Check for PDF (binary format starts with %PDF)
+        if (content.startsWith('%PDF')) {
+            return { format: DocumentFormat.PDF, confidence: 0.9 };
+        }
+        
+        // Check for DOCX (binary format, cannot reliably detect from content)
+        // If it's binary content that doesn't match PDF, assume it might be DOCX
+        if (/[\x00-\x08\x0E-\x1F\x80-\xFF]/.test(contentSample)) {
+            return { format: DocumentFormat.DOCX, confidence: 0.3 };
+        }
+        
+        // Default to plain text
+        return { format: DocumentFormat.TEXT, confidence: 0.5 };
     }
     
     /**
-     * Create error preview
-     * @param error Error that occurred
-     * @returns HTML error preview
+     * Convert content from one format to another
+     * @param content The content to convert
+     * @param sourceFormat The source format
+     * @param targetFormat The target format
+     * @param preserveFormatting Whether to preserve formatting
+     * @returns The converted content
      */
-    private _createErrorPreview(error: unknown): string {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return `
-<div class="error-preview">
-    <h2>Error Generating Preview</h2>
-    <div class="error-message">
-        ${errorMessage}
-    </div>
-    <div class="error-details">
-        <p>There was an error generating the preview. Please check the following:</p>
-        <ul>
-            <li>The document format is supported.</li>
-            <li>The document content is valid.</li>
-            <li>Required dependencies are installed.</li>
-        </ul>
-    </div>
-</div>
-<style>
-    .error-preview {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        padding: 20px;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
-    .error-message {
-        background-color: var(--vscode-inputValidation-errorBackground, #f2dede);
-        color: var(--vscode-inputValidation-errorForeground, #a94442);
-        padding: 15px;
-        border-left: 4px solid var(--vscode-errorForeground, #f44336);
-        margin: 10px 0;
-    }
-    
-    .error-details {
-        margin-top: 20px;
-    }
-</style>
-`;
+    private async _convertFormat(
+        content: string,
+        sourceFormat: DocumentFormat,
+        targetFormat: DocumentFormat,
+        preserveFormatting: boolean
+    ): Promise<string> {
+        // Implement conversion logic for each format pair
+        if (sourceFormat === targetFormat) {
+            return content;
+        }
+        
+        // Markdown to HTML
+        if (sourceFormat === DocumentFormat.MARKDOWN && targetFormat === DocumentFormat.HTML) {
+            return this._markdownToHtml(content, preserveFormatting);
+        }
+        
+        // HTML to Markdown
+        if (sourceFormat === DocumentFormat.HTML && targetFormat === DocumentFormat.MARKDOWN) {
+            return this._htmlToMarkdown(content, preserveFormatting);
+        }
+        
+        // Markdown to Text
+        if (sourceFormat === DocumentFormat.MARKDOWN && targetFormat === DocumentFormat.TEXT) {
+            return this._markdownToText(content);
+        }
+        
+        // HTML to Text
+        if (sourceFormat === DocumentFormat.HTML && targetFormat === DocumentFormat.TEXT) {
+            return this._htmlToText(content);
+        }
+        
+        // For other conversions, default to simple content pass-through
+        // In a real implementation, these would be implemented with proper conversion libraries
+        console.warn(`Conversion from ${DocumentFormat[sourceFormat]} to ${DocumentFormat[targetFormat]} not fully implemented`);
+        return content;
     }
     
     /**
-     * Get file extension for a format
-     * @param format Document format
-     * @returns File extension with dot
+     * Convert Markdown to HTML
+     * @param markdown The Markdown content
+     * @param preserveFormatting Whether to preserve formatting
+     * @returns The HTML content
      */
-    public static getFileExtension(format: DocumentFormat): string {
-        switch (format) {
-            case DocumentFormat.MARKDOWN:
-                return '.md';
-            case DocumentFormat.HTML:
-                return '.html';
-            case DocumentFormat.TEXT:
-                return '.txt';
-            case DocumentFormat.DOCX:
-                return '.docx';
-            case DocumentFormat.PDF:
-                return '.pdf';
-            default:
-                return '.txt';
+    private _markdownToHtml(markdown: string, preserveFormatting: boolean): string {
+        // In a full implementation, we would use a Markdown parser
+        // For now, implement a simple conversion with regex
+        
+        // Convert headings
+        let html = markdown
+            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+            .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
+            .replace(/^##### (.*$)/gm, '<h5>$1</h5>')
+            .replace(/^###### (.*$)/gm, '<h6>$1</h6>');
+        
+        // Convert bold and italic
+        html = html
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/__(.*?)__/g, '<strong>$1</strong>')
+            .replace(/_(.*?)_/g, '<em>$1</em>');
+        
+        // Convert links
+        html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+        
+        // Convert images
+        html = html.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
+        
+        // Convert code blocks
+        html = html.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>');
+        
+        // Convert inline code
+        html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+        
+        // Convert unordered lists
+        html = html.replace(/^\s*[-*+]\s+(.*$)/gm, '<li>$1</li>');
+        html = html.replace(/(<li>.*<\/li>\n)+/g, '<ul>$&</ul>');
+        
+        // Convert ordered lists
+        html = html.replace(/^\s*\d+\.\s+(.*$)/gm, '<li>$1</li>');
+        html = html.replace(/(<li>.*<\/li>\n)+/g, '<ol>$&</ol>');
+        
+        // Convert paragraphs (any line that doesn't match the above)
+        html = html.replace(/^([^<].*$)/gm, '<p>$1</p>');
+        
+        // Convert line breaks
+        html = html.replace(/\n\n/g, '</p><p>');
+        
+        // Wrap in HTML document
+        if (preserveFormatting) {
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Converted Document</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        pre code {
+            padding: 0;
+            background-color: transparent;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    ${html}
+</body>
+</html>`;
+        } else {
+            return html;
         }
     }
     
     /**
-     * Get format description
-     * @param format Document format
-     * @returns Human-readable format description
+     * Convert HTML to Markdown
+     * @param html The HTML content
+     * @param preserveFormatting Whether to preserve formatting
+     * @returns The Markdown content
      */
-    public static getFormatDescription(format: DocumentFormat): string {
-        switch (format) {
-            case DocumentFormat.MARKDOWN:
-                return 'Markdown';
-            case DocumentFormat.HTML:
-                return 'HTML';
-            case DocumentFormat.TEXT:
-                return 'Plain Text';
-            case DocumentFormat.DOCX:
-                return 'Word Document';
-            case DocumentFormat.PDF:
-                return 'PDF Document';
-            default:
-                return 'Unknown Format';
-        }
-    }
-    
-    /**
-     * Get content type for a format
-     * @param format Document format
-     * @returns MIME content type
-     */
-    public static getContentType(format: DocumentFormat): string {
-        switch (format) {
-            case DocumentFormat.MARKDOWN:
-                return 'text/markdown';
-            case DocumentFormat.HTML:
-                return 'text/html';
-            case DocumentFormat.TEXT:
-                return 'text/plain';
-            case DocumentFormat.DOCX:
-                return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-            case DocumentFormat.PDF:
-                return 'application/pdf';
-            default:
-                return 'text/plain';
-        }
-    }
-}
+    private _htmlToMarkdown(html: string, preserveFormatting: boolean): string {
+        // In a full implementation, we would use an HTML to Markdown converter
+        // For now, implement a simple conv
