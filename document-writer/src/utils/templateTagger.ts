@@ -4,7 +4,8 @@
  */
 
 import * as vscode from 'vscode';
-import { DocumentTemplate, DocumentFormat } from '../models/documentTemplate';
+import { DocumentTemplate } from '../models/documentTemplate';
+import { DocumentFormat } from '../models/documentFormat';
 
 /**
  * Interface for tag metadata

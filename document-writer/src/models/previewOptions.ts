@@ -4,51 +4,10 @@
  */
 
 import * as vscode from 'vscode';
+import { DocumentFormat } from './documentFormat';
 
-/**
- * Document format enum
- */
-export enum DocumentFormat {
-    /**
-     * Markdown format
-     */
-    Markdown = 'markdown',
-    
-    /**
-     * HTML format
-     */
-    HTML = 'html',
-    
-    /**
-     * PDF format
-     */
-    PDF = 'pdf',
-    
-    /**
-     * DOCX format
-     */
-    DOCX = 'docx',
-    
-    /**
-     * Text format
-     */
-    Text = 'text',
-    
-    /**
-     * JSON format
-     */
-    JSON = 'json',
-    
-    /**
-     * XML format
-     */
-    XML = 'xml',
-    
-    /**
-     * CSV format
-     */
-    CSV = 'csv'
-}
+// Re-export DocumentFormat for backward compatibility
+export { DocumentFormat };
 
 /**
  * Preview toolbar button interface
@@ -422,7 +381,7 @@ export class PreviewOptionsManager {
         // Customize for specific formats
         
         // Markdown-specific options
-        this.defaultOptions.set(DocumentFormat.Markdown, {
+        this.defaultOptions.set(DocumentFormat.MARKDOWN, {
             ...baseOptions,
             processing: {
                 ...baseOptions.processing,
@@ -431,7 +390,7 @@ export class PreviewOptionsManager {
                 renderDiagrams: true
             },
             formatOptions: {
-                [DocumentFormat.Markdown]: {
+                [DocumentFormat.MARKDOWN]: {
                     breaks: true,
                     linkify: true,
                     typographer: true
@@ -526,7 +485,7 @@ export class PreviewOptionsManager {
     public async saveOptionsForDocument(
         documentUri: vscode.Uri,
         options: Partial<PreviewOptions>,
-        format: DocumentFormat = DocumentFormat.Markdown
+        format: DocumentFormat = DocumentFormat.MARKDOWN
     ): Promise<boolean> {
         const uriString = documentUri.toString();
         

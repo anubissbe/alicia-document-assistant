@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { DocumentFormat, DocumentTemplate } from '../models/documentTemplate';
-import { SecurityManager, SecurityLevel } from '../utils/securityManager';
+import { DocumentTemplate, SecurityLevel } from '../models/documentTemplate';
+import { SecurityManager } from '../utils/securityManager';
 
 /**
  * Template information for UI display
@@ -11,7 +11,7 @@ export interface TemplateInfo {
     id: string;
     name: string;
     description: string;
-    format: DocumentFormat;
+    type: string;
 }
 
 /**
@@ -49,7 +49,7 @@ export class TemplateManagerService {
             id: template.id,
             name: template.name,
             description: template.description,
-            format: template.format
+            type: template.type
         }));
     }
     
@@ -148,48 +148,42 @@ export class TemplateManagerService {
         name: string, 
         description: string
     ): Promise<DocumentTemplate> {
-        // Validate and normalize the file path
-        const normalizedPath = this._securityManager.normalizePath(filePath);
-        if (!normalizedPath) {
-            throw new Error(`Invalid template file path: ${filePath}`);
-        }
-        
-        // Validate the file is allowed
-        const isPathValid = this._securityManager.validatePath(
-            normalizedPath,
+        // Validate the file path
+        const pathValidation = this._securityManager.validatePath(
+            filePath,
             {
                 allowedExtensions: ['.docx', '.md', '.html', '.htm', '.pdf'],
-                securityLevel: SecurityLevel.HIGH
+                allowAbsolutePaths: true,
+                allowTraversal: false,
+                enforceExtension: true
             }
         );
         
-        if (!isPathValid) {
-            throw new Error(`Template file path not allowed: ${normalizedPath}`);
+        if (!pathValidation.valid) {
+            throw new Error(`Invalid template file path: ${filePath}`);
         }
         
         // Ensure the file exists
-        if (!fs.existsSync(normalizedPath)) {
-            throw new Error(`File does not exist: ${normalizedPath}`);
+        if (!fs.existsSync(filePath)) {
+            throw new Error(`File does not exist: ${filePath}`);
         }
         
         // Determine the format based on file extension
-        const format = this._getFormatFromFilePath(normalizedPath);
+        const format = this._getFormatFromFilePath(filePath);
         
         // Create a new template
         return await this.addTemplate({
             name,
             description,
-            format,
-            templatePath: filePath,
+            type: format,
+            path: filePath,
             metadata: {
                 author: 'Unknown',
                 version: '1.0',
+                lastModified: new Date(),
                 tags: [],
                 category: 'General'
-            },
-            sections: [],
-            createdAt: new Date(),
-            updatedAt: new Date()
+            }
         });
     }
     
@@ -260,63 +254,59 @@ export class TemplateManagerService {
      * @param template The template to validate
      */
     private async _validateTemplate(template: DocumentTemplate): Promise<void> {
-        // Validate and normalize the template path
-        const normalizedPath = this._securityManager.normalizePath(template.templatePath);
-        if (!normalizedPath) {
-            throw new Error(`Invalid template file path: ${template.templatePath}`);
-        }
-        
-        // Validate the file is allowed
-        const isPathValid = this._securityManager.validatePath(
-            normalizedPath,
+        // Validate the template path
+        const pathValidation = this._securityManager.validatePath(
+            template.path,
             {
                 allowedExtensions: ['.docx', '.md', '.html', '.htm', '.pdf'],
-                securityLevel: SecurityLevel.HIGH
+                allowAbsolutePaths: true,
+                allowTraversal: false,
+                enforceExtension: true
             }
         );
         
-        if (!isPathValid) {
-            throw new Error(`Template file path not allowed: ${normalizedPath}`);
+        if (!pathValidation.valid) {
+            throw new Error(`Invalid template file path: ${pathValidation.message}`);
         }
         
         // Check if the template file exists
-        if (!fs.existsSync(normalizedPath)) {
-            throw new Error(`Template file does not exist: ${normalizedPath}`);
+        if (!fs.existsSync(template.path)) {
+            throw new Error(`Template file does not exist: ${template.path}`);
         }
         
-        // Additional validation based on format
-        switch (template.format) {
-            case DocumentFormat.DOCX:
+        // Additional validation based on type
+        switch (template.type) {
+            case 'docx':
                 // Validate DOCX template - we could add more validation in the future
-                if (!template.templatePath.toLowerCase().endsWith('.docx')) {
+                if (!template.path.toLowerCase().endsWith('.docx')) {
                     throw new Error('DOCX template must have a .docx extension');
                 }
                 break;
                 
-            case DocumentFormat.MARKDOWN:
+            case 'markdown':
                 // Validate Markdown template
-                if (!template.templatePath.toLowerCase().endsWith('.md')) {
+                if (!template.path.toLowerCase().endsWith('.md')) {
                     throw new Error('Markdown template must have a .md extension');
                 }
                 break;
                 
-            case DocumentFormat.HTML:
+            case 'html':
                 // Validate HTML template
-                if (!template.templatePath.toLowerCase().endsWith('.html') && 
-                    !template.templatePath.toLowerCase().endsWith('.htm')) {
+                if (!template.path.toLowerCase().endsWith('.html') && 
+                    !template.path.toLowerCase().endsWith('.htm')) {
                     throw new Error('HTML template must have a .html or .htm extension');
                 }
                 break;
                 
-            case DocumentFormat.PDF:
+            case 'pdf':
                 // Validate PDF template
-                if (!template.templatePath.toLowerCase().endsWith('.pdf')) {
+                if (!template.path.toLowerCase().endsWith('.pdf')) {
                     throw new Error('PDF template must have a .pdf extension');
                 }
                 break;
                 
             default:
-                throw new Error(`Unsupported document format: ${template.format}`);
+                throw new Error(`Unsupported document type: ${template.type}`);
         }
     }
     
@@ -332,21 +322,46 @@ export class TemplateManagerService {
      * Determine the document format from a file path
      * @param filePath The path to the template file
      */
-    private _getFormatFromFilePath(filePath: string): DocumentFormat {
+    private _getFormatFromFilePath(filePath: string): string {
         const extension = path.extname(filePath).toLowerCase();
         
         switch (extension) {
             case '.docx':
-                return DocumentFormat.DOCX;
+                return 'docx';
             case '.md':
-                return DocumentFormat.MARKDOWN;
+                return 'markdown';
             case '.html':
             case '.htm':
-                return DocumentFormat.HTML;
+                return 'html';
             case '.pdf':
-                return DocumentFormat.PDF;
+                return 'pdf';
             default:
                 throw new Error(`Unsupported file extension: ${extension}`);
         }
+    }
+
+    /**
+     * Export a template to a file
+     * @param id The ID of the template to export
+     * @param filePath The path to export the template to
+     */
+    public async exportTemplate(id: string, filePath: string): Promise<void> {
+        const template = this.getTemplateById(id);
+        
+        if (!template) {
+            throw new Error(`Template with ID ${id} not found`);
+        }
+
+        // Validate the export path
+        const pathValidation = this._securityManager.validatePath(filePath);
+        if (!pathValidation.valid) {
+            throw new Error(`Invalid export path: ${filePath}`);
+        }
+
+        // Read the template file
+        const templateContent = await fs.promises.readFile(template.path, 'utf8');
+        
+        // Write to the export location
+        await fs.promises.writeFile(filePath, templateContent, 'utf8');
     }
 }

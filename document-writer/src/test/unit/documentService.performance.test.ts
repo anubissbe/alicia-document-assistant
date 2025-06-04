@@ -3,7 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { DocumentService, DocumentData, DocumentSection } from '../../services/documentService';
 import { SecurityManager } from '../../utils/securityManager';
-import { DocumentTemplate, DocumentFormat, PlaceholderType } from '../../models/documentTemplate';
+import { DocumentTemplate, PlaceholderType } from '../../models/documentTemplate';
+import { DocumentFormat } from '../../models/documentFormat';
 import { TemplateManagerService } from '../../services/templateManagerService';
 
 // Mock dependencies

@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { DocumentService } from '../services/documentService';
-import { FormatProcessor, DocumentFormat } from '../core/formatProcessor';
+import { FormatProcessor } from '../core/formatProcessor';
+import { DocumentFormat } from '../models/documentFormat';
 import { PreviewEnhancer } from '../utils/previewEnhancer';
 
 /**

@@ -3,7 +3,8 @@ import * as path from 'path';
 import { BaseMCPTool, MCPToolResponse } from '../mcpTool';
 import { DocumentService } from '../../services/documentService';
 import { TemplateEngine, ValidationResult } from '../../core/templateEngine';
-import { DocumentFormat, DocumentTemplate } from '../documentTemplate';
+import { DocumentTemplate } from '../documentTemplate';
+import { DocumentFormat } from '../documentFormat';
 
 /**
  * Tool to create documents from templates

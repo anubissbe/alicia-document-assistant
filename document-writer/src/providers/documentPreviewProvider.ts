@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { DocumentFormatConverter, DocumentPreviewOptions, PreviewOptions } from '../utils/documentFormatConverter';
-import { DocumentFormat } from '../core/formatProcessor';
+import { DocumentFormat } from '../models/documentFormat';
 import { SecurityManager } from '../utils/securityManager';
 import { PathSafetyUtils } from '../utils/pathSafetyUtils';
 import { PDFPreviewProvider } from '../utils/pdfPreviewProvider';
+import { ExportUtils } from '../utils/exportUtils';
 
 /**
  * Provider for document previews in different formats
@@ -719,7 +720,7 @@ export class DocumentPreviewProvider implements vscode.WebviewViewProvider {
             }
             
             // Get file extension for target format
-            const extension = DocumentFormatConverter.getFileExtension(targetFormat);
+            const extension = ExportUtils.getFileExtension(targetFormat);
             
             // Create suggested file name based on current document
             const currentFileName = path.basename(this._currentDocument.fileName, path.extname(this._currentDocument.fileName));

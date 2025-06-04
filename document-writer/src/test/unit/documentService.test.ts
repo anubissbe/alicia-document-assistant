@@ -1,344 +1,644 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-import { DocumentService, DocumentData, DocumentSection } from '../../services/documentService';
-import { SecurityManager } from '../../utils/securityManager';
-import { DocumentTemplate, DocumentFormat } from '../../models/documentTemplate';
-import { TemplateManagerService } from '../../services/templateManagerService';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import * as fsPromises from 'node:fs/promises';
+import { DocumentService, Document, DocumentMetadata } from '../../services/documentService.js';
+
+// Silence console.error during tests
+const originalConsoleError = console.error;
+beforeAll(() => {
+    console.error = jest.fn();
+});
+afterAll(() => {
+    console.error = originalConsoleError;
+});
 
 // Mock dependencies
 jest.mock('vscode');
-jest.mock('fs');
-jest.mock('../../utils/securityManager');
-jest.mock('../../services/templateManagerService');
+
+// Mock fs and fs.promises
+const mockFsPromises = {
+    stat: jest.fn(),
+    readFile: jest.fn(),
+    writeFile: jest.fn(),
+    mkdir: jest.fn(),
+    readdir: jest.fn(),
+    unlink: jest.fn(),
+    rename: jest.fn(),
+    access: jest.fn()
+};
+
+jest.mock('node:fs', () => {
+    const actualFs = jest.requireActual('node:fs');
+    return {
+        ...actualFs,
+        constants: {
+            R_OK: 4,
+            W_OK: 2
+        },
+        Stats: actualFs.Stats,
+        promises: mockFsPromises,
+        createReadStream: jest.fn(),
+        createWriteStream: jest.fn(),
+        readFile: jest.fn(),
+        writeFile: jest.fn(),
+        access: jest.fn(),
+        existsSync: jest.fn()
+    };
+});
+
+jest.mock('node:fs/promises', () => mockFsPromises);
+
+// Error constructor with code property
+class FileSystemError extends Error {
+    code: string;
+    constructor(code: string, message: string) {
+        super(message);
+        this.code = code;
+    }
+}
 
 describe('DocumentService', () => {
     let documentService: DocumentService;
-    let mockContext: vscode.ExtensionContext;
-    let mockSecurityManager: jest.Mocked<SecurityManager>;
-    let mockTemplateManager: jest.Mocked<TemplateManagerService>;
     
-    // Sample template for testing
-    const sampleTemplate: DocumentTemplate = {
-        id: 'template_123',
-        name: 'Test Template',
-        description: 'A test template',
-        format: DocumentFormat.DOCX,
-        templatePath: '/path/to/template.docx',
-        metadata: {
-            author: 'Test Author',
-            version: '1.0',
-            tags: ['test'],
-            category: 'Test'
-        },
-        sections: [
-            {
-                id: 'section_1',
-                name: 'Introduction',
-                isRequired: true,
-                description: 'Introduction to the document',
-                placeholders: [],
-                order: 1
-            },
-            {
-                id: 'section_2',
-                name: 'Body',
-                isRequired: true,
-                description: 'Main content of the document',
-                placeholders: [],
-                order: 2
-            }
-        ],
-        createdAt: new Date(),
-        updatedAt: new Date()
-    };
-    
-    // Sample document data for testing
-    const sampleDocumentData: DocumentData = {
+    // Sample document for testing
+    const sampleDocument: Document = {
+        path: '/test/documents/test-doc.txt',
         title: 'Test Document',
-        type: 'Test Type',
-        template: 'template_123',
+        type: 'txt',
+        content: 'This is a test document',
+        dateCreated: new Date('2025-06-04T10:00:00Z'),
+        dateModified: new Date('2025-06-04T10:00:00Z'),
         author: 'Test User',
-        sections: [
-            {
-                id: 'section_1',
-                title: 'Introduction',
-                content: 'This is the introduction'
-            },
-            {
-                id: 'section_2',
-                title: 'Body',
-                content: 'This is the main body'
-            }
-        ]
+        tags: ['test'],
+        properties: {
+            version: '1.0'
+        }
     };
     
     beforeEach(() => {
-        // Create mock context
-        mockContext = {
-            subscriptions: [],
-            extensionPath: '/test/extension/path',
-            storagePath: '/test/storage/path',
-            globalStoragePath: '/test/global/storage/path',
-            logPath: '/test/log/path',
-            extensionUri: { fsPath: '/test/extension/path' } as any,
-            storageUri: { fsPath: '/test/storage/path' } as any,
-            globalStorageUri: { fsPath: '/test/global/storage/path' } as any,
-            logUri: { fsPath: '/test/log/path' } as any,
-            globalState: {
-                get: jest.fn(),
-                update: jest.fn(),
-                setKeysForSync: jest.fn(),
-            } as any,
-            workspaceState: {
-                get: jest.fn(),
-                update: jest.fn(),
-            } as any,
-            secrets: {
-                store: jest.fn(),
-                get: jest.fn(),
-                delete: jest.fn(),
-                onDidChange: jest.fn(),
-            } as any,
-            extensionMode: 1,
-            environmentVariableCollection: {} as any,
-            asAbsolutePath: jest.fn((relativePath) => path.join('/test/extension/path', relativePath)),
-            extension: {} as any,
-            languageModelAccessInformation: {} as any,
-        };
-        
-        // Create SecurityManager mock
-        mockSecurityManager = {
-            normalizePath: jest.fn().mockImplementation((path) => path),
-            validatePath: jest.fn().mockReturnValue(true),
-            addAllowedPath: jest.fn(),
-            validateInput: jest.fn().mockReturnValue(true),
-            sanitizeContent: jest.fn().mockImplementation((content) => content),
-            storeSecret: jest.fn(),
-            getSecret: jest.fn(),
-            deleteSecret: jest.fn(),
-            generateHash: jest.fn(),
-            verifyTemplateIntegrity: jest.fn().mockReturnValue(true),
-            encryptData: jest.fn(),
-            decryptData: jest.fn(),
-        } as any;
-        
-        // Create TemplateManager mock
-        mockTemplateManager = {
-            getTemplates: jest.fn().mockResolvedValue([sampleTemplate]),
-            getTemplateById: jest.fn().mockReturnValue(sampleTemplate),
-            getAvailableTemplates: jest.fn(),
-            addTemplate: jest.fn(),
-            updateTemplate: jest.fn(),
-            deleteTemplate: jest.fn(),
-            importTemplate: jest.fn(),
-        } as any;
-        
-        // Mock SecurityManager constructor
-        (SecurityManager as jest.MockedClass<typeof SecurityManager>).mockImplementation(() => mockSecurityManager);
-        
-        // Mock TemplateManagerService constructor
-        (TemplateManagerService as jest.MockedClass<typeof TemplateManagerService>).mockImplementation(() => mockTemplateManager);
-        
         // Create DocumentService instance
-        documentService = new DocumentService(mockContext, mockTemplateManager);
+        documentService = new DocumentService();
         
-        // Mock fs methods
-        (fs.mkdirSync as jest.Mock).mockReturnValue(undefined);
+        // Reset all mocks
+        jest.clearAllMocks();
+        (console.error as jest.Mock).mockClear();
+        
+        // Mock fs.promises methods with successful defaults
+        mockFsPromises.stat.mockResolvedValue({
+            birthtime: new Date('2025-06-04T10:00:00Z'),
+            mtime: new Date('2025-06-04T10:00:00Z'),
+            isDirectory: () => false
+        });
+        mockFsPromises.readFile.mockResolvedValue('This is a test document');
+        mockFsPromises.writeFile.mockResolvedValue(undefined);
+        mockFsPromises.mkdir.mockResolvedValue(undefined);
+        mockFsPromises.readdir.mockResolvedValue(['test-doc.txt']);
+        mockFsPromises.unlink.mockResolvedValue(undefined);
+        mockFsPromises.rename.mockResolvedValue(undefined);
+        mockFsPromises.access.mockResolvedValue(undefined);
     });
     
-    describe('getTemplates', () => {
-        test('should return templates from the template manager', async () => {
-            const templates = await documentService.getTemplates();
+    describe('getDocument', () => {
+        test('should get a document by path', async () => {
+            const document = await documentService.getDocument('/test/documents/test-doc.txt');
             
-            expect(mockTemplateManager.getTemplates).toHaveBeenCalled();
-            expect(templates).toEqual([sampleTemplate]);
-        });
-    });
-    
-    describe('createDocumentFromTemplate', () => {
-        test('should create a document from template ID', async () => {
-            // Mock unique ID generation
-            jest.spyOn(documentService as any, '_generateUniqueId')
-                .mockReturnValue('generated_id');
-            
-            const document = await documentService.createDocumentFromTemplate('template_123');
-            
-            // Verify document creation
-            expect(mockTemplateManager.getTemplateById).toHaveBeenCalledWith('template_123');
-            expect(document).toBeDefined();
-            expect(document.title).toBe(`New ${sampleTemplate.name}`);
-            expect(document.template).toBe('template_123');
-            expect(document.sections.length).toBe(2);
-            expect(document.sections[0].id).toBe('generated_id');
+            expect(fs.promises.stat).toHaveBeenCalled();
+            expect(fs.promises.readFile).toHaveBeenCalled();
+            expect(document).toEqual(expect.objectContaining({
+                path: '/test/documents/test-doc.txt',
+                content: 'This is a test document'
+            }));
         });
         
-        test('should throw an error if template is not found', async () => {
-            // Mock template not found
-            mockTemplateManager.getTemplateById.mockReturnValue(undefined);
+        test('should return cached document if available', async () => {
+            // First call to cache the document
+            await documentService.getDocument('/test/documents/test-doc.txt');
             
-            await expect(documentService.createDocumentFromTemplate('nonexistent_template'))
-                .rejects.toThrow('Template with ID nonexistent_template not found');
+            // Reset mocks
+            (fs.promises.stat as jest.Mock).mockClear();
+            (fs.promises.readFile as jest.Mock).mockClear();
+            
+            // Second call should use cache
+            const document = await documentService.getDocument('/test/documents/test-doc.txt');
+            
+            expect(fs.promises.stat).not.toHaveBeenCalled();
+            expect(fs.promises.readFile).not.toHaveBeenCalled();
+            expect(document).toEqual(expect.objectContaining({
+                path: '/test/documents/test-doc.txt',
+                content: 'This is a test document'
+            }));
+        });
+        
+        test('should throw error if document path is invalid', async () => {
+            await expect(documentService.getDocument('')).rejects.toThrow('Invalid document path');
+        });
+
+        test('should throw error if document does not exist', async () => {
+            (fs.promises.access as jest.Mock).mockRejectedValue(
+                new FileSystemError('ENOENT', 'File not found')
+            );
+            
+            await expect(documentService.getDocument('/test/documents/nonexistent.txt'))
+                .rejects.toThrow('Document not found');
+            
+            expect(console.error).toHaveBeenCalledWith(
+                expect.stringContaining('Error getting document'),
+                expect.any(Error)
+            );
+        });
+
+        test('should throw error if access is denied', async () => {
+            (fs.promises.access as jest.Mock).mockRejectedValue(
+                new FileSystemError('EACCES', 'Permission denied')
+            );
+            
+            await expect(documentService.getDocument('/test/documents/protected.txt'))
+                .rejects.toThrow('Access denied');
+            
+            expect(console.error).toHaveBeenCalledWith(
+                expect.stringContaining('Error getting document'),
+                expect.any(Error)
+            );
         });
     });
     
     describe('saveDocument', () => {
-        test('should save document to the documents folder', async () => {
-            // Mock file operations
-            (fs.promises.writeFile as jest.Mock).mockResolvedValue(undefined);
+        test('should throw error if document is invalid', async () => {
+            await expect(documentService.saveDocument({} as Document))
+                .rejects.toThrow('Invalid document path');
+        });
+
+        test('should save a document with write access', async () => {
+            const savedDoc = await documentService.saveDocument(sampleDocument);
             
-            // Mock global state
-            const updateSpy = jest.spyOn(mockContext.globalState, 'update');
+            expect(fs.promises.access).toHaveBeenCalledWith(
+                path.dirname(sampleDocument.path),
+                fs.constants.W_OK
+            );
+            expect(fs.promises.writeFile).toHaveBeenCalledWith(
+                sampleDocument.path,
+                sampleDocument.content,
+                'utf-8'
+            );
+            expect(savedDoc).toEqual(expect.objectContaining({
+                path: sampleDocument.path,
+                content: sampleDocument.content
+            }));
+        });
+
+        test('should create directory if it does not exist', async () => {
+            (fs.promises.access as jest.Mock).mockRejectedValue(
+                new FileSystemError('ENOENT', 'Directory not found')
+            );
             
-            // Mock generateFilename method
-            jest.spyOn(documentService as any, '_generateFilename')
-                .mockReturnValue('Test_Document_2025-06-03T10-30-00.000Z.json');
+            const savedDoc = await documentService.saveDocument(sampleDocument);
             
-            const savedPath = await documentService.saveDocument(sampleDocumentData);
-            
-            // Verify document was saved
-            expect(fs.promises.writeFile).toHaveBeenCalled();
-            expect(updateSpy).toHaveBeenCalled();
-            expect(savedPath).toContain('Test_Document_2025-06-03T10-30-00.000Z.json');
+            expect(fs.promises.mkdir).toHaveBeenCalledWith(
+                path.dirname(sampleDocument.path),
+                { recursive: true }
+            );
+            expect(savedDoc).toEqual(expect.objectContaining({
+                path: sampleDocument.path,
+                content: sampleDocument.content
+            }));
         });
         
-        test('should throw an error if path normalization fails', async () => {
-            // Mock path validation to fail
-            mockSecurityManager.normalizePath.mockReturnValue(null);
+        test('should throw error if write fails', async () => {
+            (fs.promises.writeFile as jest.Mock).mockRejectedValue(new Error('Write failed'));
             
-            await expect(documentService.saveDocument(sampleDocumentData))
-                .rejects.toThrow('Failed to normalize path for:');
-        });
-        
-        test('should throw an error if path validation fails', async () => {
-            // Mock normalization to succeed but validation to fail
-            mockSecurityManager.normalizePath.mockImplementation((path) => path);
-            mockSecurityManager.validatePath.mockReturnValue(false);
-            
-            await expect(documentService.saveDocument(sampleDocumentData))
-                .rejects.toThrow('Invalid file path:');
+            await expect(documentService.saveDocument(sampleDocument))
+                .rejects.toThrow('Failed to save document');
         });
     });
     
-    describe('loadDocument', () => {
-        test('should load document from a saved file', async () => {
-            // Mock saved documents in global state
-            const savedDocuments = {
-                'test_document.json': {
-                    title: 'Test Document',
-                    path: '/test/storage/path/documents/test_document.json',
-                    lastModified: new Date().toISOString()
-                }
-            };
-            mockContext.globalState.get = jest.fn().mockReturnValue(JSON.stringify(savedDocuments));
+    describe('deleteDocument', () => {
+        test('should delete a document', async () => {
+            const result = await documentService.deleteDocument('/test/documents/test-doc.txt');
             
-            // Mock file read operation
-            (fs.promises.readFile as jest.Mock).mockResolvedValue(JSON.stringify(sampleDocumentData));
+            expect(fs.promises.stat).toHaveBeenCalled();
+            expect(fs.promises.unlink).toHaveBeenCalled();
+            expect(result).toBe(true);
+        });
+        
+        test('should throw error if document does not exist', async () => {
+            (fs.promises.stat as jest.Mock).mockRejectedValue(new Error('File not found'));
             
-            const document = await documentService.loadDocument('test_document.json');
+            await expect(documentService.deleteDocument('/test/documents/nonexistent.txt'))
+                .rejects.toThrow('Failed to delete document');
+        });
+    });
+    
+    describe('getDocumentsInDirectory', () => {
+        test('should throw error if directory path is invalid', async () => {
+            await expect(documentService.getDocumentsInDirectory('')).rejects.toThrow('Invalid document path');
+        });
+
+        test('should throw error if directory does not exist', async () => {
+            (fs.promises.stat as jest.Mock).mockRejectedValue(
+                new FileSystemError('ENOENT', 'Directory not found')
+            );
             
-            // Verify document was loaded
-            expect(mockSecurityManager.validatePath).toHaveBeenCalled();
+            await expect(documentService.getDocumentsInDirectory('/nonexistent'))
+                .rejects.toThrow('Directory not found');
+        });
+
+        test('should throw error if path is not a directory', async () => {
+            (fs.promises.stat as jest.Mock).mockResolvedValue({
+                isDirectory: () => false,
+                birthtime: new Date(),
+                mtime: new Date()
+            });
+            
+            await expect(documentService.getDocumentsInDirectory('/test/file.txt'))
+                .rejects.toThrow('Invalid document path');
+        });
+
+        test('should throw error if access is denied', async () => {
+            // Mock stat to return directory
+            (fs.promises.stat as jest.Mock).mockResolvedValue({
+                isDirectory: () => true,
+                birthtime: new Date(),
+                mtime: new Date()
+            });
+            
+            // Mock access to throw permission denied
+            (fs.promises.access as jest.Mock).mockRejectedValue(
+                new FileSystemError('EACCES', 'Permission denied')
+            );
+            
+            await expect(documentService.getDocumentsInDirectory('/protected'))
+                .rejects.toThrow('Access denied');
+        });
+
+        test('should list all documents in a directory', async () => {
+            // Mock stat for directory check
+            (fs.promises.stat as jest.Mock).mockImplementation((path) => {
+                return Promise.resolve({
+                    isDirectory: () => path === '/test/documents',
+                    birthtime: new Date(),
+                    mtime: new Date()
+                });
+            });
+            
+            // Mock access to succeed
+            (fs.promises.access as jest.Mock).mockResolvedValue(undefined);
+            
+            // Mock readdir to return test files
+            (fs.promises.readdir as jest.Mock).mockResolvedValue(['test-doc.txt']);
+            
+            const documents = await documentService.getDocumentsInDirectory('/test/documents');
+            
+            expect(fs.promises.readdir).toHaveBeenCalled();
+            expect(fs.promises.stat).toHaveBeenCalled();
+            expect(documents).toHaveLength(1);
+            expect(documents[0]).toEqual(expect.objectContaining({
+                path: expect.stringContaining('test-doc.txt'),
+                type: 'txt'
+            }));
+        });
+        
+        test('should handle empty directories', async () => {
+            (fs.promises.stat as jest.Mock).mockResolvedValue({
+                isDirectory: () => true,
+                birthtime: new Date(),
+                mtime: new Date()
+            });
+            (fs.promises.readdir as jest.Mock).mockResolvedValue([]);
+            
+            const documents = await documentService.getDocumentsInDirectory('/test/documents');
+            
+            expect(documents).toHaveLength(0);
+        });
+    });
+    
+    describe('searchDocuments', () => {
+        test('should find documents matching search query', async () => {
+            // Mock directory listing
+            (fs.promises.stat as jest.Mock).mockImplementation((path) => {
+                return Promise.resolve({
+                    isDirectory: () => path === '/test/documents',
+                    birthtime: new Date(),
+                    mtime: new Date()
+                });
+            });
+            
+            // Mock access to succeed
+            (fs.promises.access as jest.Mock).mockResolvedValue(undefined);
+            
+            // Mock readdir to return test files
+            (fs.promises.readdir as jest.Mock).mockResolvedValue(['test-doc.txt']);
+            
+            // Mock readFile to return content
+            (fs.promises.readFile as jest.Mock).mockResolvedValue('test content');
+            
+            const results = await documentService.searchDocuments('test', '/test/documents');
+            
+            expect(fs.promises.readdir).toHaveBeenCalled();
+            expect(fs.promises.stat).toHaveBeenCalled();
             expect(fs.promises.readFile).toHaveBeenCalled();
-            expect(document).toEqual(sampleDocumentData);
+            expect(results).toHaveLength(1);
+            expect(results[0]).toEqual(expect.objectContaining({
+                path: expect.stringContaining('test-doc.txt')
+            }));
         });
         
-        test('should throw an error if document is not found', async () => {
-            // Mock empty saved documents
-            mockContext.globalState.get = jest.fn().mockReturnValue(JSON.stringify({}));
+        test('should return empty array for no matches', async () => {
+            // Mock directory listing
+            (fs.promises.stat as jest.Mock).mockImplementation((path) => {
+                return Promise.resolve({
+                    isDirectory: () => path === '/test/documents',
+                    birthtime: new Date(),
+                    mtime: new Date()
+                });
+            });
             
-            await expect(documentService.loadDocument('nonexistent_document.json'))
-                .rejects.toThrow('Document nonexistent_document.json not found');
+            // Mock access to succeed
+            (fs.promises.access as jest.Mock).mockResolvedValue(undefined);
+            
+            // Mock readdir to return test files
+            (fs.promises.readdir as jest.Mock).mockResolvedValue(['test-doc.txt']);
+            
+            // Mock readFile to return content that won't match
+            (fs.promises.readFile as jest.Mock).mockResolvedValue('other content');
+            
+            const results = await documentService.searchDocuments('nonexistent', '/test/documents');
+            
+            expect(results).toHaveLength(0);
         });
-        
-        test('should throw an error if path validation fails', async () => {
-            // Mock saved documents
-            const savedDocuments = {
-                'test_document.json': {
-                    title: 'Test Document',
-                    path: '/test/storage/path/documents/test_document.json',
-                    lastModified: new Date().toISOString()
+    });
+
+    describe('getDocumentMetadata', () => {
+        test('should get metadata from cache if available', async () => {
+            // First call to cache the document
+            await documentService.getDocument('/test/documents/test-doc.txt');
+            
+            // Reset mocks
+            (fs.promises.stat as jest.Mock).mockClear();
+            
+            // Get metadata
+            const metadata = await documentService.getDocumentMetadata('/test/documents/test-doc.txt');
+            
+            expect(fs.promises.stat).not.toHaveBeenCalled();
+            expect(metadata).toEqual(expect.objectContaining({
+                path: '/test/documents/test-doc.txt',
+                title: 'test-doc',
+                type: 'txt'
+            }));
+        });
+
+        test('should get metadata from file system if not cached', async () => {
+            const metadata = await documentService.getDocumentMetadata('/test/documents/test-doc.txt');
+            
+            expect(fs.promises.stat).toHaveBeenCalled();
+            expect(metadata).toEqual(expect.objectContaining({
+                path: '/test/documents/test-doc.txt',
+                title: 'test-doc',
+                type: 'txt'
+            }));
+        });
+
+        test('should handle errors gracefully', async () => {
+            (fs.promises.stat as jest.Mock).mockRejectedValue(new Error('Failed to get stats'));
+            
+            await expect(documentService.getDocumentMetadata('/test/documents/error.txt'))
+                .rejects.toThrow('Failed to get document metadata');
+        });
+    });
+
+    describe('createDocument', () => {
+        test('should create a new document', async () => {
+            const title = 'new-doc';
+            const type = 'txt';
+            const directoryPath = '/test/documents';
+            const content = 'New document content';
+
+            const document = await documentService.createDocument(title, type, directoryPath, content);
+
+            expect(fs.promises.writeFile).toHaveBeenCalledWith(
+                expect.stringContaining('new-doc.txt'),
+                content,
+                'utf-8'
+            );
+            expect(document).toEqual(expect.objectContaining({
+                title,
+                type,
+                content,
+                path: expect.stringContaining('new-doc.txt')
+            }));
+        });
+
+        test('should handle type with leading dot', async () => {
+            const document = await documentService.createDocument('new-doc', '.txt', '/test/documents');
+
+            expect(document.type).toBe('txt');
+            expect(document.path).toEqual(expect.stringContaining('new-doc.txt'));
+        });
+
+        test('should create document with empty content if not provided', async () => {
+            const document = await documentService.createDocument('new-doc', 'txt', '/test/documents');
+
+            expect(document.content).toBe('');
+            expect(fs.promises.writeFile).toHaveBeenCalledWith(
+                expect.stringContaining('new-doc.txt'),
+                '',
+                'utf-8'
+            );
+        });
+
+        test('should handle errors during creation', async () => {
+            (fs.promises.writeFile as jest.Mock).mockRejectedValue(new Error('Write failed'));
+
+            await expect(documentService.createDocument('error-doc', 'txt', '/test/documents'))
+                .rejects.toThrow('Failed to create document');
+        });
+    });
+
+    describe('renameDocument', () => {
+        test('should rename a document', async () => {
+            // Setup document in cache
+            await documentService.getDocument('/test/documents/test-doc.txt');
+            
+            const newTitle = 'renamed-doc';
+            const document = await documentService.renameDocument('/test/documents/test-doc.txt', newTitle);
+            
+            expect(fs.promises.rename).toHaveBeenCalledWith(
+                '/test/documents/test-doc.txt',
+                expect.stringContaining('renamed-doc.txt')
+            );
+            expect(document).toEqual(expect.objectContaining({
+                title: newTitle,
+                path: expect.stringContaining('renamed-doc.txt')
+            }));
+        });
+
+        test('should update cache after renaming', async () => {
+            // Setup document in cache
+            await documentService.getDocument('/test/documents/test-doc.txt');
+            
+            const newTitle = 'renamed-doc';
+            const newPath = '/test/documents/renamed-doc.txt';
+            
+            // Mock readFile for the new path
+            (fs.promises.readFile as jest.Mock).mockImplementation((path) => {
+                if (path === newPath) {
+                    return Promise.resolve('This is a test document');
                 }
-            };
-            mockContext.globalState.get = jest.fn().mockReturnValue(JSON.stringify(savedDocuments));
+                return Promise.reject(new Error('File not found'));
+            });
             
-            // Mock path validation to fail
-            mockSecurityManager.validatePath.mockReturnValue(false);
+            // Mock access for the new path
+            (fs.promises.access as jest.Mock).mockImplementation((path) => {
+                if (path === newPath) {
+                    return Promise.resolve();
+                }
+                return Promise.reject(new FileSystemError('ENOENT', 'File not found'));
+            });
             
-            await expect(documentService.loadDocument('test_document.json'))
-                .rejects.toThrow('Invalid file path:');
+            await documentService.renameDocument('/test/documents/test-doc.txt', newTitle);
+            
+            // Try to get document with old path
+            await expect(documentService.getDocument('/test/documents/test-doc.txt'))
+                .rejects.toThrow('Document not found');
+            
+            // Document should be accessible with new path
+            const document = await documentService.getDocument(newPath);
+            expect(document.title).toBe(newTitle);
+            expect(document.path).toBe(newPath);
+        });
+
+        test('should handle rename errors', async () => {
+            (fs.promises.rename as jest.Mock).mockRejectedValue(new Error('Rename failed'));
+            
+            await expect(documentService.renameDocument('/test/documents/test-doc.txt', 'new-name'))
+                .rejects.toThrow('Failed to rename document');
+        });
+
+        test('should preserve file extension', async () => {
+            const document = await documentService.renameDocument('/test/documents/test-doc.txt', 'new-name');
+            
+            expect(document.type).toBe('txt');
+            expect(document.path).toEqual(expect.stringContaining('new-name.txt'));
         });
     });
-    
-    describe('generatePreview', () => {
-        test('should generate a markdown preview of the document', async () => {
-            // Mock file operations
-            (fs.promises.writeFile as jest.Mock).mockResolvedValue(undefined);
+
+    describe('exportDocument', () => {
+        test('should export document to specified format', async () => {
+            const outputPath = '/test/documents/exported-doc.md';
+            const exportedPath = await documentService.exportDocument(sampleDocument, 'md', outputPath);
             
-            // Mock unique ID generation
-            jest.spyOn(documentService as any, '_generateUniqueId')
-                .mockReturnValue('preview_id');
-            
-            const previewPath = await documentService.generatePreview(sampleDocumentData);
-            
-            // Verify preview was generated
-            expect(fs.promises.writeFile).toHaveBeenCalled();
-            expect(previewPath).toContain('preview_preview_id.md');
+            expect(fs.promises.writeFile).toHaveBeenCalledWith(
+                outputPath,
+                sampleDocument.content,
+                'utf-8'
+            );
+            expect(exportedPath).toBe(outputPath);
         });
-        
-        test('should throw an error if path validation fails', async () => {
-            // Mock path validation to fail
-            mockSecurityManager.validatePath.mockReturnValue(false);
+
+        test('should generate output path if not provided', async () => {
+            const exportedPath = await documentService.exportDocument(sampleDocument, 'md');
             
-            await expect(documentService.generatePreview(sampleDocumentData))
-                .rejects.toThrow('Invalid file path:');
+            expect(exportedPath).toEqual(expect.stringContaining('test-doc.md'));
+            expect(fs.promises.writeFile).toHaveBeenCalledWith(
+                expect.stringContaining('test-doc.md'),
+                sampleDocument.content,
+                'utf-8'
+            );
+        });
+
+        test('should handle export errors', async () => {
+            (fs.promises.writeFile as jest.Mock).mockRejectedValue(new Error('Export failed'));
+            
+            await expect(documentService.exportDocument(sampleDocument, 'md'))
+                .rejects.toThrow('Failed to export document');
         });
     });
-    
-    describe('generateDocument', () => {
-        test('should generate a document from document data', async () => {
-            // Mock directory creation
-            (fs.promises.mkdir as jest.Mock).mockResolvedValue(undefined);
-            
-            // Mock file operations for DOCX generation
-            (fs.readFileSync as jest.Mock).mockReturnValue('template content');
-            (fs.writeFileSync as jest.Mock).mockReturnValue(undefined);
-            
-            // Mock the docxtemplater functionality (simplified)
-            const mockDocxTemplater = {
-                setData: jest.fn(),
-                render: jest.fn(),
-                getZip: jest.fn().mockReturnValue({
-                    generate: jest.fn().mockReturnValue(Buffer.from('document content'))
-                })
+
+    describe('updateDocumentMetadata', () => {
+        test('should update document metadata', async () => {
+            const metadata: Partial<DocumentMetadata> = {
+                title: 'Updated Title',
+                author: 'New Author',
+                tags: ['new-tag']
             };
             
-            // Mock PizZip constructor
-            const mockPizZip = function() { return {}; };
-            jest.mock('pizzip', () => mockPizZip);
+            const updatedMetadata = await documentService.updateDocumentMetadata('/test/documents/test-doc.txt', metadata);
             
-            // Mock Docxtemplater constructor
-            const mockDocxtemplaterConstructor = jest.fn().mockReturnValue(mockDocxTemplater);
-            jest.mock('docxtemplater', () => mockDocxtemplaterConstructor);
-            
-            // Use a spy to capture the internal method call
-            const generateDocxSpy = jest.spyOn(documentService as any, '_generateDocxDocument')
-                .mockResolvedValue('/test/storage/path/output/Test_Document.docx');
-            
-            const outputPath = await documentService.generateDocument(sampleDocumentData);
-            
-            // Verify document generation
-            expect(mockTemplateManager.getTemplateById).toHaveBeenCalledWith('template_123');
-            expect(generateDocxSpy).toHaveBeenCalled();
-            expect(outputPath).toBe('/test/storage/path/output/Test_Document.docx');
+            expect(updatedMetadata).toEqual(expect.objectContaining({
+                title: 'Updated Title',
+                author: 'New Author',
+                tags: ['new-tag']
+            }));
         });
-        
-        test('should throw an error if template is not found', async () => {
-            // Mock template not found
-            mockTemplateManager.getTemplateById.mockReturnValue(undefined);
+
+        test('should handle path updates', async () => {
+            // Setup initial document
+            await documentService.getDocument('/test/documents/test-doc.txt');
             
-            await expect(documentService.generateDocument(sampleDocumentData))
-                .rejects.toThrow(`Template with ID ${sampleDocumentData.template} not found`);
+            const newPath = '/test/documents/moved-doc.txt';
+            const metadata: Partial<DocumentMetadata> = {
+                path: newPath
+            };
+            
+            // Mock readFile for the new path
+            (fs.promises.readFile as jest.Mock).mockImplementation((path) => {
+                if (path === newPath) {
+                    return Promise.resolve('This is a test document');
+                }
+                return Promise.reject(new Error('File not found'));
+            });
+            
+            const updatedMetadata = await documentService.updateDocumentMetadata('/test/documents/test-doc.txt', metadata);
+            
+            expect(fs.promises.rename).toHaveBeenCalledWith(
+                '/test/documents/test-doc.txt',
+                newPath
+            );
+            expect(updatedMetadata.path).toBe(newPath);
+        });
+
+        test('should update cache when path changes', async () => {
+            // Setup document in cache
+            await documentService.getDocument('/test/documents/test-doc.txt');
+            
+            const newPath = '/test/documents/moved-doc.txt';
+            
+            // Mock readFile for the new path
+            (fs.promises.readFile as jest.Mock).mockImplementation((path) => {
+                if (path === newPath) {
+                    return Promise.resolve('This is a test document');
+                }
+                return Promise.reject(new FileSystemError('ENOENT', 'File not found'));
+            });
+            
+            // Mock access for the new path
+            (fs.promises.access as jest.Mock).mockImplementation((path) => {
+                if (path === newPath) {
+                    return Promise.resolve();
+                }
+                return Promise.reject(new FileSystemError('ENOENT', 'File not found'));
+            });
+            
+            await documentService.updateDocumentMetadata('/test/documents/test-doc.txt', { path: newPath });
+            
+            // Try to get document with old path
+            await expect(documentService.getDocument('/test/documents/test-doc.txt'))
+                .rejects.toThrow('Document not found');
+            
+            // Document should be accessible with new path
+            const document = await documentService.getDocument(newPath);
+            expect(document.path).toBe(newPath);
+        });
+
+        test('should handle update errors', async () => {
+            // Setup initial document
+            await documentService.getDocument('/test/documents/test-doc.txt');
+            
+            // Mock rename to fail
+            (fs.promises.rename as jest.Mock).mockRejectedValue(new Error('Update failed'));
+            
+            await expect(documentService.updateDocumentMetadata('/test/documents/test-doc.txt', { path: 'new-path' }))
+                .rejects.toThrow('Failed to update document metadata');
         });
     });
 });

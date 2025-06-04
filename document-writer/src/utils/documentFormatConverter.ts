@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
-import { DocumentFormat, FormatConversionOptions } from '../core/formatProcessor';
+import { DocumentFormat } from '../models/documentFormat';
 import { SecurityManager } from './securityManager';
 import { PathSafetyUtils } from './pathSafetyUtils';
 

@@ -7,7 +7,7 @@ import { ContentSuggestionEngine } from '../core/contentSuggestionEngine';
 import { FeedbackLearningEngine } from '../core/feedbackLearningEngine';
 import { SentimentAnalyzer, SentimentResult } from '../core/sentimentAnalyzer';
 import { DocumentAnalyzer, DocumentAnalysisResult } from '../core/documentAnalyzer';
-import { DocumentFormat } from '../core/formatProcessor';
+import { DocumentFormat } from '../models/documentFormat';
 import { DocumentPreviewProvider } from './documentPreviewProvider';
 import { DocumentFormatConverter } from '../utils/documentFormatConverter';
 

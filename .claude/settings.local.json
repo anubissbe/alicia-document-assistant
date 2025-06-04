@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(ls:*)",
+      "Bash(npm run compile:*)",
+      "Bash(grep:*)",
+      "Bash(npx tsc:*)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}

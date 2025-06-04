@@ -1,14 +1,35 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { TemplateManagerService } from '../../services/templateManagerService';
-import { DocumentFormat, DocumentTemplate } from '../../models/documentTemplate';
-import { SecurityManager, SecurityLevel } from '../../utils/securityManager';
+import { TemplateManagerService } from '../../services/templateManagerService.js';
+import { DocumentTemplate } from '../../models/documentTemplate.js';
+import { SecurityManager } from '../../utils/securityManager.js';
 
-// Mock the dependencies
+// Mock dependencies
 jest.mock('vscode');
-jest.mock('fs');
-jest.mock('../../utils/securityManager');
+jest.mock('fs', () => {
+    const actualFs = jest.requireActual('fs');
+    return {
+        ...actualFs,
+        constants: {
+            R_OK: 4,
+            W_OK: 2
+        },
+        promises: {
+            readFile: jest.fn(),
+            writeFile: jest.fn(),
+            access: jest.fn(),
+            mkdir: jest.fn(),
+            readdir: jest.fn(),
+            unlink: jest.fn()
+        },
+        existsSync: jest.fn(),
+        readFileSync: jest.fn(),
+        writeFileSync: jest.fn(),
+        mkdirSync: jest.fn()
+    };
+});
+jest.mock('../../utils/securityManager.js');
 
 describe('TemplateManagerService', () => {
     let templateManager: TemplateManagerService;
@@ -20,20 +41,19 @@ describe('TemplateManagerService', () => {
         id: 'template_123',
         name: 'Test Template',
         description: 'A test template',
-        format: DocumentFormat.DOCX,
-        templatePath: '/path/to/template.docx',
+        path: '/path/to/template.docx',
+        type: 'docx',
         metadata: {
             author: 'Test Author',
             version: '1.0',
-            tags: ['test'],
-            category: 'Test'
-        },
-        sections: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
+            lastModified: new Date()
+        }
     };
     
     beforeEach(() => {
+        // Reset all mocks
+        jest.clearAllMocks();
+        
         // Create mock context
         mockContext = {
             subscriptions: [],
@@ -67,27 +87,59 @@ describe('TemplateManagerService', () => {
             languageModelAccessInformation: {} as any,
         };
         
-        // Create SecurityManager mock
+        // Create SecurityManager mock with public methods and required private properties
         mockSecurityManager = {
-            normalizePath: jest.fn().mockImplementation((path) => path),
-            validatePath: jest.fn().mockReturnValue(true),
-            addAllowedPath: jest.fn(),
-            validateInput: jest.fn(),
-            sanitizeContent: jest.fn().mockImplementation((content) => content),
-            storeSecret: jest.fn(),
-            getSecret: jest.fn(),
-            deleteSecret: jest.fn(),
+            validatePath: jest.fn().mockReturnValue({ valid: true, message: 'Valid path' }),
+            sanitizePath: jest.fn().mockImplementation((path) => path),
+            sanitizeInput: jest.fn().mockImplementation((input) => input),
+            storeSecureData: jest.fn(),
+            getSecureData: jest.fn(),
+            deleteSecureData: jest.fn(),
+            storeApiKey: jest.fn(),
+            getApiKey: jest.fn(),
+            storeCredentials: jest.fn(),
+            getCredentials: jest.fn(),
+            storeSecureObject: jest.fn(),
+            getSecureObject: jest.fn(),
+            rotateEncryptionKeys: jest.fn(),
             generateHash: jest.fn(),
-            verifyTemplateIntegrity: jest.fn(),
-            encryptData: jest.fn(),
-            decryptData: jest.fn(),
-        } as any;
+            verifyIntegrity: jest.fn(),
+            generateToken: jest.fn(),
+            // Add required private properties as any
+            context: {} as any,
+            defaultAllowedExtensions: [] as any,
+            defaultEncryptionConfig: {} as any,
+            MASTER_KEY_ID: '' as any,
+            containsPathTraversal: jest.fn(),
+            encrypt: jest.fn(),
+            decrypt: jest.fn(),
+            getMasterKey: jest.fn(),
+            encryptAndStoreCredential: jest.fn(),
+            getAndDecryptCredential: jest.fn(),
+            getAllStoredKeys: jest.fn(),
+            normalizePath: jest.fn().mockImplementation((path) => path)
+        } as unknown as jest.Mocked<SecurityManager>;
         
         // Mock SecurityManager constructor
         (SecurityManager as jest.MockedClass<typeof SecurityManager>).mockImplementation(() => mockSecurityManager);
         
         // Create TemplateManagerService instance
         templateManager = new TemplateManagerService(mockContext);
+    });
+
+    afterEach(() => {
+        // Clean up
+        jest.resetModules();
+        
+        // Reset fs mocks
+        const fs = require('fs');
+        Object.values(fs.promises).forEach(mock => (mock as jest.Mock).mockClear());
+        (fs.existsSync as jest.Mock).mockClear();
+        (fs.readFileSync as jest.Mock).mockClear();
+        (fs.writeFileSync as jest.Mock).mockClear();
+        
+        // Reset SecurityManager mock
+        (SecurityManager as jest.MockedClass<typeof SecurityManager>).mockClear();
     });
     
     describe('getTemplates', () => {
@@ -124,7 +176,7 @@ describe('TemplateManagerService', () => {
             expect(templates[0].id).toBe(sampleTemplate.id);
             expect(templates[0].name).toBe(sampleTemplate.name);
             expect(templates[0].description).toBe(sampleTemplate.description);
-            expect(templates[0].format).toBe(sampleTemplate.format);
+            expect(templates[0].type).toBe(sampleTemplate.type);
         });
     });
     
@@ -157,17 +209,13 @@ describe('TemplateManagerService', () => {
             const templateData: Omit<DocumentTemplate, 'id'> = {
                 name: 'New Template',
                 description: 'A new template',
-                format: DocumentFormat.DOCX,
-                templatePath: '/path/to/new/template.docx',
+                path: '/path/to/new/template.docx',
+                type: 'docx',
                 metadata: {
                     author: 'Test Author',
                     version: '1.0',
-                    tags: ['test'],
-                    category: 'Test'
-                },
-                sections: [],
-                createdAt: new Date(),
-                updatedAt: new Date()
+                    lastModified: new Date()
+                }
             };
             
             // Add the template
@@ -235,11 +283,52 @@ describe('TemplateManagerService', () => {
         });
     });
     
+    describe('exportTemplate', () => {
+        test('should export a template to a file', async () => {
+            // Mock the global state to return a saved template
+            const templatesJson = JSON.stringify([sampleTemplate]);
+            mockContext.globalState.get = jest.fn().mockReturnValue(templatesJson);
+            
+            // Create a new instance to load the mocked templates
+            templateManager = new TemplateManagerService(mockContext);
+            
+            // Mock fs.promises.writeFile
+            (fs.promises.writeFile as jest.Mock).mockResolvedValue(undefined);
+            
+            // Export the template
+            await templateManager.exportTemplate(sampleTemplate.id, '/path/to/export/template.docx');
+            
+            // Verify the template was exported
+            expect(fs.promises.writeFile).toHaveBeenCalledWith(
+                '/path/to/export/template.docx',
+                expect.any(String),
+                'utf8'
+            );
+        });
+        
+        test('should throw an error for non-existent template ID', async () => {
+            await expect(templateManager.exportTemplate('non-existent-id', '/path/to/export/template.docx'))
+                .rejects.toThrow('Template with ID non-existent-id not found');
+        });
+        
+        test('should throw an error for invalid export path', async () => {
+            // Mock the global state to return a saved template
+            const templatesJson = JSON.stringify([sampleTemplate]);
+            mockContext.globalState.get = jest.fn().mockReturnValue(templatesJson);
+            
+            // Mock SecurityManager to reject the path
+            mockSecurityManager.validatePath.mockReturnValue({ valid: false, message: 'Invalid path' });
+            
+            await expect(templateManager.exportTemplate(sampleTemplate.id, '/invalid/path/template.docx'))
+                .rejects.toThrow('Invalid export path: /invalid/path/template.docx');
+        });
+    });
+
     describe('importTemplate', () => {
         test('should import a template from a file', async () => {
             // Mock SecurityManager methods
-            mockSecurityManager.normalizePath.mockImplementation((path) => path);
-            mockSecurityManager.validatePath.mockReturnValue(true);
+            mockSecurityManager.sanitizePath.mockImplementation((path) => path);
+            mockSecurityManager.validatePath.mockReturnValue({ valid: true, message: 'Valid path' });
             
             // Mock fs.existsSync
             (fs.existsSync as jest.Mock).mockReturnValue(true);
@@ -250,7 +339,7 @@ describe('TemplateManagerService', () => {
                     ...sampleTemplate,
                     name: 'Imported Template',
                     description: 'Imported from file',
-                    templatePath: '/path/to/imported/template.docx'
+                    path: '/path/to/imported/template.docx'
                 });
             
             // Import the template
@@ -261,7 +350,6 @@ describe('TemplateManagerService', () => {
             );
             
             // Verify the template was imported
-            expect(mockSecurityManager.normalizePath).toHaveBeenCalled();
             expect(mockSecurityManager.validatePath).toHaveBeenCalled();
             expect(fs.existsSync).toHaveBeenCalled();
             expect(addTemplateSpy).toHaveBeenCalled();
@@ -270,7 +358,7 @@ describe('TemplateManagerService', () => {
         
         test('should throw an error for invalid file path', async () => {
             // Mock SecurityManager methods
-            mockSecurityManager.normalizePath.mockReturnValue(null);
+            mockSecurityManager.sanitizePath.mockReturnValue('');
             
             await expect(templateManager.importTemplate(
                 '/invalid/path/template.docx',
@@ -281,8 +369,8 @@ describe('TemplateManagerService', () => {
         
         test('should throw an error for disallowed file path', async () => {
             // Mock SecurityManager methods
-            mockSecurityManager.normalizePath.mockImplementation((path) => path);
-            mockSecurityManager.validatePath.mockReturnValue(false);
+            mockSecurityManager.sanitizePath.mockImplementation((path) => path);
+            mockSecurityManager.validatePath.mockReturnValue({ valid: false, message: 'Invalid path' });
             
             await expect(templateManager.importTemplate(
                 '/disallowed/path/template.docx',
@@ -293,8 +381,8 @@ describe('TemplateManagerService', () => {
         
         test('should throw an error if file does not exist', async () => {
             // Mock SecurityManager methods
-            mockSecurityManager.normalizePath.mockImplementation((path) => path);
-            mockSecurityManager.validatePath.mockReturnValue(true);
+            mockSecurityManager.sanitizePath.mockImplementation((path) => path);
+            mockSecurityManager.validatePath.mockReturnValue({ valid: true, message: 'Valid path' });
             
             // Mock fs.existsSync
             (fs.existsSync as jest.Mock).mockReturnValue(false);

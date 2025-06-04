@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { FormatProcessor, DocumentFormat } from '../core/formatProcessor';
+import { FormatProcessor } from '../core/formatProcessor';
+import { DocumentFormat } from '../models/documentFormat';
 import { JSDOM } from 'jsdom';
 import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';

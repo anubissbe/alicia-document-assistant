@@ -1,992 +1,326 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-import { createCanvas, loadImage, Canvas, CanvasRenderingContext2D } from 'canvas';
+// Types only imports
+import type { Chart, ChartConfiguration } from 'chart.js';
+import type { Canvas, CanvasRenderingContext2D } from 'canvas';
+import type PDFKit from 'pdfkit';
+import type { Canvg } from 'canvg';
 
-/**
- * Interface for chart data configuration
- * 
- * @remarks
- * This interface defines the structure of data required to generate charts.
- * It follows a similar pattern to Chart.js data configuration to make it
- * familiar to developers used to web-based charting libraries.
- * 
- * @example
- * ```typescript
- * const salesData: ChartData = {
- *   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
- *   datasets: [{
- *     label: 'Sales 2024',
- *     data: [5000, 6200, 7800, 8400, 9100],
- *     backgroundColor: '#4e79a7',
- *     borderColor: '#2c3e50',
- *     borderWidth: 1
- *   }]
- * };
- * ```
- */
 export interface ChartData {
-    /**
-     * Array of labels for data points (e.g., categories, dates, etc.)
-     */
     labels: string[];
-    
-    /**
-     * Array of dataset objects containing the actual data and styling
-     */
     datasets: {
-        /**
-         * Name/label for this dataset (used in legends)
-         */
         label: string;
-        
-        /**
-         * Array of numeric values for this dataset
-         */
         data: number[];
-        
-        /**
-         * Background color(s) for chart elements
-         * Can be a single color or array of colors for each data point
-         */
-        backgroundColor?: string | string[];
-        
-        /**
-         * Border color(s) for chart elements
-         * Can be a single color or array of colors for each data point
-         */
-        borderColor?: string | string[];
-        
-        /**
-         * Width of borders for chart elements in pixels
-         */
+        backgroundColor?: string[];
+        borderColor?: string;
         borderWidth?: number;
-        
-        /**
-         * Whether to fill the area under lines (for line charts)
-         */
-        fill?: boolean;
     }[];
 }
 
-/**
- * Interface for chart configuration
- * 
- * @remarks
- * This interface defines the overall configuration for a chart, including
- * its type, data, dimensions, and title. It provides a unified configuration
- * object for all chart types supported by the ChartGenerator.
- * 
- * @example
- * ```typescript
- * const chartConfig: ChartConfig = {
- *   type: 'bar',
- *   data: salesData,
- *   title: 'Monthly Sales Report',
- *   width: 800,
- *   height: 500,
- *   options: {
- *     // Additional chart-specific options
- *   }
- * };
- * ```
- */
-export interface ChartConfig {
-    /**
-     * Type of chart to generate
-     * 
-     * - 'bar': Vertical bar chart for comparing categories
-     * - 'line': Line chart for showing trends over time
-     * - 'pie': Circular chart showing proportions of a whole
-     * - 'doughnut': Pie chart with a hole in the center
-     * - 'scatter': Points plotted on x/y coordinates
-     */
-    type: 'bar' | 'line' | 'pie' | 'doughnut' | 'scatter';
-    
-    /**
-     * Data configuration for the chart
-     */
-    data: ChartData;
-    
-    /**
-     * Optional title to display at the top of the chart
-     */
+export type ChartType = 'bar' | 'line' | 'pie' | 'doughnut' | 'radar';
+
+export interface ChartOptions {
+    type: ChartType;
     title?: string;
-    
-    /**
-     * Width of the chart in pixels (default: 800)
-     */
     width?: number;
-    
-    /**
-     * Height of the chart in pixels (default: 500)
-     */
     height?: number;
-    
-    /**
-     * Additional chart-specific options
-     */
-    options?: any;
+    responsive?: boolean;
+    maintainAspectRatio?: boolean;
+    legend?: boolean;
+    animation?: boolean;
 }
 
-/**
- * Class for generating charts for documents
- * 
- * @remarks
- * The ChartGenerator class provides functionality for creating various types of charts
- * as images that can be embedded in documents. It uses the node-canvas library for
- * rendering and supports bar, line, pie, doughnut, and scatter charts.
- * 
- * Charts are generated as PNG files and saved in the extension's resources directory.
- * The class handles all aspects of chart generation including:
- * - Canvas setup and configuration
- * - Data processing and scaling
- * - Drawing chart elements (bars, lines, points, etc.)
- * - Adding titles, labels, and legends
- * - Saving output as PNG files
- * 
- * @example
- * ```typescript
- * // Create a chart generator
- * const chartGenerator = new ChartGenerator(context);
- * 
- * // Generate a bar chart
- * const chartConfig = {
- *   type: 'bar',
- *   data: {
- *     labels: ['Q1', 'Q2', 'Q3', 'Q4'],
- *     datasets: [{
- *       label: 'Revenue',
- *       data: [5000, 6000, 7000, 8000]
- *     }]
- *   },
- *   title: 'Quarterly Revenue'
- * };
- * 
- * const chartPath = await chartGenerator.generateChart(chartConfig);
- * ```
- */
 export class ChartGenerator {
-    /**
-     * Default color palette for charts
-     * These colors are designed to be distinct, accessible, and visually appealing
-     * @private
-     */
     private readonly defaultColors = [
-        '#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f',
-        '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+        '#4BC0C0',
+        '#9966FF',
+        '#FF9F40'
     ];
-    
-    /**
-     * Creates a new instance of the ChartGenerator
-     * 
-     * @param context - VS Code extension context used to access extension resources
-     */
-    constructor(private context: vscode.ExtensionContext) {}
-    
-    /**
-     * Generate a chart as a PNG image based on the provided configuration
-     * 
-     * @param config - Chart configuration defining type, data, and appearance
-     * @returns Promise resolving to the file path of the generated chart image
-     * 
-     * @throws Error if chart generation fails for any reason
-     * 
-     * @remarks
-     * This is the main method for generating charts. It handles the entire process from
-     * creating the canvas to saving the final image. The method:
-     * 
-     * 1. Sets up the canvas with the specified dimensions
-     * 2. Applies default colors to datasets if not provided
-     * 3. Delegates to specialized methods for each chart type
-     * 4. Adds titles and other common elements
-     * 5. Saves the chart as a PNG file in the extension's resources directory
-     * 
-     * Each chart type has its own rendering method that handles the specifics of
-     * drawing that particular chart type.
-     * 
-     * @example
-     * ```typescript
-     * const chartPath = await chartGenerator.generateChart({
-     *   type: 'line',
-     *   data: timeSeriesData,
-     *   title: 'Temperature Trends',
-     *   width: 1000,
-     *   height: 600
-     * });
-     * ```
-     */
-    async generateChart(config: ChartConfig): Promise<string> {
+
+    private readonly defaultOptions: Partial<ChartOptions> = {
+        width: 600,
+        height: 400,
+        responsive: true,
+        maintainAspectRatio: true,
+        legend: true,
+        animation: true,
+        type: 'bar' // Add default chart type
+    };
+
+    async generateChart(data: ChartData, options: ChartOptions): Promise<string> {
         try {
-            // Set default width and height if not provided
-            const width = config.width || 800;
-            const height = config.height || 500;
+            // Validate inputs
+            this.validateChartData(data);
+            this.validateChartOptions(options);
+
+            // Merge options with defaults
+            const finalOptions = { ...this.defaultOptions, ...options };
             
-            // Create canvas
-            const canvas = createCanvas(width, height);
-            const ctx = canvas.getContext('2d');
-            
-            // Apply background
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, width, height);
-            
-            // Ensure colors are set for datasets
-            this.applyColorDefaults(config.data);
-            
-            // Draw the chart based on type
-            switch (config.type) {
-                case 'bar':
-                    await this.drawBarChart(ctx, config, width, height);
-                    break;
-                case 'line':
-                    await this.drawLineChart(ctx, config, width, height);
-                    break;
-                case 'pie':
-                case 'doughnut':
-                    await this.drawPieChart(ctx, config, width, height, config.type === 'doughnut');
-                    break;
-                case 'scatter':
-                    await this.drawScatterChart(ctx, config, width, height);
-                    break;
-                default:
-                    throw new Error(`Unsupported chart type: ${config.type}`);
-            }
-            
-            // Add title if provided
-            if (config.title) {
-                ctx.font = 'bold 24px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillStyle = 'black';
-                ctx.fillText(config.title, width / 2, 30);
-            }
-            
-            // Save the chart as an image
-            const outputDir = path.join(this.context.extensionPath, 'resources', 'charts');
-            await this.ensureDirectoryExists(outputDir);
-            
-            const fileName = `chart_${Date.now()}.png`;
-            const outputPath = path.join(outputDir, fileName);
-            
-            const buffer = canvas.toBuffer('image/png');
-            await fs.promises.writeFile(outputPath, buffer);
-            
-            return outputPath;
-        } catch (error) {
-            console.error('Error generating chart:', error);
-            throw new Error(`Failed to generate chart: ${error instanceof Error ? error.message : String(error)}`);
+            // Ensure valid dimensions
+            finalOptions.width = Math.max(finalOptions.width || 600, 1);
+            finalOptions.height = Math.max(finalOptions.height || 400, 1);
+
+            // Apply colors if not provided
+            data.datasets = data.datasets.map((dataset, index) => ({
+                ...dataset,
+                backgroundColor: dataset.backgroundColor || this.getDefaultColors(index, data.labels.length),
+                borderColor: dataset.borderColor || this.defaultColors[index % this.defaultColors.length],
+                borderWidth: dataset.borderWidth || 1
+            }));
+
+            // Generate chart configuration
+            const config = this.generateChartConfig(data, finalOptions);
+
+            // Convert to base64 string (placeholder - actual implementation would use a charting library)
+            return this.generateChartMarkup(config);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new Error(`Failed to generate chart: ${errorMessage}`);
         }
     }
-    
-    /**
-     * Apply default colors to datasets if not provided
-     * 
-     * @param data - Chart data to process
-     * 
-     * @remarks
-     * This method ensures all datasets have appropriate colors by applying defaults
-     * from the color palette when colors aren't explicitly specified. It handles both
-     * backgroundColor and borderColor properties, and sets a default borderWidth.
-     * 
-     * The method cycles through the default colors array for datasets beyond the
-     * palette size, ensuring all datasets receive a color.
-     * 
-     * @private
-     */
-    private applyColorDefaults(data: ChartData): void {
+
+    private validateChartData(data: ChartData): void {
+        if (!data.labels || !Array.isArray(data.labels)) {
+            throw new Error('Chart labels must be an array');
+        }
+
+        if (!data.datasets || !Array.isArray(data.datasets)) {
+            throw new Error('Chart datasets must be an array');
+        }
+
         data.datasets.forEach((dataset, index) => {
-            const colorIndex = index % this.defaultColors.length;
-            const color = this.defaultColors[colorIndex];
-            
-            if (!dataset.backgroundColor) {
-                dataset.backgroundColor = color;
+            if (!dataset.data || !Array.isArray(dataset.data)) {
+                throw new Error(`Dataset ${index} data must be an array`);
             }
-            
-            if (!dataset.borderColor) {
-                dataset.borderColor = color;
-            }
-            
-            if (dataset.borderWidth === undefined) {
-                dataset.borderWidth = 1;
+
+            if (dataset.data.length !== data.labels.length) {
+                throw new Error(`Dataset ${index} length must match labels length`);
             }
         });
     }
-    
-    /**
-     * Draw a bar chart on the canvas
-     * 
-     * @param ctx - Canvas rendering context to draw on
-     * @param config - Chart configuration
-     * @param width - Canvas width in pixels
-     * @param height - Canvas height in pixels
-     * 
-     * @remarks
-     * This method renders a bar chart on the provided canvas context.
-     * The implementation:
-     * 
-     * 1. Calculates chart dimensions and margins
-     * 2. Determines the maximum value for scaling
-     * 3. Draws axes and grid lines
-     * 4. Renders bars for each dataset with appropriate colors
-     * 5. Adds labels for data points
-     * 6. Draws the legend for multiple datasets
-     * 
-     * For grouped bar charts (multiple datasets), each group of bars is 
-     * arranged side by side for the corresponding category.
-     * 
-     * @private
-     */
-    private async drawBarChart(
-        ctx: CanvasRenderingContext2D,
-        config: ChartConfig,
-        width: number,
-        height: number
-    ): Promise<void> {
-        const { data } = config;
-        const marginTop = config.title ? 60 : 30;
-        const marginBottom = 60;
-        const marginLeft = 60;
-        const marginRight = 30;
-        
-        const chartWidth = width - marginLeft - marginRight;
-        const chartHeight = height - marginTop - marginBottom;
-        
-        const numBars = data.labels.length;
-        const numGroups = data.datasets.length;
-        const groupWidth = chartWidth / numBars;
-        const barWidth = groupWidth / (numGroups + 1);
-        
-        // Find the maximum value for scaling
-        let maxValue = 0;
-        for (const dataset of data.datasets) {
-            const datasetMax = Math.max(...dataset.data);
-            maxValue = Math.max(maxValue, datasetMax);
+
+    private validateChartOptions(options: ChartOptions): void {
+        const validTypes = ['bar', 'line', 'pie', 'doughnut', 'radar'];
+        if (!validTypes.includes(options.type)) {
+            throw new Error('Invalid chart type');
         }
-        
-        // Add some padding to the maximum value
-        maxValue *= 1.1;
-        
-        // Draw axes
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 1;
-        
-        // Y-axis
-        ctx.beginPath();
-        ctx.moveTo(marginLeft, marginTop);
-        ctx.lineTo(marginLeft, height - marginBottom);
-        ctx.stroke();
-        
-        // X-axis
-        ctx.beginPath();
-        ctx.moveTo(marginLeft, height - marginBottom);
-        ctx.lineTo(width - marginRight, height - marginBottom);
-        ctx.stroke();
-        
-        // Draw Y-axis labels
-        const numYLabels = 5;
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.font = '12px Arial';
-        ctx.fillStyle = 'black';
-        
-        for (let i = 0; i <= numYLabels; i++) {
-            const value = (maxValue * i) / numYLabels;
-            const y = height - marginBottom - (chartHeight * i) / numYLabels;
-            
-            ctx.fillText(value.toFixed(0), marginLeft - 10, y);
-            
-            // Draw grid line
-            ctx.beginPath();
-            ctx.strokeStyle = '#e0e0e0';
-            ctx.moveTo(marginLeft, y);
-            ctx.lineTo(width - marginRight, y);
-            ctx.stroke();
+
+        if (options.width && options.width <= 0) {
+            throw new Error('Chart width must be positive');
         }
-        
-        // Draw bars and X-axis labels
-        for (let i = 0; i < numBars; i++) {
-            const label = data.labels[i];
-            const x = marginLeft + i * groupWidth + groupWidth / 2;
-            
-            // Draw X-axis label
-            ctx.save();
-            ctx.translate(x, height - marginBottom + 10);
-            ctx.rotate(Math.PI / 4); // Rotate labels to prevent overlap
-            ctx.textAlign = 'left';
-            ctx.fillStyle = 'black';
-            ctx.fillText(label, 0, 0);
-            ctx.restore();
-            
-            // Draw bars for each dataset
-            for (let j = 0; j < numGroups; j++) {
-                const dataset = data.datasets[j];
-                const value = dataset.data[i];
-                const barHeight = (chartHeight * value) / maxValue;
-                
-                const barX = marginLeft + i * groupWidth + (j + 0.5) * barWidth;
-                const barY = height - marginBottom - barHeight;
-                
-                // Draw bar
-                ctx.fillStyle = Array.isArray(dataset.backgroundColor) 
-                    ? dataset.backgroundColor[i % dataset.backgroundColor.length] 
-                    : dataset.backgroundColor as string;
-                
-                ctx.fillRect(barX, barY, barWidth, barHeight);
-                
-                // Draw border
-                ctx.strokeStyle = Array.isArray(dataset.borderColor) 
-                    ? dataset.borderColor[i % dataset.borderColor.length] 
-                    : dataset.borderColor as string;
-                
-                ctx.lineWidth = dataset.borderWidth || 1;
-                ctx.strokeRect(barX, barY, barWidth, barHeight);
-            }
+
+        if (options.height && options.height <= 0) {
+            throw new Error('Chart height must be positive');
         }
-        
-        // Draw legend
-        this.drawLegend(ctx, config, width, height);
     }
-    
-    /**
-     * Draw a line chart on the canvas
-     * 
-     * @param ctx - Canvas rendering context to draw on
-     * @param config - Chart configuration
-     * @param width - Canvas width in pixels
-     * @param height - Canvas height in pixels
-     * 
-     * @remarks
-     * This method renders a line chart on the provided canvas context.
-     * The implementation:
-     * 
-     * 1. Calculates chart dimensions and margins
-     * 2. Determines the maximum value for scaling
-     * 3. Draws axes and grid lines
-     * 4. Renders lines connecting data points for each dataset
-     * 5. Optionally fills the area under each line if specified
-     * 6. Draws data points as circles
-     * 7. Adds labels for data points
-     * 8. Draws the legend for multiple datasets
-     * 
-     * Line charts are particularly useful for visualizing trends over time
-     * or continuous data.
-     * 
-     * @private
-     */
-    private async drawLineChart(
-        ctx: CanvasRenderingContext2D,
-        config: ChartConfig,
-        width: number,
-        height: number
-    ): Promise<void> {
-        const { data } = config;
-        const marginTop = config.title ? 60 : 30;
-        const marginBottom = 60;
-        const marginLeft = 60;
-        const marginRight = 30;
-        
-        const chartWidth = width - marginLeft - marginRight;
-        const chartHeight = height - marginTop - marginBottom;
-        
-        const numPoints = data.labels.length;
-        
-        // Find the maximum value for scaling
-        let maxValue = 0;
-        for (const dataset of data.datasets) {
-            const datasetMax = Math.max(...dataset.data);
-            maxValue = Math.max(maxValue, datasetMax);
+
+    private getDefaultColors(datasetIndex: number, count: number): string[] {
+        const chartType = this.defaultOptions.type || 'bar';
+        if (['pie', 'doughnut'].includes(chartType)) {
+            return Array.from({ length: count }, (_, i) => 
+                this.defaultColors[(datasetIndex + i) % this.defaultColors.length]
+            );
         }
-        
-        // Add some padding to the maximum value
-        maxValue *= 1.1;
-        
-        // Draw axes
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 1;
-        
-        // Y-axis
-        ctx.beginPath();
-        ctx.moveTo(marginLeft, marginTop);
-        ctx.lineTo(marginLeft, height - marginBottom);
-        ctx.stroke();
-        
-        // X-axis
-        ctx.beginPath();
-        ctx.moveTo(marginLeft, height - marginBottom);
-        ctx.lineTo(width - marginRight, height - marginBottom);
-        ctx.stroke();
-        
-        // Draw Y-axis labels
-        const numYLabels = 5;
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.font = '12px Arial';
-        ctx.fillStyle = 'black';
-        
-        for (let i = 0; i <= numYLabels; i++) {
-            const value = (maxValue * i) / numYLabels;
-            const y = height - marginBottom - (chartHeight * i) / numYLabels;
-            
-            ctx.fillText(value.toFixed(0), marginLeft - 10, y);
-            
-            // Draw grid line
-            ctx.beginPath();
-            ctx.strokeStyle = '#e0e0e0';
-            ctx.moveTo(marginLeft, y);
-            ctx.lineTo(width - marginRight, y);
-            ctx.stroke();
-        }
-        
-        // Draw X-axis labels
-        for (let i = 0; i < numPoints; i++) {
-            const label = data.labels[i];
-            const x = marginLeft + (i / (numPoints - 1)) * chartWidth;
-            
-            ctx.save();
-            ctx.translate(x, height - marginBottom + 10);
-            ctx.rotate(Math.PI / 4); // Rotate labels to prevent overlap
-            ctx.textAlign = 'left';
-            ctx.fillStyle = 'black';
-            ctx.fillText(label, 0, 0);
-            ctx.restore();
-            
-            // Draw grid line
-            ctx.beginPath();
-            ctx.strokeStyle = '#e0e0e0';
-            ctx.moveTo(x, marginTop);
-            ctx.lineTo(x, height - marginBottom);
-            ctx.stroke();
-        }
-        
-        // Draw lines for each dataset
-        for (let i = 0; i < data.datasets.length; i++) {
-            const dataset = data.datasets[i];
-            
-            // Draw line
-            ctx.beginPath();
-            ctx.strokeStyle = Array.isArray(dataset.borderColor) 
-                ? dataset.borderColor[0] 
-                : dataset.borderColor as string;
-            ctx.lineWidth = dataset.borderWidth || 2;
-            
-            for (let j = 0; j < numPoints; j++) {
-                const x = marginLeft + (j / (numPoints - 1)) * chartWidth;
-                const y = height - marginBottom - (chartHeight * dataset.data[j]) / maxValue;
-                
-                if (j === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
+        return [this.defaultColors[datasetIndex % this.defaultColors.length]];
+    }
+
+    private generateChartConfig(data: ChartData, options: ChartOptions): ChartConfiguration<ChartType> {
+        const mergedOptions = { ...this.defaultOptions, ...options };
+        return {
+            type: options.type, // Always use provided type, not from defaults
+            data: {
+                labels: data.labels,
+                datasets: data.datasets
+            },
+            options: {
+                responsive: mergedOptions.responsive,
+                maintainAspectRatio: mergedOptions.maintainAspectRatio,
+                plugins: {
+                    legend: {
+                        display: mergedOptions.legend
+                    },
+                    title: {
+                        display: !!mergedOptions.title,
+                        text: mergedOptions.title
+                    }
+                },
+                animation: {
+                    duration: mergedOptions.animation ? 1000 : 0
                 }
             }
-            
-            ctx.stroke();
-            
-            // Fill area under the line if specified
-            if (dataset.fill) {
-                ctx.lineTo(marginLeft + chartWidth, height - marginBottom);
-                ctx.lineTo(marginLeft, height - marginBottom);
-                ctx.closePath();
-                
-                const fillColor = Array.isArray(dataset.backgroundColor) 
-                    ? dataset.backgroundColor[0] 
-                    : dataset.backgroundColor as string;
-                
-                // Create a semi-transparent fill
-                const rgbaFill = this.convertToRGBA(fillColor, 0.2);
-                ctx.fillStyle = rgbaFill;
-                ctx.fill();
-            }
-            
-            // Draw data points
-            for (let j = 0; j < numPoints; j++) {
-                const x = marginLeft + (j / (numPoints - 1)) * chartWidth;
-                const y = height - marginBottom - (chartHeight * dataset.data[j]) / maxValue;
-                
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fillStyle = Array.isArray(dataset.backgroundColor) 
-                    ? dataset.backgroundColor[j % dataset.backgroundColor.length] 
-                    : dataset.backgroundColor as string;
-                ctx.fill();
-                
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-        }
-        
-        // Draw legend
-        this.drawLegend(ctx, config, width, height);
+        };
     }
-    
-    /**
-     * Draw a pie or doughnut chart on the canvas
-     * 
-     * @param ctx - Canvas rendering context to draw on
-     * @param config - Chart configuration
-     * @param width - Canvas width in pixels
-     * @param height - Canvas height in pixels
-     * @param isDoughnut - Whether to draw a doughnut chart (true) or a pie chart (false)
-     * 
-     * @remarks
-     * This method renders either a pie or doughnut chart on the provided canvas context.
-     * The implementation:
-     * 
-     * 1. Calculates the center point and radius
-     * 2. Computes the total value to determine slice proportions
-     * 3. Draws each slice with appropriate colors
-     * 4. Adds percentage labels inside slices when they're large enough
-     * 5. For doughnut charts, cuts out the center circle
-     * 6. Adds a legend to identify each slice
-     * 
-     * Pie and doughnut charts are ideal for showing proportions of a whole
-     * or composition of a total value.
-     * 
-     * @private
-     */
-    private async drawPieChart(
-        ctx: CanvasRenderingContext2D,
-        config: ChartConfig,
-        width: number,
-        height: number,
-        isDoughnut: boolean
-    ): Promise<void> {
-        const { data } = config;
-        const marginTop = config.title ? 60 : 30;
-        
-        // Use the first dataset for pie/doughnut chart
-        const dataset = data.datasets[0];
-        const total = dataset.data.reduce((sum, value) => sum + value, 0);
-        
-        // Calculate the center and radius
-        const centerX = width / 2;
-        const centerY = (height + marginTop) / 2;
-        const radius = Math.min(width, height) / 3;
-        
-        // Draw slices
-        let startAngle = 0;
-        
-        for (let i = 0; i < dataset.data.length; i++) {
-            const value = dataset.data[i];
-            const sliceAngle = (value / total) * Math.PI * 2;
+
+    private generateChartMarkup(config: ChartConfiguration<ChartType>): string {
+        const chartId = `chart-${Date.now()}`;
+        const width = (config as any).width || 600;
+        const height = (config as any).height || 400;
+        const containerStyle = config.options?.responsive 
+            ? 'position: relative; width: 100%; height: 100%;'
+            : `position: relative; width: ${width}px; height: ${height}px;`;
             
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
-            ctx.closePath();
-            
-            // Fill slice
-            ctx.fillStyle = Array.isArray(dataset.backgroundColor) 
-                ? dataset.backgroundColor[i % dataset.backgroundColor.length] 
-                : dataset.backgroundColor as string;
-            ctx.fill();
-            
-            // Draw border
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // If it's a doughnut chart, draw the inner circle
-            if (isDoughnut) {
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius * 0.6, 0, Math.PI * 2);
-                ctx.fillStyle = 'white';
-                ctx.fill();
-            }
-            
-            // Calculate the midpoint of the slice for label
-            const midAngle = startAngle + sliceAngle / 2;
-            const labelRadius = radius * 0.7;
-            const labelX = centerX + Math.cos(midAngle) * labelRadius;
-            const labelY = centerY + Math.sin(midAngle) * labelRadius;
-            
-            // Draw percentage label inside the slice if large enough
-            if (sliceAngle > 0.2) {
-                const percentage = ((value / total) * 100).toFixed(1) + '%';
-                
-                ctx.font = 'bold 12px Arial';
-                ctx.fillStyle = 'white';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(percentage, labelX, labelY);
-            }
-            
-            startAngle += sliceAngle;
-        }
-        
-        // Draw legend with labels
-        const legendX = width - 150;
-        const legendY = marginTop + 20;
-        
-        ctx.font = '12px Arial';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        
-        for (let i = 0; i < data.labels.length; i++) {
-            const label = data.labels[i];
-            const y = legendY + i * 20;
-            
-            // Draw color box
-            ctx.fillStyle = Array.isArray(dataset.backgroundColor) 
-                ? dataset.backgroundColor[i % dataset.backgroundColor.length] 
-                : dataset.backgroundColor as string;
-            ctx.fillRect(legendX, y - 6, 12, 12);
-            
-            // Draw label
-            ctx.fillStyle = 'black';
-            ctx.fillText(label, legendX + 20, y);
-        }
+        return `
+            <div class="chart-container" style="${containerStyle}">
+                <canvas id="${chartId}"></canvas>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+            <script>
+                (function() {
+                    const ctx = document.getElementById('${chartId}').getContext('2d');
+                    const chart = new Chart(ctx, ${JSON.stringify(config)});
+                    
+                    // Handle responsiveness
+                    if (${config.options?.responsive}) {
+                        const container = document.querySelector('#${chartId}').parentElement;
+                        const resizeObserver = new ResizeObserver(entries => {
+                            for (const entry of entries) {
+                                const { width, height } = entry.contentRect;
+                                chart.resize(width, height);
+                                chart.update('resize');
+                            }
+                        });
+                        resizeObserver.observe(container);
+                    }
+                })();
+            </script>
+        `;
     }
-    
-    /**
-     * Draw a scatter chart on the canvas
-     * 
-     * @param ctx - Canvas rendering context to draw on
-     * @param config - Chart configuration
-     * @param width - Canvas width in pixels
-     * @param height - Canvas height in pixels
-     * 
-     * @remarks
-     * This method renders a scatter chart on the provided canvas context.
-     * The implementation:
-     * 
-     * 1. Calculates chart dimensions and margins
-     * 2. Determines the maximum X and Y values for scaling
-     * 3. Draws axes and grid lines
-     * 4. Plots individual data points as circles
-     * 5. Adds labels to data points
-     * 6. Draws the legend for multiple datasets
-     * 
-     * Scatter charts are useful for showing relationships between two variables
-     * and identifying patterns or correlations in the data.
-     * 
-     * @private
-     */
-    private async drawScatterChart(
-        ctx: CanvasRenderingContext2D,
-        config: ChartConfig,
-        width: number,
-        height: number
-    ): Promise<void> {
-        const { data } = config;
-        const marginTop = config.title ? 60 : 30;
-        const marginBottom = 60;
-        const marginLeft = 60;
-        const marginRight = 30;
-        
-        const chartWidth = width - marginLeft - marginRight;
-        const chartHeight = height - marginTop - marginBottom;
-        
-        // Find the maximum values for scaling
-        let maxX = 0;
-        let maxY = 0;
-        
-        for (const dataset of data.datasets) {
-            for (const value of dataset.data) {
-                maxX = Math.max(maxX, value);
-                maxY = Math.max(maxY, value);
-            }
-        }
-        
-        // Add some padding to the maximum values
-        maxX *= 1.1;
-        maxY *= 1.1;
-        
-        // Draw axes
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 1;
-        
-        // Y-axis
-        ctx.beginPath();
-        ctx.moveTo(marginLeft, marginTop);
-        ctx.lineTo(marginLeft, height - marginBottom);
-        ctx.stroke();
-        
-        // X-axis
-        ctx.beginPath();
-        ctx.moveTo(marginLeft, height - marginBottom);
-        ctx.lineTo(width - marginRight, height - marginBottom);
-        ctx.stroke();
-        
-        // Draw Y-axis labels
-        const numYLabels = 5;
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.font = '12px Arial';
-        ctx.fillStyle = 'black';
-        
-        for (let i = 0; i <= numYLabels; i++) {
-            const value = (maxY * i) / numYLabels;
-            const y = height - marginBottom - (chartHeight * i) / numYLabels;
-            
-            ctx.fillText(value.toFixed(0), marginLeft - 10, y);
-            
-            // Draw grid line
-            ctx.beginPath();
-            ctx.strokeStyle = '#e0e0e0';
-            ctx.moveTo(marginLeft, y);
-            ctx.lineTo(width - marginRight, y);
-            ctx.stroke();
-        }
-        
-        // Draw X-axis labels
-        const numXLabels = 5;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        
-        for (let i = 0; i <= numXLabels; i++) {
-            const value = (maxX * i) / numXLabels;
-            const x = marginLeft + (chartWidth * i) / numXLabels;
-            
-            ctx.fillText(value.toFixed(0), x, height - marginBottom + 10);
-            
-            // Draw grid line
-            ctx.beginPath();
-            ctx.strokeStyle = '#e0e0e0';
-            ctx.moveTo(x, marginTop);
-            ctx.lineTo(x, height - marginBottom);
-            ctx.stroke();
-        }
-        
-        // Draw data points for each dataset
-        for (let i = 0; i < data.datasets.length; i++) {
-            const dataset = data.datasets[i];
-            
-            for (let j = 0; j < dataset.data.length && j < data.labels.length; j++) {
-                const value = dataset.data[j];
-                const x = marginLeft + (chartWidth * value) / maxX;
-                const y = height - marginBottom - (chartHeight * value) / maxY;
-                
-                // Draw point
-                ctx.beginPath();
-                ctx.arc(x, y, 5, 0, Math.PI * 2);
-                ctx.fillStyle = Array.isArray(dataset.backgroundColor) 
-                    ? dataset.backgroundColor[j % dataset.backgroundColor.length] 
-                    : dataset.backgroundColor as string;
-                ctx.fill();
-                
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-                
-                // Draw label if needed
-                ctx.fillStyle = 'black';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.font = '10px Arial';
-                ctx.fillText(data.labels[j], x, y - 8);
-            }
-        }
-        
-        // Draw legend
-        this.drawLegend(ctx, config, width, height);
-    }
-    
-    /**
-     * Draw a legend for the chart
-     * 
-     * @param ctx - Canvas rendering context to draw on
-     * @param config - Chart configuration
-     * @param width - Canvas width in pixels
-     * @param height - Canvas height in pixels
-     * 
-     * @remarks
-     * This method draws a legend on the right side of the chart, showing
-     * color indicators and labels for each dataset. It's used by all chart types
-     * except pie/doughnut charts, which have their own legend implementation.
-     * 
-     * The legend consists of:
-     * - Small colored rectangles representing each dataset
-     * - Dataset labels next to the color indicators
-     * 
-     * @private
-     */
-    private drawLegend(
-        ctx: CanvasRenderingContext2D,
-        config: ChartConfig,
-        width: number,
-        height: number
-    ): void {
-        if (config.type === 'pie' || config.type === 'doughnut') {
-            // Legend is already drawn in the pie chart method
-            return;
-        }
-        
-        const { data } = config;
-        const legendX = width - 150;
-        const legendY = 50;
-        
-        ctx.font = '12px Arial';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        
-        for (let i = 0; i < data.datasets.length; i++) {
-            const dataset = data.datasets[i];
-            const y = legendY + i * 20;
-            
-            // Draw color box
-            ctx.fillStyle = Array.isArray(dataset.backgroundColor) 
-                ? dataset.backgroundColor[0] 
-                : dataset.backgroundColor as string;
-            ctx.fillRect(legendX, y - 6, 12, 12);
-            
-            // Draw label
-            ctx.fillStyle = 'black';
-            ctx.fillText(dataset.label, legendX + 20, y);
-        }
-    }
-    
-    /**
-     * Convert a hex color to RGBA with specified alpha transparency
-     * 
-     * @param hex - Hex color code (e.g., '#ff0000' or '#f00')
-     * @param alpha - Alpha transparency value between 0 and 1
-     * @returns RGBA color string (e.g., 'rgba(255, 0, 0, 0.5)')
-     * 
-     * @remarks
-     * This utility method converts a hex color code to an RGBA color string
-     * with the specified alpha transparency. It's used primarily for:
-     * 
-     * - Creating semi-transparent fills for line charts
-     * - Applying transparency to chart elements
-     * - Creating hover/focus effects
-     * 
-     * @private
-     */
-    private convertToRGBA(hex: string, alpha: number): string {
-        // Remove # if present
-        hex = hex.replace('#', '');
-        
-        // Parse hex to RGB
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-        
-        // Return as rgba
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
-    
-    /**
-     * Ensure a directory exists, creating it if necessary
-     * 
-     * @param dir - Directory path to check/create
-     * @returns Promise that resolves when the directory exists
-     * 
-     * @remarks
-     * This utility method checks if a directory exists and creates it
-     * if it doesn't. It's used to ensure the charts output directory
-     * exists before attempting to save chart images.
-     * 
-     * The method uses the recursive option when creating directories,
-     * so it will create any missing parent directories as well.
-     * 
-     * @private
-     */
-    private async ensureDirectoryExists(dir: string): Promise<void> {
+
+    async exportChart(data: ChartData, options: ChartOptions, format: 'png' | 'svg' | 'pdf'): Promise<Buffer> {
         try {
-            await fs.promises.access(dir, fs.constants.F_OK);
-        } catch (error) {
-            await fs.promises.mkdir(dir, { recursive: true });
+            // Validate inputs
+            this.validateChartData(data);
+            this.validateChartOptions(options);
+
+            // Generate chart configuration
+            const config = this.generateChartConfig(data, { ...this.defaultOptions, ...options });
+
+            // Generate chart markup
+            const chartMarkup = this.generateChartMarkup(config);
+
+            // Convert to requested format using appropriate library
+            switch (format) {
+                case 'png':
+                    return await this.convertToPNG(chartMarkup, config);
+                case 'svg':
+                    return await this.convertToSVG(chartMarkup, config);
+                case 'pdf':
+                    return await this.convertToPDF(chartMarkup, config);
+                default:
+                    throw new Error(`Unsupported export format: ${format}`);
+            }
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new Error(`Failed to export chart: ${errorMessage}`);
+        }
+    }
+
+    private async convertToPNG(markup: string, config: ChartConfiguration<ChartType> & { width?: number; height?: number }): Promise<Buffer> {
+        try {
+            // Dynamic imports
+            const { createCanvas } = await import('canvas');
+            const { Chart, registerables } = await import('chart.js');
+            
+            // Ensure valid dimensions
+            const width = Math.max(config.width || 600, 1);
+            const height = Math.max(config.height || 400, 1);
+            
+            // Create canvas with dimensions
+            const canvas = createCanvas(width, height);
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Register required Chart.js components
+            Chart.register(...registerables);
+            
+            // Create and render chart
+            const ctx = canvas.getContext('2d');
+            const chart = new Chart(ctx as unknown as CanvasRenderingContext2D, config);
+            
+            // Wait for any animations to complete
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Convert to PNG buffer
+            return canvas.toBuffer('image/png');
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new Error(`PNG conversion failed: ${errorMessage}`);
+        }
+    }
+
+    private async convertToSVG(markup: string, config: ChartConfiguration<ChartType> & { width?: number; height?: number }): Promise<Buffer> {
+        try {
+            // Dynamic imports
+            const { createCanvas } = await import('canvas');
+            const { Chart, registerables } = await import('chart.js');
+            const { Canvg } = await import('canvg');
+            
+            // Ensure valid dimensions
+            const width = Math.max(config.width || 600, 1);
+            const height = Math.max(config.height || 400, 1);
+            
+            // Create canvas with dimensions
+            const canvas = createCanvas(width, height);
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Register required Chart.js components
+            Chart.register(...registerables);
+            
+            // Create and render chart
+            const ctx = canvas.getContext('2d');
+            const chart = new Chart(ctx as unknown as CanvasRenderingContext2D, config);
+            
+            // Wait for any animations to complete
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Get chart as base64 image
+            const base64Image = chart.toBase64Image();
+            
+            // Create SVG with embedded image
+            const svgMarkup = `
+                <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+                    <image href="${base64Image}" width="100%" height="100%" />
+                </svg>`;
+            
+            return Buffer.from(svgMarkup);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new Error(`SVG conversion failed: ${errorMessage}`);
+        }
+    }
+
+    private async convertToPDF(markup: string, config: ChartConfiguration<ChartType> & { width?: number; height?: number }): Promise<Buffer> {
+        try {
+            const { default: PDFDocument } = await import('pdfkit');
+            
+            // Ensure valid dimensions
+            const width = Math.max(config.width || 600, 1);
+            const height = Math.max(config.height || 400, 1);
+            
+            const doc = new PDFDocument({ size: [width, height] });
+            
+            // Convert chart to PNG first
+            const pngBuffer = await this.convertToPNG(markup, config);
+            
+            // Add PNG to PDF
+            doc.image(pngBuffer, 0, 0, {
+                width,
+                height
+            });
+            
+            // Get PDF buffer
+            return new Promise((resolve, reject) => {
+                const chunks: Buffer[] = [];
+                doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+                doc.on('end', () => resolve(Buffer.concat(chunks)));
+                doc.on('error', (err: Error) => reject(err));
+                doc.end();
+            });
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new Error(`PDF conversion failed: ${errorMessage}`);
         }
     }
 }

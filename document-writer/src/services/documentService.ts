@@ -1,13 +1,32 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-import { promisify } from 'util';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { constants } from 'node:fs';
 
-// Promisify fs functions
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const mkdir = promisify(fs.mkdir);
-const stat = promisify(fs.stat);
+const { R_OK, W_OK } = constants;
+const fsPromises = fs.promises;
+
+// Custom error class for document operations
+class DocumentError extends Error {
+    constructor(message: string, public code?: string) {
+        super(message);
+        this.name = 'DocumentError';
+    }
+}
+
+// Type guard for NodeJS.ErrnoException
+function isNodeError(error: unknown): error is NodeJS.ErrnoException {
+    return error instanceof Error && 'code' in error;
+}
+
+// Error messages
+const ERROR_MESSAGES = {
+    INVALID_PATH: 'Invalid document path',
+    FILE_NOT_FOUND: 'Document not found',
+    ACCESS_DENIED: 'Access denied',
+    INVALID_OPERATION: 'Invalid operation',
+    DIRECTORY_NOT_FOUND: 'Directory not found'
+};
 
 /**
  * Document metadata interface
@@ -49,18 +68,35 @@ export class DocumentService {
      * @returns The document
      */
     public async getDocument(documentPath: string): Promise<Document> {
+        if (!documentPath) {
+            throw new Error(ERROR_MESSAGES.INVALID_PATH);
+        }
+
         try {
             // Check if document is in cache
             const cachedDocument = this._documentsCache.get(documentPath);
             if (cachedDocument) {
                 return cachedDocument;
             }
+
+            // Check if file exists and is accessible
+            try {
+                await fs.promises.access(documentPath, R_OK);
+            } catch (error) {
+                if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+                    throw new Error(ERROR_MESSAGES.FILE_NOT_FOUND);
+                }
+                if (error instanceof Error && 'code' in error && error.code === 'EACCES') {
+                    throw new Error(ERROR_MESSAGES.ACCESS_DENIED);
+                }
+                throw error;
+            }
             
             // Get file stats
-            const stats = await stat(documentPath);
+            const stats = await fs.promises.stat(documentPath);
             
             // Read file content
-            const content = await readFile(documentPath, 'utf-8');
+            const content = await fs.promises.readFile(documentPath, 'utf-8');
             
             // Create document object
             const document: Document = {
@@ -78,7 +114,13 @@ export class DocumentService {
             return document;
         } catch (error) {
             console.error(`Error getting document ${documentPath}:`, error);
-            throw new Error(`Failed to get document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            if (error instanceof DocumentError) {
+                throw error;
+            }
+            throw new DocumentError(
+                `Failed to get document: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                isNodeError(error) ? error.code : undefined
+            );
         }
     }
     
@@ -88,13 +130,21 @@ export class DocumentService {
      * @returns The saved document
      */
     public async saveDocument(document: Document): Promise<Document> {
+        if (!document || !document.path) {
+            throw new Error(ERROR_MESSAGES.INVALID_PATH);
+        }
+
         try {
-            // Create directory if it doesn't exist
+            // Validate write access to directory
             const directory = path.dirname(document.path);
-            await mkdir(directory, { recursive: true });
+            try {
+                await fs.promises.access(directory, W_OK);
+            } catch (error) {
+                await fs.promises.mkdir(directory, { recursive: true });
+            }
             
             // Write file content
-            await writeFile(document.path, document.content, 'utf-8');
+            await fs.promises.writeFile(document.path, document.content, 'utf-8');
             
             // Update metadata
             document.dateModified = new Date();
@@ -105,7 +155,13 @@ export class DocumentService {
             return document;
         } catch (error) {
             console.error(`Error saving document ${document.path}:`, error);
-            throw new Error(`Failed to save document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            if (error instanceof DocumentError) {
+                throw error;
+            }
+            throw new DocumentError(
+                `Failed to save document: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                isNodeError(error) ? error.code : undefined
+            );
         }
     }
     
@@ -117,10 +173,10 @@ export class DocumentService {
     public async deleteDocument(documentPath: string): Promise<boolean> {
         try {
             // Check if document exists
-            await stat(documentPath);
+            await fs.promises.stat(documentPath);
             
             // Delete file
-            await promisify(fs.unlink)(documentPath);
+            await fs.promises.unlink(documentPath);
             
             // Remove from cache
             this._documentsCache.delete(documentPath);
@@ -128,7 +184,13 @@ export class DocumentService {
             return true;
         } catch (error) {
             console.error(`Error deleting document ${documentPath}:`, error);
-            throw new Error(`Failed to delete document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            if (error instanceof DocumentError) {
+                throw error;
+            }
+            throw new DocumentError(
+                `Failed to delete document: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                isNodeError(error) ? error.code : undefined
+            );
         }
     }
     
@@ -148,7 +210,7 @@ export class DocumentService {
             }
             
             // Get file stats
-            const stats = await stat(documentPath);
+            const stats = await fs.promises.stat(documentPath);
             
             // Create metadata object
             const metadata: DocumentMetadata = {
@@ -162,7 +224,13 @@ export class DocumentService {
             return metadata;
         } catch (error) {
             console.error(`Error getting document metadata ${documentPath}:`, error);
-            throw new Error(`Failed to get document metadata: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            if (error instanceof DocumentError) {
+                throw error;
+            }
+            throw new DocumentError(
+                `Failed to get document metadata: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                isNodeError(error) ? error.code : undefined
+            );
         }
     }
     
@@ -172,16 +240,37 @@ export class DocumentService {
      * @returns Array of document metadata
      */
     public async getDocumentsInDirectory(directoryPath: string): Promise<DocumentMetadata[]> {
+        if (!directoryPath) {
+            throw new Error(ERROR_MESSAGES.INVALID_PATH);
+        }
+
         try {
+            // Verify directory exists and is accessible
+            try {
+                const stats = await fs.promises.stat(directoryPath);
+                if (!stats.isDirectory()) {
+                    throw new Error(ERROR_MESSAGES.INVALID_PATH);
+                }
+                await fs.promises.access(directoryPath, R_OK);
+            } catch (error) {
+                if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+                    throw new Error(ERROR_MESSAGES.DIRECTORY_NOT_FOUND);
+                }
+                if (error instanceof Error && 'code' in error && error.code === 'EACCES') {
+                    throw new Error(ERROR_MESSAGES.ACCESS_DENIED);
+                }
+                throw error;
+            }
+
             // Get all files in directory
-            const files = await promisify(fs.readdir)(directoryPath);
+            const files = await fs.promises.readdir(directoryPath);
             
             // Get metadata for each file
-            const metadataPromises = files.map(async (file) => {
+            const metadataPromises = files.map(async (file: string) => {
                 const filePath = path.join(directoryPath, file);
                 
                 try {
-                    const fileStats = await stat(filePath);
+                    const fileStats = await fs.promises.stat(filePath);
                     
                     // Skip directories
                     if (fileStats.isDirectory()) {
@@ -204,12 +293,18 @@ export class DocumentService {
             });
             
             // Filter out nulls - explicitly casting to satisfy TypeScript
-            const metadataArray = (await Promise.all(metadataPromises)).filter((item): item is DocumentMetadata => item !== null);
+            const metadataArray = (await Promise.all(metadataPromises)).filter((item: DocumentMetadata | null): item is DocumentMetadata => item !== null);
             
             return metadataArray;
         } catch (error) {
             console.error(`Error getting documents in directory ${directoryPath}:`, error);
-            throw new Error(`Failed to get documents in directory: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            if (error instanceof DocumentError) {
+                throw error;
+            }
+            throw new DocumentError(
+                `Failed to get documents in directory: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                isNodeError(error) ? error.code : undefined
+            );
         }
     }
     
@@ -303,7 +398,7 @@ export class DocumentService {
             const newPath = path.join(directory, `${newTitle}${extension}`);
             
             // Rename file
-            await promisify(fs.rename)(documentPath, newPath);
+            await fs.promises.rename(documentPath, newPath);
             
             // Update document
             document.path = newPath;
@@ -343,7 +438,7 @@ export class DocumentService {
             
             // In a real implementation, we would use a format processor to convert the content
             // For now, we'll just write the content as is
-            await writeFile(outputPath, document.content, 'utf-8');
+            await fs.promises.writeFile(outputPath, document.content, 'utf-8');
             
             return outputPath;
         } catch (error) {
@@ -365,24 +460,29 @@ export class DocumentService {
         try {
             // Get document
             const document = await this.getDocument(documentPath);
+            const oldPath = document.path;
             
-            // Update metadata
-            Object.assign(document, metadata, { dateModified: new Date() });
-            
-            // If path changed, handle rename
-            if (metadata.path && metadata.path !== document.path) {
-                await promisify(fs.rename)(document.path, metadata.path);
+            // Handle path update first if needed
+            if (metadata.path && metadata.path !== oldPath) {
+                // Attempt rename
+                await fs.promises.rename(oldPath, metadata.path);
+                
+                // Update document path
+                document.path = metadata.path;
                 
                 // Update cache
-                this._documentsCache.delete(document.path);
+                this._documentsCache.delete(oldPath);
                 this._documentsCache.set(metadata.path, document);
-                
-                document.path = metadata.path;
             }
             
-            // Return metadata
-            const { content, ...updatedMetadata } = document;
+            // Update other metadata
+            Object.assign(document, {
+                ...metadata,
+                dateModified: new Date()
+            });
             
+            // Return metadata without content
+            const { content, ...updatedMetadata } = document;
             return updatedMetadata;
         } catch (error) {
             console.error(`Error updating document metadata ${documentPath}:`, error);

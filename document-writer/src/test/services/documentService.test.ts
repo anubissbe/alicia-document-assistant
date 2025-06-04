@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { DocumentService } from '../../services/documentService';
-import { DocumentFormat, DocumentTemplate } from '../../models/documentTemplate';
+import { DocumentTemplate } from '../../models/documentTemplate';
+import { DocumentFormat } from '../../models/documentFormat';
 import * as vscode from '../vscode-mock';
 
 // Mock dependencies

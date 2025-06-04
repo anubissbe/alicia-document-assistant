@@ -3,7 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { DocumentService } from '../../services/documentService';
-import { DocumentTemplate, DocumentFormat, PlaceholderType } from '../../models/documentTemplate';
+import { DocumentTemplate, PlaceholderType } from '../../models/documentTemplate';
+import { DocumentFormat } from '../../models/documentFormat';
 
 /**
  * Integration test for document generation
