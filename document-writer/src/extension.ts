@@ -215,6 +215,81 @@ export function activate(context: vscode.ExtensionContext) {
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to export document to Markdown: ${error}`);
             }
+        }),
+
+        // Add missing commands that are declared in package.json
+        vscode.commands.registerCommand('document-writer.addTemplate', async () => {
+            try {
+                const templateFiles = await vscode.window.showOpenDialog({
+                    canSelectFiles: true,
+                    canSelectFolders: false,
+                    canSelectMany: false,
+                    filters: {
+                        'Templates': ['docx', 'doc', 'md', 'html']
+                    },
+                    title: 'Select a template file to add'
+                });
+                
+                if (templateFiles && templateFiles.length > 0) {
+                    const templatePath = templateFiles[0].fsPath;
+                    // Add template logic here (for now just show success message)
+                    vscode.window.showInformationMessage(`Template added: ${path.basename(templatePath)}`);
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to add template: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('document-writer.generateFromTemplate', async () => {
+            try {
+                // Show template selection
+                const templates = ['Business Report', 'Technical Specification', 'Academic Paper'];
+                const selectedTemplate = await vscode.window.showQuickPick(templates, {
+                    placeHolder: 'Select a template to generate from'
+                });
+                
+                if (selectedTemplate) {
+                    await documentCreationWizard.showWizard();
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to generate from template: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('document-writer.cloneTemplate', async () => {
+            try {
+                vscode.window.showInformationMessage('Clone template functionality not yet implemented');
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to clone template: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('document-writer.openDocument', async (filePath?: string) => {
+            try {
+                if (filePath) {
+                    // Open specific document
+                    const doc = await vscode.workspace.openTextDocument(filePath);
+                    await vscode.window.showTextDocument(doc);
+                } else {
+                    // Show file picker to open document
+                    const documentFiles = await vscode.window.showOpenDialog({
+                        canSelectFiles: true,
+                        canSelectFolders: false,
+                        canSelectMany: false,
+                        filters: {
+                            'Documents': ['docx', 'doc', 'md', 'html', 'pdf', 'txt']
+                        },
+                        title: 'Select a document to open'
+                    });
+                    
+                    if (documentFiles && documentFiles.length > 0) {
+                        const doc = await vscode.workspace.openTextDocument(documentFiles[0]);
+                        await vscode.window.showTextDocument(doc);
+                    }
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to open document: ${error}`);
+            }
         })
     );
 

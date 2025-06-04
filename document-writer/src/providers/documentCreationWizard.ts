@@ -778,25 +778,27 @@ export class DocumentCreationWizard implements WebviewStateProvider {
         }
         
         try {
-            // Get templates from template service
-            const templates = await this._templateService.getTemplates();
+            // Get templates from template service (synchronous call)
+            const templates = this._templateService.getTemplates();
+            console.log('Loaded templates:', templates);
             
             // Filter templates by document type
-            const filteredTemplates = templates.filter(template => 
-                template.metadata && template.metadata.category === documentType
-            );
+            const filteredTemplates = templates.filter(template => {
+                if (!template.metadata) {
+                    console.log('Template has no metadata:', template);
+                    return false;
+                }
+                return template.metadata.category === documentType;
+            });
             
-            // Send templates to webview
+            console.log('Filtered templates for', documentType, ':', filteredTemplates);
+            
+            // Send filtered templates to webview
             this._panel.webview.postMessage({
                 command: 'templatesLoaded',
                 templates: filteredTemplates
             });
             
-            // Send templates to webview
-            this._panel.webview.postMessage({
-                command: 'templatesLoaded',
-                templates
-            });
         } catch (error) {
             console.error('Error loading templates:', error);
             
