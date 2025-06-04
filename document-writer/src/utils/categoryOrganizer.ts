@@ -70,6 +70,12 @@ export class CategoryOrganizer {
     // Keep track of item categories
     private itemCategories: Map<string, string> = new Map();
 
+    // Keep track of templates
+    private templates: Map<string, DocumentTemplate> = new Map();
+
+    // Keep track of categories with templates
+    private categoriesWithTemplates: Map<string, DocumentTemplate[]> = new Map();
+
     // Extension URI
     private readonly extensionUri: vscode.Uri;
 
@@ -387,7 +393,7 @@ export class CategoryOrganizer {
                 
                 // Set command to open document when clicked
                 treeItem.command = {
-                    command: 'documentWriter.openDocument',
+                    command: 'document-writer.openDocument',
                     title: 'Open Document',
                     arguments: [item.path]
                 };
@@ -449,5 +455,168 @@ export class CategoryOrganizer {
             path: item.path,
             template: item.template
         });
+    }
+
+    /**
+     * Initialize from legacy categories format
+     * @param legacyCategories Legacy category format
+     */
+    public initializeFromLegacyCategories(legacyCategories: any[]): void {
+        this.templates.clear();
+        this.categoriesWithTemplates.clear();
+        
+        for (const category of legacyCategories) {
+            const categoryName = category.name;
+            this.categoriesWithTemplates.set(categoryName, []);
+            
+            for (const template of category.templates) {
+                this.templates.set(template.id, template);
+                this.setItemCategory(template.id, categoryName);
+                
+                const categoryTemplates = this.categoriesWithTemplates.get(categoryName) || [];
+                categoryTemplates.push(template);
+                this.categoriesWithTemplates.set(categoryName, categoryTemplates);
+            }
+        }
+    }
+
+    /**
+     * Export to legacy format
+     * @returns Legacy format categories
+     */
+    public exportToLegacyFormat(): any[] {
+        const legacyCategories: any[] = [];
+        
+        for (const [categoryName, templates] of this.categoriesWithTemplates.entries()) {
+            legacyCategories.push({
+                id: categoryName.toLowerCase().replace(/\s+/g, '-'),
+                name: categoryName,
+                description: `Templates for ${categoryName}`,
+                templates: templates,
+                sortOrder: this.getAllCategories().indexOf(categoryName) + 1
+            });
+        }
+        
+        return legacyCategories;
+    }
+
+    /**
+     * Get template by ID
+     * @param templateId Template ID
+     * @returns Template or undefined
+     */
+    public getTemplate(templateId: string): DocumentTemplate | undefined {
+        return this.templates.get(templateId);
+    }
+
+    /**
+     * Add template to a category
+     * @param template Template to add
+     * @param categoryName Category name
+     */
+    public addTemplate(template: DocumentTemplate, categoryName: string): void {
+        this.templates.set(template.id, template);
+        this.setItemCategory(template.id, categoryName);
+        
+        const categoryTemplates = this.categoriesWithTemplates.get(categoryName) || [];
+        categoryTemplates.push(template);
+        this.categoriesWithTemplates.set(categoryName, categoryTemplates);
+    }
+
+    /**
+     * Remove template
+     * @param templateId Template ID
+     */
+    public removeTemplate(templateId: string): void {
+        const template = this.templates.get(templateId);
+        if (template) {
+            const categoryName = this.getItemCategory(templateId);
+            const categoryTemplates = this.categoriesWithTemplates.get(categoryName) || [];
+            const index = categoryTemplates.findIndex(t => t.id === templateId);
+            if (index !== -1) {
+                categoryTemplates.splice(index, 1);
+                this.categoriesWithTemplates.set(categoryName, categoryTemplates);
+            }
+            
+            this.templates.delete(templateId);
+            this.itemCategories.delete(templateId);
+        }
+    }
+
+    /**
+     * Create category
+     * @param categoryName Category name
+     * @param parentCategory Parent category (unused in this implementation)
+     * @param description Category description
+     * @param iconPath Icon path
+     * @param sortOrder Sort order
+     */
+    public createCategory(categoryName: string, parentCategory: string | null, description?: string, iconPath?: string, sortOrder?: number): void {
+        if (!this.categoriesWithTemplates.has(categoryName)) {
+            this.categoriesWithTemplates.set(categoryName, []);
+            this.addCustomCategory(categoryName);
+        }
+    }
+
+    /**
+     * Delete category
+     * @param categoryId Category ID (can be name or ID)
+     */
+    public deleteCategory(categoryId: string): void {
+        // Try to find category by name first
+        let categoryName = categoryId;
+        if (!this.categoriesWithTemplates.has(categoryId)) {
+            // Try to find by ID format
+            categoryName = this.getAllCategories().find(cat => 
+                cat.toLowerCase().replace(/\s+/g, '-') === categoryId
+            ) || categoryId;
+        }
+        
+        if (this.categoriesWithTemplates.has(categoryName)) {
+            // Move all templates to 'Other' category
+            const templates = this.categoriesWithTemplates.get(categoryName) || [];
+            for (const template of templates) {
+                this.setItemCategory(template.id, 'Other');
+                const otherTemplates = this.categoriesWithTemplates.get('Other') || [];
+                otherTemplates.push(template);
+                this.categoriesWithTemplates.set('Other', otherTemplates);
+            }
+            
+            this.categoriesWithTemplates.delete(categoryName);
+            this.removeCustomCategory(categoryName);
+        }
+    }
+
+    /**
+     * Rename category
+     * @param categoryId Category ID (can be name or ID)
+     * @param newName New category name
+     */
+    public renameCategory(categoryId: string, newName: string): void {
+        // Try to find category by name first
+        let categoryName = categoryId;
+        if (!this.categoriesWithTemplates.has(categoryId)) {
+            // Try to find by ID format
+            categoryName = this.getAllCategories().find(cat => 
+                cat.toLowerCase().replace(/\s+/g, '-') === categoryId
+            ) || categoryId;
+        }
+        
+        if (this.categoriesWithTemplates.has(categoryName)) {
+            const templates = this.categoriesWithTemplates.get(categoryName) || [];
+            
+            // Update all template categories
+            for (const template of templates) {
+                this.setItemCategory(template.id, newName);
+            }
+            
+            // Move templates to new category
+            this.categoriesWithTemplates.set(newName, templates);
+            this.categoriesWithTemplates.delete(categoryName);
+            
+            // Update custom categories list
+            this.removeCustomCategory(categoryName);
+            this.addCustomCategory(newName);
+        }
     }
 }

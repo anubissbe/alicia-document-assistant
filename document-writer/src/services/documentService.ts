@@ -489,4 +489,97 @@ export class DocumentService {
             throw new Error(`Failed to update document metadata: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
+    
+    /**
+     * Generate a preview of the document
+     * @param document The document to preview
+     * @returns The path to the generated preview file
+     */
+    public async generatePreview(document: any): Promise<string> {
+        try {
+            const previewDir = path.join(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '', '.previews');
+            
+            // Ensure preview directory exists
+            if (!fs.existsSync(previewDir)) {
+                await fs.promises.mkdir(previewDir, { recursive: true });
+            }
+            
+            // Generate preview filename
+            const previewName = `${document.title || 'document'}_preview.html`;
+            const previewPath = path.join(previewDir, previewName);
+            
+            // Convert document content to HTML for preview
+            let previewContent = '';
+            if (document.type === 'markdown') {
+                // Basic markdown to HTML conversion (simplified)
+                previewContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Preview: ${document.title || 'Document'}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            pre { background: #f4f4f4; padding: 10px; border-radius: 4px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${document.title || 'Document Preview'}</h1>
+                        <pre>${document.content || ''}</pre>
+                    </body>
+                    </html>
+                `;
+            } else {
+                previewContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Preview: ${document.title || 'Document'}</title>
+                    </head>
+                    <body>
+                        <h1>${document.title || 'Document Preview'}</h1>
+                        <div>${document.content || ''}</div>
+                    </body>
+                    </html>
+                `;
+            }
+            
+            // Write preview file
+            await fs.promises.writeFile(previewPath, previewContent, 'utf8');
+            
+            return previewPath;
+        } catch (error) {
+            console.error('Error generating preview:', error);
+            throw new Error(`Failed to generate preview: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    
+    /**
+     * Generate a document from template or content
+     * @param document The document to generate
+     * @returns The path to the generated document
+     */
+    public async generateDocument(document: any): Promise<string> {
+        try {
+            const outputDir = vscode.workspace.getConfiguration('documentWriter').get('outputPath') as string || './generated-documents';
+            const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+            const resolvedOutputDir = outputDir.startsWith('./') ? path.join(workspacePath, outputDir.substring(2)) : outputDir;
+            
+            // Ensure output directory exists
+            if (!fs.existsSync(resolvedOutputDir)) {
+                await fs.promises.mkdir(resolvedOutputDir, { recursive: true });
+            }
+            
+            // Generate filename based on document type
+            const fileName = `${document.title || 'document'}.${document.type === 'markdown' ? 'md' : 'txt'}`;
+            const outputPath = path.join(resolvedOutputDir, fileName);
+            
+            // Write document content
+            await fs.promises.writeFile(outputPath, document.content || '', 'utf8');
+            
+            return outputPath;
+        } catch (error) {
+            console.error('Error generating document:', error);
+            throw new Error(`Failed to generate document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
 }

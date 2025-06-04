@@ -193,6 +193,11 @@ export class TemplateTagger {
             return false;
         }
         
+        // Initialize metadata if needed
+        if (!template.metadata) {
+            template.metadata = {};
+        }
+        
         // Initialize tags array if needed
         if (!template.metadata.tags) {
             template.metadata.tags = [];
@@ -222,7 +227,7 @@ export class TemplateTagger {
         // Normalize tag
         tag = this.normalizeTag(tag);
         
-        if (!tag || !template.metadata.tags) {
+        if (!tag || !template.metadata || !template.metadata.tags) {
             return false;
         }
         
@@ -383,7 +388,7 @@ export class TemplateTagger {
         }
         
         return templates.filter(template => 
-            template.metadata.tags?.includes(tag)
+            template.metadata?.tags?.includes(tag)
         );
     }
     
@@ -408,7 +413,7 @@ export class TemplateTagger {
         const nameLower = template.name.toLowerCase();
         const formatLower = template.format.toString().toLowerCase();
         const descLower = template.description.toLowerCase();
-        const categoryLower = template.metadata.category.toLowerCase();
+        const categoryLower = template.metadata?.category?.toLowerCase() || '';
         
         // Add category-based tags
         if (categoryLower.includes('business') || 

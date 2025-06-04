@@ -49,7 +49,7 @@ export class ClineIntegration implements vscode.Disposable {
      */
     private registerBuiltInTools(): void {
         // Create service instances
-        const documentService = new DocumentService(this.context);
+        const documentService = new DocumentService();
         const templateEngine = new TemplateEngine(this.context);
         const chartGenerator = new ChartGenerator(this.context);
 

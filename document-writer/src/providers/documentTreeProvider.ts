@@ -83,7 +83,7 @@ export class DocumentTreeItem extends vscode.TreeItem {
             
             // Set the command that is executed when the tree item is clicked
             this.command = {
-                command: 'documentWriter.openTemplate',
+                command: 'document-writer.openTemplate',
                 title: 'Open Template',
                 arguments: [template]
             };
@@ -166,29 +166,22 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
     constructor(
         templateManager: TemplateManagerService,
         documentService: DocumentService,
-        storage?: vscode.Memento
+        extensionUri?: vscode.Uri
     ) {
         this._templateManager = templateManager;
         this._documentService = documentService;
         
-        // Initialize category organizer
-        this._categoryOrganizer = new CategoryOrganizer(storage);
+        // Initialize category organizer with a default URI if none provided
+        const defaultExtensionUri = extensionUri || vscode.Uri.file(__dirname);
+        this._categoryOrganizer = new CategoryOrganizer(defaultExtensionUri);
         
         // Initialize categories
         this._initializeCategories();
-        
-        // Listen for category changes
-        this._categoryOrganizer.onDidChangeCategories(() => {
-            this.refresh();
-        });
         
         // Set up auto refresh if enabled
         if (this._autoRefreshEnabled) {
             this._startAutoRefresh();
         }
-        
-        // Register commands for context menu actions
-        this._registerCommands();
         
         // Register drag and drop handler
         this._registerDragAndDropHandler();
@@ -196,156 +189,173 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
     
     /**
      * Register commands for context menu actions
+     * @param context Extension context for proper command lifecycle management
      */
-    private _registerCommands(): void {
+    public registerCommands(context: vscode.ExtensionContext): void {
         // Register refresh command
-        vscode.commands.registerCommand('documentWriter.refreshTemplates', () => {
-            this.refresh();
-            vscode.window.showInformationMessage('Template list refreshed');
-        });
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.refreshTreeView', () => {
+                this.refresh();
+                vscode.window.showInformationMessage('Template list refreshed');
+            })
+        );
         
         // Register add to favorites command
-        vscode.commands.registerCommand('documentWriter.addToFavorites', (item: DocumentTreeItem) => {
-            if (item.template) {
-                const isFavorite = this.toggleFavorite(item.template.id);
-                vscode.window.showInformationMessage(
-                    isFavorite 
-                        ? `Added "${item.template.name}" to favorites` 
-                        : `Removed "${item.template.name}" from favorites`
-                );
-            }
-        });
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.addToFavorites', (item: DocumentTreeItem) => {
+                if (item.template) {
+                    const isFavorite = this.toggleFavorite(item.template.id);
+                    vscode.window.showInformationMessage(
+                        isFavorite 
+                            ? `Added "${item.template.name}" to favorites` 
+                            : `Removed "${item.template.name}" from favorites`
+                    );
+                }
+            })
+        );
         
         // Register create new document from template command
-        vscode.commands.registerCommand('documentWriter.createFromTemplate', (item: DocumentTreeItem) => {
-            if (item.template) {
-                vscode.commands.executeCommand('documentWriter.openDocumentWizard', item.template.id);
-            }
-        });
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.createFromTemplate', (item: DocumentTreeItem) => {
+                if (item.template) {
+                    vscode.commands.executeCommand('document-writer.openDocumentWizard', item.template.id);
+                }
+            })
+        );
         
         // Register edit template command
-        vscode.commands.registerCommand('documentWriter.editTemplate', (item: DocumentTreeItem) => {
-            if (item.template) {
-                vscode.commands.executeCommand('documentWriter.openTemplateEditor', item.template.id);
-            }
-        });
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.editTemplate', (item: DocumentTreeItem) => {
+                if (item.template) {
+                    vscode.commands.executeCommand('document-writer.openTemplateEditor', item.template.id);
+                }
+            })
+        );
         
         // Register delete template command
-        vscode.commands.registerCommand('documentWriter.deleteTemplate', async (item: DocumentTreeItem) => {
-            if (item.template) {
-                const result = await vscode.window.showWarningMessage(
-                    `Are you sure you want to delete "${item.template.name}"?`,
-                    { modal: true },
-                    'Delete',
-                    'Cancel'
-                );
-                
-                if (result === 'Delete') {
-                    try {
-                        this.removeTemplate(item.template.id);
-                        vscode.window.showInformationMessage(`Deleted "${item.template.name}"`);
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Error deleting template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.deleteTemplate', async (item: DocumentTreeItem) => {
+                if (item.template) {
+                    const result = await vscode.window.showWarningMessage(
+                        `Are you sure you want to delete "${item.template.name}"?`,
+                        { modal: true },
+                        'Delete',
+                        'Cancel'
+                    );
+                    
+                    if (result === 'Delete') {
+                        try {
+                            this.removeTemplate(item.template.id);
+                            vscode.window.showInformationMessage(`Deleted "${item.template.name}"`);
+                        } catch (error) {
+                            vscode.window.showErrorMessage(`Error deleting template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                        }
                     }
                 }
-            }
-        });
+            })
+        );
         
         // Register create new category command
-        vscode.commands.registerCommand('documentWriter.createCategory', async () => {
-            const categoryName = await vscode.window.showInputBox({
-                placeHolder: 'Enter category name',
-                prompt: 'Create a new template category'
-            });
-            
-            if (categoryName) {
-                try {
-                    const categoryId = categoryName.toLowerCase().replace(/\s+/g, '-');
-                    
-                    // Check if category already exists
-                    if (this._categories.some(c => c.id === categoryId)) {
-                        vscode.window.showErrorMessage(`Category "${categoryName}" already exists`);
-                        return;
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.createCategory', async () => {
+                const categoryName = await vscode.window.showInputBox({
+                    placeHolder: 'Enter category name',
+                    prompt: 'Create a new template category'
+                });
+                
+                if (categoryName) {
+                    try {
+                        const categoryId = categoryName.toLowerCase().replace(/\s+/g, '-');
+                        
+                        // Check if category already exists
+                        if (this._categories.some(c => c.id === categoryId)) {
+                            vscode.window.showErrorMessage(`Category "${categoryName}" already exists`);
+                            return;
+                        }
+                        
+                        this.addCategory({
+                            id: categoryId,
+                            name: categoryName,
+                            description: `Templates for ${categoryName}`,
+                            templates: []
+                        });
+                        
+                        vscode.window.showInformationMessage(`Created category "${categoryName}"`);
+                    } catch (error) {
+                        vscode.window.showErrorMessage(`Error creating category: ${error instanceof Error ? error.message : 'Unknown error'}`);
                     }
-                    
-                    this.addCategory({
-                        id: categoryId,
-                        name: categoryName,
-                        description: `Templates for ${categoryName}`,
-                        templates: []
-                    });
-                    
-                    vscode.window.showInformationMessage(`Created category "${categoryName}"`);
-                } catch (error) {
-                    vscode.window.showErrorMessage(`Error creating category: ${error instanceof Error ? error.message : 'Unknown error'}`);
                 }
-            }
-        });
+            })
+        );
         
         // Register rename category command
-        vscode.commands.registerCommand('documentWriter.renameCategory', async (item: DocumentTreeItem) => {
-            if (item.type === TreeItemType.Category) {
-                const category = this._categories.find(c => c.id === item.id);
-                
-                if (category) {
-                    const newName = await vscode.window.showInputBox({
-                        placeHolder: 'Enter new category name',
-                        prompt: 'Rename category',
-                        value: category.name
-                    });
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.renameCategory', async (item: DocumentTreeItem) => {
+                if (item.type === TreeItemType.Category) {
+                    const category = this._categories.find(c => c.id === item.id);
                     
-                    if (newName && newName !== category.name) {
-                        try {
-                            this.renameCategory(category.id, newName);
-                            vscode.window.showInformationMessage(`Renamed category to "${newName}"`);
-                        } catch (error) {
-                            vscode.window.showErrorMessage(`Error renaming category: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                    if (category) {
+                        const newName = await vscode.window.showInputBox({
+                            placeHolder: 'Enter new category name',
+                            prompt: 'Rename category',
+                            value: category.name
+                        });
+                        
+                        if (newName && newName !== category.name) {
+                            try {
+                                this.renameCategory(category.id, newName);
+                                vscode.window.showInformationMessage(`Renamed category to "${newName}"`);
+                            } catch (error) {
+                                vscode.window.showErrorMessage(`Error renaming category: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                            }
                         }
                     }
                 }
-            }
-        });
+            })
+        );
         
         // Register delete category command
-        vscode.commands.registerCommand('documentWriter.deleteCategory', async (item: DocumentTreeItem) => {
-            if (item.type === TreeItemType.Category) {
-                const category = this._categories.find(c => c.id === item.id);
-                
-                if (category) {
-                    // Check if category has templates
-                    if (category.templates.length > 0) {
-                        const result = await vscode.window.showWarningMessage(
-                            `Category "${category.name}" contains ${category.templates.length} template(s). Are you sure you want to delete it?`,
-                            { modal: true },
-                            'Delete',
-                            'Cancel'
-                        );
-                        
-                        if (result !== 'Delete') {
-                            return;
-                        }
-                    } else {
-                        const result = await vscode.window.showWarningMessage(
-                            `Are you sure you want to delete category "${category.name}"?`,
-                            { modal: true },
-                            'Delete',
-                            'Cancel'
-                        );
-                        
-                        if (result !== 'Delete') {
-                            return;
-                        }
-                    }
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.deleteCategory', async (item: DocumentTreeItem) => {
+                if (item.type === TreeItemType.Category) {
+                    const category = this._categories.find(c => c.id === item.id);
                     
-                    try {
-                        this.removeCategory(category.id);
-                        vscode.window.showInformationMessage(`Deleted category "${category.name}"`);
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Error deleting category: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                    if (category) {
+                        // Check if category has templates
+                        if (category.templates.length > 0) {
+                            const result = await vscode.window.showWarningMessage(
+                                `Category "${category.name}" contains ${category.templates.length} template(s). Are you sure you want to delete it?`,
+                                { modal: true },
+                                'Delete',
+                                'Cancel'
+                            );
+                            
+                            if (result !== 'Delete') {
+                                return;
+                            }
+                        } else {
+                            const result = await vscode.window.showWarningMessage(
+                                `Are you sure you want to delete category "${category.name}"?`,
+                                { modal: true },
+                                'Delete',
+                                'Cancel'
+                            );
+                            
+                            if (result !== 'Delete') {
+                                return;
+                            }
+                        }
+                        
+                        try {
+                            this.removeCategory(category.id);
+                            vscode.window.showInformationMessage(`Deleted category "${category.name}"`);
+                        } catch (error) {
+                            vscode.window.showErrorMessage(`Error deleting category: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                        }
                     }
                 }
-            }
-        });
+            })
+        );
     }
     
     /**

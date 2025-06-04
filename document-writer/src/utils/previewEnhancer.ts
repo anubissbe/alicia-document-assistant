@@ -110,7 +110,7 @@ export class PreviewEnhancer {
         
         // Add format-specific enhancements
         switch (format) {
-            case DocumentFormat.Markdown:
+            case DocumentFormat.MARKDOWN:
                 result.html = this.enhanceMarkdown(result.html, options);
                 break;
             case DocumentFormat.HTML:
@@ -472,7 +472,7 @@ export class PreviewEnhancer {
     /**
      * Enhance PDF content
      */
-    private enhancePdf(html: string, options: PreviewOptions): string {
+    private enhancePdf(html: string, _options: PreviewOptions): string {
         // PDF is typically rendered in an iframe or object tag
         // This would wrap the content appropriately
         return `
@@ -485,7 +485,7 @@ export class PreviewEnhancer {
     /**
      * Enhance DOCX content
      */
-    private enhanceDocx(html: string, options: PreviewOptions): string {
+    private enhanceDocx(html: string, _options: PreviewOptions): string {
         // DOCX content is typically converted to HTML for preview
         // This method would add any DOCX-specific enhancements
         return html;
@@ -521,7 +521,7 @@ export class PreviewEnhancer {
     /**
      * Get enhancement JavaScript
      */
-    private getEnhancementJavaScript(options: PreviewOptions): string {
+    private getEnhancementJavaScript(_options: PreviewOptions): string {
         return `
             // This is a placeholder for the dynamic JavaScript that would be injected
             // In practice, this would be loaded from previewEnhancer.js in the media folder

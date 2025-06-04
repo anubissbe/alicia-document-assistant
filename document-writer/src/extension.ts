@@ -9,19 +9,36 @@ import { DocumentAssistant } from './providers/documentAssistant';
 import { DocumentTreeProvider } from './providers/documentTreeProvider';
 import { ExportService } from './services/exportService';
 import { ClineIntegration } from './integrations/clineIntegration';
+import { FormatProcessor } from './core/formatProcessor';
+import { ConversationHistoryManager } from './providers/conversationHistoryManager';
+import { EntityExtractor } from './core/entityExtractor';
+import { ContentSuggestionEngine } from './core/contentSuggestionEngine';
+import { FeedbackLearningEngine } from './core/feedbackLearningEngine';
+import { SentimentAnalyzer } from './core/sentimentAnalyzer';
 
 export function activate(context: vscode.ExtensionContext) {
-    // Initialize services
-    const templateManager = new TemplateManagerService(context);
-    const clineIntegration = new ClineIntegration();
-    const documentService = new DocumentService(context, templateManager, clineIntegration);
-    const exportService = new ExportService(templateManager, documentService);
+    try {
+        console.log('Document Writer extension is activating...');
+        
+        // Initialize core services
+        const templateManager = new TemplateManagerService(context);
+        const clineIntegration = new ClineIntegration(context);
+        const documentService = new DocumentService();
+        const exportService = new ExportService(templateManager, documentService);
+        const formatProcessor = new FormatProcessor();
+        
+        // Initialize AI services for DocumentAssistant
+        const conversationHistoryManager = new ConversationHistoryManager();
+        const entityExtractor = new EntityExtractor();
+        const contentSuggestionEngine = new ContentSuggestionEngine();
+        const feedbackLearningEngine = new FeedbackLearningEngine(context);
+        const sentimentAnalyzer = new SentimentAnalyzer();
     
     // Initialize wizard
-    const documentCreationWizard = new DocumentCreationWizard(context, documentService, templateManager);
+    const documentCreationWizard = new DocumentCreationWizard(context.extensionUri, documentService, templateManager);
     
     // Register document webview provider
-    const documentWebviewProvider = new DocumentWebviewProvider(context, documentService, templateManager, exportService);
+    const documentWebviewProvider = new DocumentWebviewProvider(context.extensionUri, documentService, formatProcessor);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
             DocumentWebviewProvider.viewType,
@@ -29,34 +46,46 @@ export function activate(context: vscode.ExtensionContext) {
         )
     );
     
-    // Register document assistant provider
-    const documentAssistant = new DocumentAssistant(context, documentService);
-    context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(
-            DocumentAssistant.viewType,
-            documentAssistant
-        )
+    // Initialize document assistant (it registers its own commands)
+    const documentAssistant = new DocumentAssistant(
+        context.extensionUri, 
+        conversationHistoryManager,
+        entityExtractor,
+        contentSuggestionEngine,
+        feedbackLearningEngine,
+        sentimentAnalyzer
     );
     
     // Register document tree view provider
-    const documentTreeProvider = new DocumentTreeProvider(context, documentService, templateManager);
+    const documentTreeProvider = new DocumentTreeProvider(templateManager, documentService, context.extensionUri);
     context.subscriptions.push(documentTreeProvider);
+    
+    // Register the tree view
+    const treeView = vscode.window.createTreeView('documentWriter.documentExplorer', {
+        treeDataProvider: documentTreeProvider,
+        showCollapseAll: true,
+        canSelectMany: false
+    });
+    context.subscriptions.push(treeView);
+    
+    // Register tree view commands
+    documentTreeProvider.registerCommands(context);
 
     // Register commands
     context.subscriptions.push(
-        vscode.commands.registerCommand('documentWriter.openEditor', (document?: any) => {
+        vscode.commands.registerCommand('document-writer.openEditor', (document?: any) => {
             documentWebviewProvider.openEditor(document);
         }),
 
-        vscode.commands.registerCommand('documentWriter.createDocument', async () => {
-            await documentCreationWizard.open();
+        vscode.commands.registerCommand('document-writer.createDocument', async () => {
+            await documentCreationWizard.showWizard();
         }),
 
-        vscode.commands.registerCommand('documentWriter.openTemplate', async () => {
+        vscode.commands.registerCommand('document-writer.openTemplate', async () => {
             documentWebviewProvider.createNewDocument();
         }),
 
-        vscode.commands.registerCommand('documentWriter.saveDocument', async (document: any) => {
+        vscode.commands.registerCommand('document-writer.saveDocument', async (document: any) => {
             try {
                 await documentService.saveDocument(document);
                 vscode.window.showInformationMessage('Document saved successfully!');
@@ -65,7 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
 
-        vscode.commands.registerCommand('documentWriter.previewDocument', async (document: any) => {
+        vscode.commands.registerCommand('document-writer.previewDocument', async (document: any) => {
             try {
                 const previewPath = await documentService.generatePreview(document);
                 // Open preview in editor
@@ -76,7 +105,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
 
-        vscode.commands.registerCommand('documentWriter.generateDocument', async (document: any) => {
+        vscode.commands.registerCommand('document-writer.generateDocument', async (document: any) => {
             try {
                 const outputPath = await documentService.generateDocument(document);
                 vscode.window.showInformationMessage(
@@ -93,7 +122,7 @@ export function activate(context: vscode.ExtensionContext) {
         }),
 
         // Export document to PDF
-        vscode.commands.registerCommand('documentWriter.exportToPdf', async (document: any) => {
+        vscode.commands.registerCommand('document-writer.exportToPdf', async (document: any) => {
             try {
                 // Get the output path
                 const defaultPath = vscode.workspace.getConfiguration('documentWriter').get('outputPath') as string || './generated-documents';
@@ -125,7 +154,7 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         
         // Export document to HTML
-        vscode.commands.registerCommand('documentWriter.exportToHtml', async (document: any) => {
+        vscode.commands.registerCommand('document-writer.exportToHtml', async (document: any) => {
             try {
                 // Get the output path
                 const defaultPath = vscode.workspace.getConfiguration('documentWriter').get('outputPath') as string || './generated-documents';
@@ -157,7 +186,7 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         
         // Export document to Markdown
-        vscode.commands.registerCommand('documentWriter.exportToMarkdown', async (document: any) => {
+        vscode.commands.registerCommand('document-writer.exportToMarkdown', async (document: any) => {
             try {
                 // Get the output path
                 const defaultPath = vscode.workspace.getConfiguration('documentWriter').get('outputPath') as string || './generated-documents';
@@ -190,7 +219,14 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     // Command to open the document editor webview
-    vscode.commands.executeCommand('documentWriter.openEditor');
+    vscode.commands.executeCommand('document-writer.openEditor');
+    
+    console.log('Document Writer extension activated successfully!');
+    } catch (error) {
+        console.error('Document Writer extension failed to activate:', error);
+        vscode.window.showErrorMessage(`Document Writer extension failed to activate: ${error}`);
+        throw error;
+    }
 }
 
 export function deactivate() {}

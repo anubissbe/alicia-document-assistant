@@ -3,7 +3,6 @@
   "displayName": "Document Writer with AI",
   "description": "Create professional documents with AI assistance and Cline integration",
   "version": "0.0.1",
-  "type": "module",
   "engines": {
     "vscode": "^1.100.0"
   },
@@ -142,6 +141,66 @@
         "title": "Open Document",
         "category": "Document Writer",
         "icon": "$(open-preview)"
+      },
+      {
+        "command": "document-writer.openEditor",
+        "title": "Open Editor",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.saveDocument",
+        "title": "Save Document",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.previewDocument",
+        "title": "Preview Document",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.generateDocument",
+        "title": "Generate Document",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.exportToPdf",
+        "title": "Export to PDF",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.exportToHtml",
+        "title": "Export to HTML",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.exportToMarkdown",
+        "title": "Export to Markdown",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.addToFavorites",
+        "title": "Add to Favorites",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.createFromTemplate",
+        "title": "Create from Template",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.createCategory",
+        "title": "Create Category",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.renameCategory",
+        "title": "Rename Category",
+        "category": "Document Writer"
+      },
+      {
+        "command": "document-writer.deleteCategory",
+        "title": "Delete Category",
+        "category": "Document Writer"
       }
     ],
     "configuration": {

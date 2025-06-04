@@ -1017,4 +1017,64 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
                 return DocumentFormat.MARKDOWN; // Default to markdown
         }
     }
+    
+    /**
+     * Open a document in the editor
+     * @param document The document to open
+     */
+    public openEditor(document?: any): void {
+        if (document) {
+            // Load the document into the editor
+            this._state.documentContent = document.content || '';
+            this._state.documentTitle = document.title || 'Untitled';
+            this._state.documentType = document.type || 'markdown';
+            this._state.documentPath = document.path;
+            this._state.isModified = false;
+            this._state.viewMode = 'edit';
+            
+            // Update the webview if it exists
+            if (this._view) {
+                this._view.webview.postMessage({
+                    command: 'updateContent',
+                    content: this._state.documentContent,
+                    title: this._state.documentTitle,
+                    type: this._state.documentType,
+                    viewMode: this._state.viewMode,
+                    path: this._state.documentPath
+                });
+            }
+        }
+        
+        // Show the webview if not already visible
+        if (this._view) {
+            this._view.show(true);
+        }
+    }
+    
+    /**
+     * Create a new document in the editor
+     */
+    public createNewDocument(): void {
+        // Reset state for new document
+        this._state.documentContent = '';
+        this._state.documentTitle = 'Untitled';
+        this._state.documentType = 'markdown';
+        this._state.documentPath = undefined;
+        this._state.isModified = false;
+        this._state.viewMode = 'edit';
+        
+        // Update the webview if it exists
+        if (this._view) {
+            this._view.webview.postMessage({
+                command: 'updateContent',
+                content: this._state.documentContent,
+                title: this._state.documentTitle,
+                type: this._state.documentType,
+                viewMode: this._state.viewMode,
+                path: this._state.documentPath
+            });
+            
+            this._view.show(true);
+        }
+    }
 }
