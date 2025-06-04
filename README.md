@@ -43,7 +43,7 @@ Document Writer is a powerful VS Code extension that enables the creation, manag
 
 ## Project Structure
 
-```
+```plaintext
 document-writer/
 ├── src/                           # Source code
 │   ├── extension.ts               # Main extension entry point
@@ -76,18 +76,18 @@ document-writer/
 ### Setup
 
 1. Clone the repository
-   ```
+   ```bash
    git clone https://github.com/anubissbe/document-writer.git
    ```
 
 2. Install dependencies
-   ```
+   ```bash
    cd document-writer
    npm install
    ```
 
 3. Build the extension
-   ```
+   ```bash
    npm run compile
    ```
 
@@ -98,7 +98,7 @@ document-writer/
 
 Run the tests with:
 
-```
+```bash
 npm test
 ```
 
@@ -133,3 +133,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## Todo
+
+- Implement PDF generation using puppeteer
+- Add support for HTML document generation
+- Enhance AI content generation capabilities
+- Improve chart integration and visualization options
+- Finalize documentation and example templates
+- Prepare the extension for release on VS Code marketplace
