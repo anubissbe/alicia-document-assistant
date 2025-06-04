@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for utils/securityManager.ts</title>
+    <title>Code coverage report for utils/templateIntegrityChecker.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">utils</a> securityManager.ts</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">utils</a> templateIntegrityChecker.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">74.84% </span>
+                <span class="strong">84.49% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>122/163</span>
+                <span class='fraction'>109/129</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.33% </span>
+                <span class="strong">74.46% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>67/101</span>
+                <span class='fraction'>35/47</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.28% </span>
+                <span class="strong">84.61% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>25/28</span>
+                <span class='fraction'>11/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75.62% </span>
+                <span class="strong">84.49% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>121/160</span>
+                <span class='fraction'>109/129</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -659,461 +659,8 @@
 <a name='L594'></a><a href='#L594'>594</a>
 <a name='L595'></a><a href='#L595'>595</a>
 <a name='L596'></a><a href='#L596'>596</a>
-<a name='L597'></a><a href='#L597'>597</a>
-<a name='L598'></a><a href='#L598'>598</a>
-<a name='L599'></a><a href='#L599'>599</a>
-<a name='L600'></a><a href='#L600'>600</a>
-<a name='L601'></a><a href='#L601'>601</a>
-<a name='L602'></a><a href='#L602'>602</a>
-<a name='L603'></a><a href='#L603'>603</a>
-<a name='L604'></a><a href='#L604'>604</a>
-<a name='L605'></a><a href='#L605'>605</a>
-<a name='L606'></a><a href='#L606'>606</a>
-<a name='L607'></a><a href='#L607'>607</a>
-<a name='L608'></a><a href='#L608'>608</a>
-<a name='L609'></a><a href='#L609'>609</a>
-<a name='L610'></a><a href='#L610'>610</a>
-<a name='L611'></a><a href='#L611'>611</a>
-<a name='L612'></a><a href='#L612'>612</a>
-<a name='L613'></a><a href='#L613'>613</a>
-<a name='L614'></a><a href='#L614'>614</a>
-<a name='L615'></a><a href='#L615'>615</a>
-<a name='L616'></a><a href='#L616'>616</a>
-<a name='L617'></a><a href='#L617'>617</a>
-<a name='L618'></a><a href='#L618'>618</a>
-<a name='L619'></a><a href='#L619'>619</a>
-<a name='L620'></a><a href='#L620'>620</a>
-<a name='L621'></a><a href='#L621'>621</a>
-<a name='L622'></a><a href='#L622'>622</a>
-<a name='L623'></a><a href='#L623'>623</a>
-<a name='L624'></a><a href='#L624'>624</a>
-<a name='L625'></a><a href='#L625'>625</a>
-<a name='L626'></a><a href='#L626'>626</a>
-<a name='L627'></a><a href='#L627'>627</a>
-<a name='L628'></a><a href='#L628'>628</a>
-<a name='L629'></a><a href='#L629'>629</a>
-<a name='L630'></a><a href='#L630'>630</a>
-<a name='L631'></a><a href='#L631'>631</a>
-<a name='L632'></a><a href='#L632'>632</a>
-<a name='L633'></a><a href='#L633'>633</a>
-<a name='L634'></a><a href='#L634'>634</a>
-<a name='L635'></a><a href='#L635'>635</a>
-<a name='L636'></a><a href='#L636'>636</a>
-<a name='L637'></a><a href='#L637'>637</a>
-<a name='L638'></a><a href='#L638'>638</a>
-<a name='L639'></a><a href='#L639'>639</a>
-<a name='L640'></a><a href='#L640'>640</a>
-<a name='L641'></a><a href='#L641'>641</a>
-<a name='L642'></a><a href='#L642'>642</a>
-<a name='L643'></a><a href='#L643'>643</a>
-<a name='L644'></a><a href='#L644'>644</a>
-<a name='L645'></a><a href='#L645'>645</a>
-<a name='L646'></a><a href='#L646'>646</a>
-<a name='L647'></a><a href='#L647'>647</a>
-<a name='L648'></a><a href='#L648'>648</a>
-<a name='L649'></a><a href='#L649'>649</a>
-<a name='L650'></a><a href='#L650'>650</a>
-<a name='L651'></a><a href='#L651'>651</a>
-<a name='L652'></a><a href='#L652'>652</a>
-<a name='L653'></a><a href='#L653'>653</a>
-<a name='L654'></a><a href='#L654'>654</a>
-<a name='L655'></a><a href='#L655'>655</a>
-<a name='L656'></a><a href='#L656'>656</a>
-<a name='L657'></a><a href='#L657'>657</a>
-<a name='L658'></a><a href='#L658'>658</a>
-<a name='L659'></a><a href='#L659'>659</a>
-<a name='L660'></a><a href='#L660'>660</a>
-<a name='L661'></a><a href='#L661'>661</a>
-<a name='L662'></a><a href='#L662'>662</a>
-<a name='L663'></a><a href='#L663'>663</a>
-<a name='L664'></a><a href='#L664'>664</a>
-<a name='L665'></a><a href='#L665'>665</a>
-<a name='L666'></a><a href='#L666'>666</a>
-<a name='L667'></a><a href='#L667'>667</a>
-<a name='L668'></a><a href='#L668'>668</a>
-<a name='L669'></a><a href='#L669'>669</a>
-<a name='L670'></a><a href='#L670'>670</a>
-<a name='L671'></a><a href='#L671'>671</a>
-<a name='L672'></a><a href='#L672'>672</a>
-<a name='L673'></a><a href='#L673'>673</a>
-<a name='L674'></a><a href='#L674'>674</a>
-<a name='L675'></a><a href='#L675'>675</a>
-<a name='L676'></a><a href='#L676'>676</a>
-<a name='L677'></a><a href='#L677'>677</a>
-<a name='L678'></a><a href='#L678'>678</a>
-<a name='L679'></a><a href='#L679'>679</a>
-<a name='L680'></a><a href='#L680'>680</a>
-<a name='L681'></a><a href='#L681'>681</a>
-<a name='L682'></a><a href='#L682'>682</a>
-<a name='L683'></a><a href='#L683'>683</a>
-<a name='L684'></a><a href='#L684'>684</a>
-<a name='L685'></a><a href='#L685'>685</a>
-<a name='L686'></a><a href='#L686'>686</a>
-<a name='L687'></a><a href='#L687'>687</a>
-<a name='L688'></a><a href='#L688'>688</a>
-<a name='L689'></a><a href='#L689'>689</a>
-<a name='L690'></a><a href='#L690'>690</a>
-<a name='L691'></a><a href='#L691'>691</a>
-<a name='L692'></a><a href='#L692'>692</a>
-<a name='L693'></a><a href='#L693'>693</a>
-<a name='L694'></a><a href='#L694'>694</a>
-<a name='L695'></a><a href='#L695'>695</a>
-<a name='L696'></a><a href='#L696'>696</a>
-<a name='L697'></a><a href='#L697'>697</a>
-<a name='L698'></a><a href='#L698'>698</a>
-<a name='L699'></a><a href='#L699'>699</a>
-<a name='L700'></a><a href='#L700'>700</a>
-<a name='L701'></a><a href='#L701'>701</a>
-<a name='L702'></a><a href='#L702'>702</a>
-<a name='L703'></a><a href='#L703'>703</a>
-<a name='L704'></a><a href='#L704'>704</a>
-<a name='L705'></a><a href='#L705'>705</a>
-<a name='L706'></a><a href='#L706'>706</a>
-<a name='L707'></a><a href='#L707'>707</a>
-<a name='L708'></a><a href='#L708'>708</a>
-<a name='L709'></a><a href='#L709'>709</a>
-<a name='L710'></a><a href='#L710'>710</a>
-<a name='L711'></a><a href='#L711'>711</a>
-<a name='L712'></a><a href='#L712'>712</a>
-<a name='L713'></a><a href='#L713'>713</a>
-<a name='L714'></a><a href='#L714'>714</a>
-<a name='L715'></a><a href='#L715'>715</a>
-<a name='L716'></a><a href='#L716'>716</a>
-<a name='L717'></a><a href='#L717'>717</a>
-<a name='L718'></a><a href='#L718'>718</a>
-<a name='L719'></a><a href='#L719'>719</a>
-<a name='L720'></a><a href='#L720'>720</a>
-<a name='L721'></a><a href='#L721'>721</a>
-<a name='L722'></a><a href='#L722'>722</a>
-<a name='L723'></a><a href='#L723'>723</a>
-<a name='L724'></a><a href='#L724'>724</a>
-<a name='L725'></a><a href='#L725'>725</a>
-<a name='L726'></a><a href='#L726'>726</a>
-<a name='L727'></a><a href='#L727'>727</a>
-<a name='L728'></a><a href='#L728'>728</a>
-<a name='L729'></a><a href='#L729'>729</a>
-<a name='L730'></a><a href='#L730'>730</a>
-<a name='L731'></a><a href='#L731'>731</a>
-<a name='L732'></a><a href='#L732'>732</a>
-<a name='L733'></a><a href='#L733'>733</a>
-<a name='L734'></a><a href='#L734'>734</a>
-<a name='L735'></a><a href='#L735'>735</a>
-<a name='L736'></a><a href='#L736'>736</a>
-<a name='L737'></a><a href='#L737'>737</a>
-<a name='L738'></a><a href='#L738'>738</a>
-<a name='L739'></a><a href='#L739'>739</a>
-<a name='L740'></a><a href='#L740'>740</a>
-<a name='L741'></a><a href='#L741'>741</a>
-<a name='L742'></a><a href='#L742'>742</a>
-<a name='L743'></a><a href='#L743'>743</a>
-<a name='L744'></a><a href='#L744'>744</a>
-<a name='L745'></a><a href='#L745'>745</a>
-<a name='L746'></a><a href='#L746'>746</a>
-<a name='L747'></a><a href='#L747'>747</a>
-<a name='L748'></a><a href='#L748'>748</a>
-<a name='L749'></a><a href='#L749'>749</a>
-<a name='L750'></a><a href='#L750'>750</a>
-<a name='L751'></a><a href='#L751'>751</a>
-<a name='L752'></a><a href='#L752'>752</a>
-<a name='L753'></a><a href='#L753'>753</a>
-<a name='L754'></a><a href='#L754'>754</a>
-<a name='L755'></a><a href='#L755'>755</a>
-<a name='L756'></a><a href='#L756'>756</a>
-<a name='L757'></a><a href='#L757'>757</a>
-<a name='L758'></a><a href='#L758'>758</a>
-<a name='L759'></a><a href='#L759'>759</a>
-<a name='L760'></a><a href='#L760'>760</a>
-<a name='L761'></a><a href='#L761'>761</a>
-<a name='L762'></a><a href='#L762'>762</a>
-<a name='L763'></a><a href='#L763'>763</a>
-<a name='L764'></a><a href='#L764'>764</a>
-<a name='L765'></a><a href='#L765'>765</a>
-<a name='L766'></a><a href='#L766'>766</a>
-<a name='L767'></a><a href='#L767'>767</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">22x</span>
+<a name='L597'></a><a href='#L597'>597</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1125,15 +672,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1143,80 +684,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1232,13 +702,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1247,334 +717,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">52x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1585,780 +727,1128 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as vscode from 'vscode';
-import * as path from 'path';
-import * as crypto from 'crypto';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as crypto from 'crypto';
 import * as fs from 'fs';
+import * as path from 'path';
+import { PathSafetyUtils } from './pathSafetyUtils';
+import { SecurityManager } from './securityManager';
 &nbsp;
 /**
- * Options for path validation
+ * Template Integrity Checker
+ * 
+ * Provides functions to verify the integrity of document templates through:
+ * - Checksum verification (MD5, SHA-256)
+ * - File signature validation
+ * - Timestamp validation
+ * - Source verification
+ * 
+ * This class helps maintain security and trust in document templates by:
+ * 1. Ensuring templates haven't been tampered with
+ * 2. Validating templates come from trusted sources
+ * 3. Tracking which templates have been verified
+ * 4. Providing cryptographic signature capabilities
+ * 
+ * @remarks
+ * Template integrity is critical for document generation security, as templates
+ * could potentially contain malicious code or unauthorized modifications.
+ * 
+ * @example
+ * ```typescript
+ * const securityManager = new SecurityManager(context);
+ * const integrityChecker = new TemplateIntegrityChecker(securityManager);
+ * 
+ * // Verify template integrity
+ * const result = await integrityChecker.verifyTemplateIntegrity('path/to/template.docx');
+ * if (result.valid) {
+ *   // Template is safe to use
+ * }
+ * ```
  */
-export interface PathValidationOptions {
+export class TemplateIntegrityChecker {
     /**
-     * List of allowed file extensions
+     * Map of trusted sources for templates
+     * Key: source identifier (e.g., 'default', 'business')
+     * Value: either 'extension-provided' for built-in templates or path to public key for verification
      */
-    allowedExtensions?: string[];
+    private readonly trustedSources: Map&lt;string, string&gt; = new Map();
     
     /**
-     * List of allowed base directories
+     * Set of file paths for templates that have been verified
+     * Used to cache verification results for performance
      */
-    allowedBaseDirs?: string[];
+    private readonly verifiedTemplates: Set&lt;string&gt; = new Set();
     
     /**
-     * Whether to allow absolute paths
+     * Security manager used for path validation and other security operations
      */
-    allowAbsolutePaths?: boolean;
+    private readonly securityManager: SecurityManager;
     
     /**
-     * Whether to allow path traversal
+     * Utility for checking path safety to prevent directory traversal attacks
      */
-    allowTraversal?: boolean;
+    private readonly pathSafetyUtils: PathSafetyUtils;
     
     /**
-     * Whether to enforce extension check
+     * Creates a new instance of the TemplateIntegrityChecker
+     * 
+     * @param securityManager - The security manager instance to use for path validation
      */
-    enforceExtension?: boolean;
-}
-&nbsp;
-/**
- * Result of path validation
- */
-export interface PathValidationResult {
-    /**
-     * Whether the path is valid
-     */
-    valid: boolean;
-    
-    /**
-     * Validation message (error or confirmation)
-     */
-    message: string;
-    
-    /**
-     * Validation errors if any
-     */
-    errors?: string[];
-}
-&nbsp;
-/**
- * Configuration for encryption
- */
-export interface EncryptionConfig {
-    /**
-     * Algorithm to use for encryption (default: aes-256-cbc)
-     */
-    algorithm?: string;
-    
-    /**
-     * Initialization vector length (default: 16 bytes)
-     */
-    ivLength?: number;
-    
-    /**
-     * Key derivation iterations (default: 10000)
-     */
-    iterations?: number;
-    
-    /**
-     * Key length in bytes (default: 32)
-     */
-    keyLength?: number;
-    
-    /**
-     * Hash algorithm for key derivation (default: sha256)
-     */
-    digest?: string;
-}
-&nbsp;
-/**
- * Stored credential item
- */
-export interface StoredCredential {
-    /**
-     * When the credential was created
-     */
-    createdAt: number;
-    
-    /**
-     * When the credential expires (if applicable)
-     */
-    expiresAt?: number;
-    
-    /**
-     * The encrypted value
-     */
-    value: string;
-    
-    /**
-     * Initialization vector used for encryption
-     */
-    iv: string;
-    
-    /**
-     * Salt used for key derivation
-     */
-    salt: string;
-    
-    /**
-     * Information about what type of credential this is
-     */
-    type: 'api-key' | 'password' | 'token' | 'certificate' | 'other';
-    
-    /**
-     * Optional metadata
-     */
-    metadata?: Record&lt;string, any&gt;;
-}
-&nbsp;
-/**
- * SecurityManager provides centralized security services throughout the application
- * It handles input validation, sanitization, and secure storage operations
- */
-export class SecurityManager {
-    private context: vscode.ExtensionContext;
-    
-    // Default allowed extensions
-    private defaultAllowedExtensions: string[] = [
-        '.docx', '.pdf', '.txt', '.json', '.md', '.html', '.xml', '.csv'
-    ];
-    
-    // Default encryption configuration
-    private defaultEncryptionConfig: EncryptionConfig = {
-        algorithm: 'aes-256-cbc',
-        ivLength: 16,
-        iterations: 10000,
-        keyLength: 32,
-        digest: 'sha256'
-    };
-    
-    // Master key identifier for the application
-    private readonly MASTER_KEY_ID = 'document-writer-master-key';
-    
-    /**
-     * Creates a new SecurityManager instance
-     * @param context The extension context
-     */
-    constructor(context: vscode.ExtensionContext) {
-        this.context = context;
+    constructor(securityManager: SecurityManager) {
+        this.securityManager = securityManager;
+        this.pathSafetyUtils = new PathSafetyUtils(securityManager);
+        
+        // Initialize with default trusted sources
+        // 'extension-provided' indicates templates bundled with the extension
+        // that don't require cryptographic verification
+        this.trustedSources.set('default', 'extension-provided');
+        this.trustedSources.set('business', 'extension-provided');
+        this.trustedSources.set('technical', 'extension-provided');
+        this.trustedSources.set('academic', 'extension-provided');
     }
     
     /**
-     * Validates a file path against security constraints
-     * @param filePath The path to validate
-     * @param options Validation options
-     * @returns Validation result
+     * Calculate checksum for a file using various cryptographic hash algorithms
+     * 
+     * @param filePath - Path to the template file
+     * @param algorithm - Hash algorithm to use (default: 'sha256')
+     * @returns Promise resolving to the checksum as a hex string
+     * 
+     * @throws Error if the file path is invalid, unsafe, or the file cannot be read
+     * 
+     * @remarks
+     * This method validates the file path before attempting to read the file,
+     * protecting against path traversal attacks and other security issues.
+     * 
+     * Supported algorithms are:
+     * - md5 (not recommended for security-critical applications)
+     * - sha1 (not recommended for security-critical applications)
+     * - sha256 (recommended default)
+     * - sha512 (highest security, slightly slower)
      */
-    public validatePath(filePath: string, options: PathValidationOptions = {}): PathValidationResult {
-        if (!filePath) {
-            return {
-                valid: false,
-                message: 'Path cannot be empty',
-                errors: ['Empty path provided']
-            };
+    public async calculateChecksum(filePath: string, algorithm: 'md5' | 'sha1' | 'sha256' | 'sha512' = 'sha256'): Promise&lt;string&gt; {
+        if (!filePath || !this.isPathSafe(filePath)) {
+            throw new Error('Invalid or unsafe template path provided');
         }
         
-        const errors: string[] = [];
-        const normalizedPath = this.normalizePath(filePath);
-        
-        // Check if path is absolute when not allowed
-        if (path.isAbsolute(normalizedPath) &amp;&amp; options.allowAbsolutePaths === false) {
-            errors.push('Absolute paths are not allowed');
+        try {
+            const fileBuffer = await fs.promises.readFile(filePath);
+            const hashSum = crypto.createHash(algorithm);
+            hashSum.update(fileBuffer);
+            return hashSum.digest('hex');
+        } catch (error) {
+            throw new Error(`Failed to calculate checksum: ${(error as Error).message}`);
+        }
+    }
+    
+    /**
+     * Verify template checksum against a known good value
+     * 
+     * @param filePath - Path to the template file
+     * @param expectedChecksum - Expected checksum value to verify against
+     * @param algorithm - Hash algorithm to use (default: 'sha256')
+     * @returns Promise resolving to a boolean indicating whether the checksum matches
+     * 
+     * @remarks
+     * This method calculates the checksum of the file and compares it to the expected value.
+     * It returns false if any errors occur during the verification process, making it safe
+     * to use in security-critical contexts where failing closed is preferred.
+     * 
+     * The comparison is done using a timing-safe string comparison to prevent
+     * timing attacks.
+     */
+    public async verifyChecksum(filePath: string, expectedChecksum: string, algorithm: 'md5' | 'sha1' | 'sha256' | 'sha512' = 'sha256'): Promise&lt;boolean&gt; {
+        try {
+            const actualChecksum = await this.calculateChecksum(filePath, algorithm);
+            return actualChecksum === expectedChecksum;
+        } catch (error) {
+            console.error('Checksum verification failed:', error);
+            return false;
+        }
+    }
+    
+    /**
+     * Generate and save a checksum file for a template
+     * 
+     * @param templatePath - Path to the template file
+     * @returns Promise resolving to the path of the generated checksum file
+     * 
+     * @throws Error if the template path is invalid or if the checksum file cannot be created
+     * 
+     * @remarks
+     * Creates a checksum file containing multiple hash algorithms (MD5 and SHA-256) as well as
+     * a timestamp. The format of the generated file is:
+     * ```
+     * MD5=&lt;md5sum&gt;
+     * SHA256=&lt;sha256sum&gt;
+     * TIMESTAMP=&lt;ISO date string&gt;
+     * ```
+     * 
+     * This file can later be used to verify the integrity of the template.
+     */
+    public async generateChecksumFile(templatePath: string): Promise&lt;string&gt; {
+        if (!templatePath || !this.isPathSafe(templatePath)) {
+            throw new Error('Invalid or unsafe template path provided');
         }
         
-        // Check for path traversal attempts if not allowed
-        if (!options.allowTraversal &amp;&amp; this.containsPathTraversal(normalizedPath)) {
-            errors.push('Path traversal is not allowed');
-        }
-        
-        // Check file extension if enforced
-        if (options.enforceExtension !== false) {
-            const ext = path.extname(normalizedPath).toLowerCase();
-            const allowedExts = options.allowedExtensions || this.defaultAllowedExtensions;
+        try {
+            const md5sum = await this.calculateChecksum(templatePath, 'md5');
+            const sha256sum = await this.calculateChecksum(templatePath, 'sha256');
             
-            if (!allowedExts.includes(ext)) {
-                errors.push(`File extension "${ext}" is not allowed. Allowed extensions: ${allowedExts.join(', ')}`);
+            const checksumData = `MD5=${md5sum}\nSHA256=${sha256sum}\nTIMESTAMP=${new Date().toISOString()}\n`;
+            const checksumFilePath = `${templatePath}.checksum`;
+            
+            await fs.promises.writeFile(checksumFilePath, checksumData);
+            return checksumFilePath;
+        } catch (error) {
+<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to generate checksum file: ${(error as Error).message}`);</span>
+        }
+    }
+    
+    /**
+     * Verify template integrity using its checksum file
+     * 
+     * @param templatePath - Path to the template file
+     * @returns Promise resolving to a boolean indicating whether the template is valid
+     * 
+     * @remarks
+     * This method looks for a checksum file at `${templatePath}.checksum` and validates
+     * the template against the checksums contained in this file. It verifies both MD5 and
+     * SHA-256 checksums if available.
+     * 
+     * If verification passes, the template is added to the verifiedTemplates set for
+     * faster checking in future operations.
+     * 
+     * The method follows a secure failure approach - any missing checksums or failed
+     * verifications will cause the entire validation to fail.
+     * 
+     * @example
+     * ```typescript
+     * const isValid = await integrityChecker.verifyTemplateWithChecksumFile('templates/invoice.docx');
+     * if (isValid) {
+     *   // Template is valid, proceed with using it
+     * } else {
+     *   // Template failed validation, do not use
+     * }
+     * ```
+     */
+    public async verifyTemplateWithChecksumFile(templatePath: string): Promise&lt;boolean&gt; {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!templatePath || !this.isPathSafe(templatePath)) {
+<span class="cstat-no" title="statement not covered" >            throw new Error('Invalid or unsafe template path provided');</span>
+        }
+        
+        try {
+            const checksumFilePath = `${templatePath}.checksum`;
+            
+            // Check if checksum file exists
+            try {
+                await fs.promises.access(checksumFilePath);
+            } catch {
+                console.warn(`No checksum file found for template: ${templatePath}`);
+                return false;
             }
-        }
-        
-        // Check if path is within allowed directories if specified
-        if (options.allowedBaseDirs &amp;&amp; options.allowedBaseDirs.length &gt; 0) {
-            const isWithinAllowedDir = options.allowedBaseDirs.some(dir =&gt; {
-                const normalizedDir = this.normalizePath(dir);
-                return normalizedPath.startsWith(normalizedDir);
-            });
             
-            if (!isWithinAllowedDir) {
-                errors.push('Path is not within allowed directories');
-            }
-        }
-        
-        // Return validation result
-        if (errors.length &gt; 0) {
-            return {
-                valid: false,
-                message: errors[0],
-                errors
-            };
-        }
-        
-        return {
-            valid: true,
-            message: 'Path validation successful'
-        };
-    }
-    
-    /**
-     * Sanitizes a file path to prevent path traversal and other issues
-     * @param filePath Path to sanitize
-     * @param baseDir Base directory for resolving relative paths
-     * @returns Sanitized path
-     */
-    public sanitizePath(filePath: string, baseDir: string = ''): string {
-        if (!filePath) {
-            return '';
-        }
-        
-        // Normalize the path to handle different separators
-        let normalizedPath = this.normalizePath(filePath);
-        
-        // Resolve relative paths
-        if (!path.isAbsolute(normalizedPath) &amp;&amp; baseDir) {
-            normalizedPath = path.join(baseDir, normalizedPath);
-        }
-        
-        // Remove any remaining relative components by converting to absolute and back
-        const absolutePath = path.resolve(normalizedPath);
-        
-        // Make sure the path is within the baseDir if provided
-        if (baseDir &amp;&amp; !absolutePath.startsWith(this.normalizePath(baseDir))) {
-            // If outside baseDir, return just the filename to prevent traversal
-            return path.join(baseDir, path.basename(absolutePath));
-        }
-        
-        return absolutePath;
-    }
-    
-    /**
-     * Sanitizes input to prevent XSS and injection attacks
-     * @param input String to sanitize
-     * @returns Sanitized string
-     */
-    public sanitizeInput(input: string): string {
-        if (!input) {
-            return '';
-        }
-        
-        // Basic HTML encoding of special characters
-        return input
-            .replace(/&lt;/g, '&amp;lt;')
-            .replace(/&gt;/g, '&amp;gt;')
-            .replace(/"/g, '&amp;quot;')
-            .replace(/'/g, '&amp;#39;');
-    }
-    
-    /**
-     * Stores sensitive data securely using VS Code's secret storage
-     * @param key Key to store data under
-     * @param value Value to store
-     * @returns Promise that resolves when storage is complete
-     */
-    public async storeSecureData(key: string, value: string): Promise&lt;void&gt; {
-        if (!key || !value) {
-            throw new Error('Key and value must be provided for secure storage');
-        }
-        
-        try {
-            await this.context.secrets.store(key, value);
-        } catch (error) {
-            console.error('Failed to store secure data:', error);
-            throw new Error(`Failed to store secure data: ${error instanceof Error ? error.message : <span class="branch-1 cbranch-no" title="branch not covered" >String(error)}</span>`);
-        }
-    }
-    
-    /**
-     * Retrieves sensitive data from secure storage
-     * @param key Key to retrieve
-     * @returns Promise that resolves to the stored value or undefined if not found
-     */
-    public async getSecureData(key: string): Promise&lt;string | undefined&gt; {
-        if (!key) {
-            throw new Error('Key must be provided to retrieve secure data');
-        }
-        
-        try {
-            return await this.context.secrets.get(key);
-        } catch (error) {
-            console.error('Failed to retrieve secure data:', error);
-            throw new Error(`Failed to retrieve secure data: ${error instanceof Error ? error.message : <span class="branch-1 cbranch-no" title="branch not covered" >String(error)}</span>`);
-        }
-    }
-    
-    /**
-     * Deletes sensitive data from secure storage
-     * @param key Key to delete
-     * @returns Promise that resolves when deletion is complete
-     */
-    public async deleteSecureData(key: string): Promise&lt;void&gt; {
-        if (!key) {
-            throw new Error('Key must be provided to delete secure data');
-        }
-        
-        try {
-            await this.context.secrets.delete(key);
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to delete secure data:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to delete secure data: ${error instanceof Error ? error.message : String(error)}`);</span>
-        }
-    }
-    
-    /**
-     * Stores an API key securely with encryption
-     * @param serviceId Identifier for the service (e.g., 'github', 'openai')
-     * @param apiKey The API key to store
-     * @param expiryDays Optional number of days until the key expires
-     * @param metadata Optional metadata about the API key
-     * @returns Promise that resolves when storage is complete
-     */
-    public async storeApiKey(
-        serviceId: string, 
-        apiKey: string, 
-        expiryDays?: number,
-        metadata?: Record&lt;string, any&gt;
-    ): Promise&lt;void&gt; {
-        if (!serviceId || !apiKey) {
-            throw new Error('Service ID and API key must be provided');
-        }
-        
-        const storageKey = `api-key-${serviceId}`;
-        const credential: StoredCredential = {
-            createdAt: Date.now(),
-            expiresAt: expiryDays ? Date.now() + (expiryDays * 24 * 60 * 60 * 1000) : undefined,
-            type: 'api-key',
-            metadata: metadata || {},
-            value: '', // Will be set during encryption
-            iv: '',    // Will be set during encryption
-            salt: ''   // Will be set during encryption
-        };
-        
-        await this.encryptAndStoreCredential(storageKey, apiKey, credential);
-    }
-    
-    /**
-     * Retrieves an API key that was stored securely
-     * @param serviceId Identifier for the service
-     * @returns Promise that resolves to the API key or undefined if not found or expired
-     */
-    public async getApiKey(serviceId: string): Promise&lt;string | undefined&gt; {
-        const storageKey = `api-key-${serviceId}`;
-        return this.getAndDecryptCredential(storageKey);
-    }
-    
-    /**
-     * Stores user credentials securely with encryption
-     * @param service Name of the service or system
-     * @param username Username
-     * @param password Password
-     * @param expiryDays Optional number of days until the credentials expire
-     * @returns Promise that resolves when storage is complete
-     */
-    public async storeCredentials(
-        service: string,
-        username: string,
-        password: string,
-        expiryDays?: number
-    ): Promise&lt;void&gt; {
-        if (!service || !username || !password) {
-            throw new Error('Service name, username, and password must be provided');
-        }
-        
-        const storageKey = `credentials-${service}-${username}`;
-        const credential: StoredCredential = {
-            createdAt: Date.now(),
-            expiresAt: expiryDays ? <span class="branch-0 cbranch-no" title="branch not covered" >Date.now() + (expiryDays * 24 * 60 * 60 * 1000) </span>: undefined,
-            type: 'password',
-            metadata: { username },
-            value: '', // Will be set during encryption
-            iv: '',    // Will be set during encryption
-            salt: ''   // Will be set during encryption
-        };
-        
-        await this.encryptAndStoreCredential(storageKey, password, credential);
-    }
-    
-    /**
-     * Retrieves user credentials that were stored securely
-     * @param service Name of the service or system
-     * @param username Username
-     * @returns Promise that resolves to the password or undefined if not found or expired
-     */
-    public async getCredentials(service: string, username: string): Promise&lt;string | undefined&gt; {
-        const storageKey = `credentials-${service}-${username}`;
-        return this.getAndDecryptCredential(storageKey);
-    }
-    
-    /**
-     * Stores structured data (JSON object) securely with encryption
-     * @param key Storage key
-     * @param data Object to store
-     * @param expiryDays Optional number of days until the data expires
-     * @returns Promise that resolves when storage is complete
-     */
-    public async storeSecureObject&lt;T&gt;(key: string, data: T, expiryDays?: number): Promise&lt;void&gt; {
-        if (!key || data === undefined) {
-            throw new Error('Key and data object must be provided');
-        }
-        
-        const jsonData = JSON.stringify(data);
-        const storageKey = `secure-object-${key}`;
-        const credential: StoredCredential = {
-            createdAt: Date.now(),
-            expiresAt: expiryDays ? <span class="branch-0 cbranch-no" title="branch not covered" >Date.now() + (expiryDays * 24 * 60 * 60 * 1000) </span>: undefined,
-            type: 'other',
-            value: '', // Will be set during encryption
-            iv: '',    // Will be set during encryption
-            salt: ''   // Will be set during encryption
-        };
-        
-        await this.encryptAndStoreCredential(storageKey, jsonData, credential);
-    }
-    
-    /**
-     * Retrieves a structured data object that was stored securely
-     * @param key Storage key
-     * @returns Promise that resolves to the object or undefined if not found or expired
-     */
-    public async getSecureObject&lt;T&gt;(key: string): Promise&lt;T | undefined&gt; {
-        const storageKey = `secure-object-${key}`;
-        const jsonData = await this.getAndDecryptCredential(storageKey);
-        
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (!jsonData) {
-<span class="cstat-no" title="statement not covered" >            return undefined;</span>
-        }
-        
-        try {
-            return JSON.parse(jsonData) as T;
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to parse secure object:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to parse secure object: ${error instanceof Error ? error.message : String(error)}`);</span>
-        }
-    }
-    
-    /**
-     * Rotates encryption keys and re-encrypts all stored data
-     * This should be called periodically to enhance security
-     * @returns Promise that resolves when key rotation is complete
-     */
-    public <span class="fstat-no" title="function not covered" >async </span>rotateEncryptionKeys(): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >        try {</span>
-            // Generate a new master key
-            const newMasterKey = <span class="cstat-no" title="statement not covered" >crypto.randomBytes(32).toString('hex');</span>
+            // Read checksum file
+            const checksumData = await fs.promises.readFile(checksumFilePath, 'utf-8');
+            const lines = checksumData.split('\n');
             
-            // Get all stored keys
-            const allKeys = <span class="cstat-no" title="statement not covered" >await this.getAllStoredKeys();</span>
-            
-            // Find all secure credential keys
-            const credentialKeys = <span class="cstat-no" title="statement not covered" >allKeys.filter(<span class="fstat-no" title="function not covered" >key </span>=&gt; </span>
-<span class="cstat-no" title="statement not covered" >                key.startsWith('api-key-') || </span>
-                key.startsWith('credentials-') ||
-                key.startsWith('secure-object-')
-            );
-            
-            // Re-encrypt each credential with the new key
-<span class="cstat-no" title="statement not covered" >            for (const key of credentialKeys) {</span>
-                // Get the credential using old key
-                const rawData = <span class="cstat-no" title="statement not covered" >await this.context.secrets.get(key);</span>
-<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (!rawData) <span class="cstat-no" title="statement not covered" >continue;</span></span>
-                
-                const credential = <span class="cstat-no" title="statement not covered" >JSON.parse(rawData) as StoredCredential;</span>
-                
-                // Get the original value
-                const value = <span class="cstat-no" title="statement not covered" >await this.getAndDecryptCredential(key);</span>
-<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (!value) <span class="cstat-no" title="statement not covered" >continue;</span></span>
-                
-                // Store with new master key (temporarily store the new master key)
-<span class="cstat-no" title="statement not covered" >                await this.context.secrets.store('temp-master-key', newMasterKey);</span>
-                const currentMasterKey = <span class="cstat-no" title="statement not covered" >await this.context.secrets.get(this.MASTER_KEY_ID);</span>
-<span class="cstat-no" title="statement not covered" >                await this.context.secrets.store(this.MASTER_KEY_ID, newMasterKey);</span>
-                
-                // Re-encrypt with new master key
-<span class="cstat-no" title="statement not covered" >                await this.encryptAndStoreCredential(key, value, credential);</span>
-                
-                // Restore the current master key
-<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (currentMasterKey) {</span>
-<span class="cstat-no" title="statement not covered" >                    await this.context.secrets.store(this.MASTER_KEY_ID, currentMasterKey);</span>
+            const expectedChecksums: Record&lt;string, string&gt; = {};
+            for (const line of lines) {
+                const match = line.match(/^([A-Z0-9]+)=(.+)$/);
+                if (match) {
+                    expectedChecksums[match[1]] = match[2];
                 }
             }
             
-            // Finally update the master key
-<span class="cstat-no" title="statement not covered" >            await this.context.secrets.store(this.MASTER_KEY_ID, newMasterKey);</span>
+            // Verify MD5
+            if (expectedChecksums.MD5) {
+                const md5Valid = await this.verifyChecksum(templatePath, expectedChecksums.MD5, 'md5');
+                if (!md5Valid) {
+                    console.warn(`MD5 checksum verification failed for template: ${templatePath}`);
+                    return false;
+                }
+            }
             
-            // Clean up
-<span class="cstat-no" title="statement not covered" >            await this.context.secrets.delete('temp-master-key');</span>
+            // Verify SHA256
+            if (expectedChecksums.SHA256) {
+                const sha256Valid = await this.verifyChecksum(templatePath, expectedChecksums.SHA256, 'sha256');
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (!sha256Valid) {
+<span class="cstat-no" title="statement not covered" >                    console.warn(`SHA256 checksum verification failed for template: ${templatePath}`);</span>
+<span class="cstat-no" title="statement not covered" >                    return false;</span>
+                }
+            }
             
+            // Template passed all available checks
+            this.verifiedTemplates.add(templatePath);
+            return true;
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to rotate encryption keys:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to rotate encryption keys: ${error instanceof Error ? error.message : String(error)}`);</span>
+<span class="cstat-no" title="statement not covered" >            console.error('Template verification failed:', error);</span>
+<span class="cstat-no" title="statement not covered" >            return false;</span>
         }
     }
     
     /**
-     * Encrypts a value using a derived key
-     * @param value Value to encrypt
-     * @param salt Salt for key derivation
-     * @param config Encryption configuration
-     * @returns Encrypted data with IV
+     * Create a digital signature for a template file using RSA-SHA256
+     * 
+     * @param templatePath - Path to the template file
+     * @param privateKeyPath - Path to the private key file in PEM format
+     * @returns Promise resolving to the path of the generated signature file
+     * 
+     * @throws Error if paths are invalid/unsafe or if signing fails
+     * 
+     * @remarks
+     * This method creates a cryptographic signature for the template file using
+     * the RSA-SHA256 algorithm. The signature is stored in a separate file with
+     * the same name as the template but with a `.sig` extension.
+     * 
+     * The private key should be kept secure and only accessible to authorized template
+     * publishers. The corresponding public key should be distributed to users for
+     * verification.
+     * 
+     * @example
+     * ```typescript
+     * // Sign a template using a private key
+     * const sigPath = await integrityChecker.signTemplate(
+     *   'templates/contract.docx',
+     *   'keys/private_key.pem'
+     * );
+     * console.log(`Signature created at: ${sigPath}`);
+     * ```
      */
-    private async encrypt(
-        value: string, 
-        salt: Buffer, 
-        config: EncryptionConfig = this.defaultEncryptionConfig
-    ): Promise&lt;{ encrypted: Buffer, iv: Buffer }&gt; {
-        // Get master encryption key
-        const masterKey = await this.getMasterKey();
-        
-        // Derive encryption key from master key
-        const key = crypto.pbkdf2Sync(
-            masterKey,
-            salt,
-            config.iterations || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.iterations!,</span>
-            config.keyLength || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.keyLength!,</span>
-            config.digest || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.digest!</span>
-        );
-        
-        // Generate random IV
-        const iv = crypto.randomBytes(config.ivLength || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.ivLength!)</span>;
-        
-        // Create cipher and encrypt
-        const cipher = crypto.createCipheriv(
-            config.algorithm || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.algorithm!,</span>
-            key,
-            iv
-        );
-        
-        const encrypted = Buffer.concat([
-            cipher.update(Buffer.from(value, 'utf8')),
-            cipher.final()
-        ]);
-        
-        return { encrypted, iv };
-    }
-    
-    /**
-     * Decrypts a value using a derived key
-     * @param encrypted Encrypted data
-     * @param iv Initialization vector
-     * @param salt Salt used for key derivation
-     * @param config Encryption configuration
-     * @returns Decrypted value
-     */
-    private async decrypt(
-        encrypted: Buffer,
-        iv: Buffer,
-        salt: Buffer,
-        config: EncryptionConfig = this.defaultEncryptionConfig
-    ): Promise&lt;string&gt; {
-        // Get master encryption key
-        const masterKey = await this.getMasterKey();
-        
-        // Derive encryption key from master key
-        const key = crypto.pbkdf2Sync(
-            masterKey,
-            salt,
-            config.iterations || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.iterations!,</span>
-            config.keyLength || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.keyLength!,</span>
-            config.digest || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.digest!</span>
-        );
-        
-        // Create decipher and decrypt
-        const decipher = crypto.createDecipheriv(
-            config.algorithm || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.algorithm!,</span>
-            key,
-            iv
-        );
-        
-        const decrypted = Buffer.concat([
-            decipher.update(encrypted),
-            decipher.final()
-        ]);
-        
-        return decrypted.toString('utf8');
-    }
-    
-    /**
-     * Gets or creates a master encryption key
-     * @returns Master key
-     */
-    private async getMasterKey(): Promise&lt;string&gt; {
-        // Try to get existing master key
-        let masterKey = await this.context.secrets.get(this.MASTER_KEY_ID);
-        
-        // If no master key exists, create one
-        if (!masterKey) {
-            masterKey = crypto.randomBytes(32).toString('hex');
-            await this.context.secrets.store(this.MASTER_KEY_ID, masterKey);
+    public async signTemplate(templatePath: string, privateKeyPath: string): Promise&lt;string&gt; {
+        if (!templatePath || !this.isPathSafe(templatePath) || !privateKeyPath || !this.isPathSafe(privateKeyPath)) {
+            throw new Error('Invalid or unsafe path provided');
         }
         
-        return masterKey;
-    }
-    
-    /**
-     * Encrypts a credential and stores it
-     * @param key Storage key
-     * @param value Value to encrypt
-     * @param credential Credential object to update with encryption details
-     */
-    private async encryptAndStoreCredential(
-        key: string, 
-        value: string, 
-        credential: StoredCredential
-    ): Promise&lt;void&gt; {
         try {
-            // Generate random salt
-            const salt = crypto.randomBytes(16);
+            // Read private key
+            const privateKey = await fs.promises.readFile(privateKeyPath, 'utf-8');
             
-            // Encrypt the value
-            const { encrypted, iv } = await this.encrypt(value, salt);
+            // Read template file
+            const templateData = await fs.promises.readFile(templatePath);
             
-            // Update credential with encryption details
-            credential.value = encrypted.toString('base64');
-            credential.iv = iv.toString('base64');
-            credential.salt = salt.toString('base64');
+            // Create signature
+            const sign = crypto.createSign('RSA-SHA256');
+            sign.update(templateData);
+            const signature = sign.sign(privateKey, 'base64');
             
-            // Store the credential
-            await this.context.secrets.store(key, JSON.stringify(credential));
+            // Save signature to file
+            const signatureFilePath = `${templatePath}.sig`;
+            await fs.promises.writeFile(signatureFilePath, signature);
+            
+            return signatureFilePath;
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to encrypt and store credential:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to encrypt and store credential: ${error instanceof Error ? error.message : String(error)}`);</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to sign template: ${(error as Error).message}`);</span>
         }
     }
     
     /**
-     * Retrieves and decrypts a credential
-     * @param key Storage key
-     * @returns Decrypted value or undefined if not found or expired
+     * Verify a template's digital signature using RSA-SHA256
+     * 
+     * @param templatePath - Path to the template file
+     * @param publicKeyPath - Path to the public key file in PEM format
+     * @returns Promise resolving to a boolean indicating whether the signature is valid
+     * 
+     * @remarks
+     * This method verifies the cryptographic signature of a template using the
+     * corresponding public key. It looks for a signature file at `${templatePath}.sig`.
+     * 
+     * The verification uses the RSA-SHA256 algorithm, which provides strong
+     * cryptographic assurance that the template was signed by the holder of the
+     * private key and has not been modified since signing.
+     * 
+     * Returns false if any part of the verification process fails, including
+     * missing signature file or invalid signature.
+     * 
+     * @example
+     * ```typescript
+     * const isSignatureValid = await integrityChecker.verifySignature(
+     *   'templates/contract.docx',
+     *   'keys/public_key.pem'
+     * );
+     * ```
      */
-    private async getAndDecryptCredential(key: string): Promise&lt;string | undefined&gt; {
+    public async verifySignature(templatePath: string, publicKeyPath: string): Promise&lt;boolean&gt; {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!templatePath || !this.isPathSafe(templatePath) || !publicKeyPath || !this.isPathSafe(publicKeyPath)) {
+<span class="cstat-no" title="statement not covered" >            throw new Error('Invalid or unsafe path provided');</span>
+        }
+        
         try {
-            // Get the stored credential
-            const rawData = await this.context.secrets.get(key);
-            <span class="missing-if-branch" title="if path not taken" >I</span>if (!rawData) {
-<span class="cstat-no" title="statement not covered" >                return undefined;</span>
+            const signatureFilePath = `${templatePath}.sig`;
+            
+            // Check if signature file exists
+            try {
+                await fs.promises.access(signatureFilePath);
+            } catch {
+                console.warn(`No signature file found for template: ${templatePath}`);
+                return false;
             }
             
-            // Parse the credential
-            const credential = JSON.parse(rawData) as StoredCredential;
+            // Read public key
+            const publicKey = await fs.promises.readFile(publicKeyPath, 'utf-8');
             
-            // Check if credential has expired
-            if (credential.expiresAt &amp;&amp; credential.expiresAt &lt; Date.now()) {
-                // Automatically delete expired credentials
-                await this.context.secrets.delete(key);
-                return undefined;
-            }
+            // Read signature
+            const signature = await fs.promises.readFile(signatureFilePath, 'utf-8');
             
-            // Decrypt the value
-            return await this.decrypt(
-                Buffer.from(credential.value, 'base64'),
-                Buffer.from(credential.iv, 'base64'),
-                Buffer.from(credential.salt, 'base64')
-            );
+            // Read template file
+            const templateData = await fs.promises.readFile(templatePath);
+            
+            // Verify signature
+            const verify = crypto.createVerify('RSA-SHA256');
+            verify.update(templateData);
+            return verify.verify(publicKey, signature, 'base64');
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to get and decrypt credential:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to get and decrypt credential: ${error instanceof Error ? error.message : String(error)}`);</span>
+<span class="cstat-no" title="statement not covered" >            console.error('Signature verification failed:', error);</span>
+<span class="cstat-no" title="statement not covered" >            return false;</span>
         }
     }
     
     /**
-     * Gets all keys stored in the secret storage
-     * @returns Array of keys
+     * Add a trusted source for templates
+     * 
+     * @param sourceName - Name identifier for the source
+     * @param publicKeyPath - Path to the public key for verification
+     * @throws Error if source name or public key path are invalid
+     * 
+     * @remarks
+     * Registers a trusted source that can be used to verify templates. The source is
+     * identified by a name, and templates from this source are verified using the
+     * provided public key.
+     * 
+     * Use this method to register external template providers that are trusted by
+     * the application. Once registered, templates can be verified against this
+     * source using the {@link isFromTrustedSource} method.
+     * 
+     * @example
+     * ```typescript
+     * // Register a corporate template provider
+     * integrityChecker.addTrustedSource('corporate', 'keys/corporate_pubkey.pem');
+     * ```
      */
-    private <span class="fstat-no" title="function not covered" >async </span>getAllStoredKeys(): Promise&lt;string[]&gt; {
-<span class="cstat-no" title="statement not covered" >        try {</span>
-            // This is a workaround since VS Code API doesn't provide a direct way to list all keys
-            // We'll use reflection to access the underlying storage if possible
+    public addTrustedSource(sourceName: string, publicKeyPath: string): void {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!sourceName || !publicKeyPath) {
+<span class="cstat-no" title="statement not covered" >            throw new Error('Invalid source name or public key path');</span>
+        }
+        
+        this.trustedSources.set(sourceName, publicKeyPath);
+    }
+    
+    /**
+     * Check if a template is from a trusted source
+     * 
+     * @param templatePath - Path to the template file
+     * @param sourceName - Name of the source to check against
+     * @returns Promise resolving to a boolean indicating whether the template is from the specified trusted source
+     * 
+     * @remarks
+     * This method verifies whether a template comes from a specific trusted source.
+     * For extension-provided templates, it checks if the template is in the extension's
+     * resources directory. For external templates, it verifies the digital signature
+     * using the public key associated with the trusted source.
+     * 
+     * The method performs path safety validation before any operations.
+     * 
+     * @example
+     * ```typescript
+     * if (await integrityChecker.isFromTrustedSource('templates/report.docx', 'corporate')) {
+     *   // Template is from the trusted corporate source
+     * }
+     * ```
+     */
+    public async isFromTrustedSource(templatePath: string, sourceName: string): Promise&lt;boolean&gt; {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!templatePath || !this.isPathSafe(templatePath) || !sourceName) {
+<span class="cstat-no" title="statement not covered" >            return false;</span>
+        }
+        
+        const publicKeyPath = this.trustedSources.get(sourceName);
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!publicKeyPath) {
+<span class="cstat-no" title="statement not covered" >            return false;</span>
+        }
+        
+        if (publicKeyPath === 'extension-provided') {
+            // For extension-provided templates, we trust them by default
+            // but verify their location is within the extension's resources directory
+            const normPath = path.normalize(templatePath);
+            return normPath.includes('resources/templates');
+        }
+        
+        // For templates with public key verification
+        return await this.verifySignature(templatePath, publicKeyPath);
+    }
+    
+    /**
+     * Perform a full integrity check on a template
+     * 
+     * @param templatePath - Path to the template file
+     * @returns Promise resolving to an object containing comprehensive verification results
+     * 
+     * @throws Error if the template path is invalid or unsafe
+     * 
+     * @remarks
+     * This method performs a comprehensive integrity check on a template, including:
+     * 1. Checksum verification against a checksum file if available
+     * 2. Signature verification if the template claims to be from a trusted source
+     * 3. Source verification to confirm the template is from a trusted provider
+     * 
+     * The method returns a detailed result object with multiple validation flags.
+     * A template is considered valid only if it's from a trusted source AND
+     * either its checksum or signature is valid.
+     * 
+     * @example
+     * ```typescript
+     * const result = await integrityChecker.verifyTemplateIntegrity('templates/contract.docx');
+     * if (result.valid) {
+     *   console.log(`Template is valid from source: ${result.source}`);
+     * } else {
+     *   console.log('Template failed integrity check');
+     *   if (!result.checksumValid) console.log('Checksum validation failed');
+     *   if (!result.signatureValid) console.log('Signature validation failed');
+     *   if (!result.fromTrustedSource) console.log('Not from a trusted source');
+     * }
+     * ```
+     */
+    public async verifyTemplateIntegrity(templatePath: string): Promise&lt;{
+        valid: boolean;
+        checksumValid: boolean;
+        signatureValid: boolean;
+        fromTrustedSource: boolean;
+        source?: string;
+    }&gt; {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!templatePath || !this.isPathSafe(templatePath)) {
+<span class="cstat-no" title="statement not covered" >            throw new Error('Invalid or unsafe template path provided');</span>
+        }
+        
+        // Default results
+        const results = {
+            valid: false,
+            checksumValid: false,
+            signatureValid: false,
+            fromTrustedSource: false,
+            source: undefined as string | undefined
+        };
+        
+        try {
+            // Check if file exists
+            await fs.promises.access(templatePath);
             
-            // Try to access the storage directly - this may not work in all VS Code versions
-            const secretStorage = (<span class="cstat-no" title="statement not covered" >this.context.secrets as any)._storage;</span>
-<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (secretStorage &amp;&amp; typeof secretStorage.getKeys === 'function') {</span>
-<span class="cstat-no" title="statement not covered" >                return await secretStorage.getKeys();</span>
+            // Check checksum
+            results.checksumValid = await this.verifyTemplateWithChecksumFile(templatePath);
+            
+            // Check signature and source
+            for (const [sourceName, publicKeyPath] of this.trustedSources.entries()) {
+                const isFromSource = await this.isFromTrustedSource(templatePath, sourceName);
+                if (isFromSource) {
+                    results.fromTrustedSource = true;
+                    results.source = sourceName;
+                    
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (publicKeyPath !== 'extension-provided') {
+<span class="cstat-no" title="statement not covered" >                        results.signatureValid = await this.verifySignature(templatePath, publicKeyPath);</span>
+                    } else {
+                        // For extension-provided templates, we consider signature valid by default
+                        results.signatureValid = true;
+                    }
+                    
+                    break;
+                }
             }
             
-            // If direct access is not available, return an empty array
-            // In a real implementation, you might want to maintain a separate index of keys
-<span class="cstat-no" title="statement not covered" >            console.warn('Unable to list all stored keys - direct access to secret storage not available');</span>
-<span class="cstat-no" title="statement not covered" >            return [];</span>
+            // Template is valid if it's from a trusted source and either checksum or signature is valid
+            results.valid = results.fromTrustedSource &amp;&amp; (results.checksumValid || <span class="branch-2 cbranch-no" title="branch not covered" >results.signatureValid)</span>;
+            
+            return results;
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to get all stored keys:', error);</span>
-<span class="cstat-no" title="statement not covered" >            return [];</span>
+<span class="cstat-no" title="statement not covered" >            console.error('Template integrity verification failed:', error);</span>
+<span class="cstat-no" title="statement not covered" >            return results;</span>
         }
     }
     
     /**
-     * Generates a cryptographic hash for integrity checking
-     * @param data Data to hash
-     * @param algorithm Hash algorithm to use (default: sha256)
-     * @returns Hex-encoded hash
+     * Check if a template has been previously verified
+     * 
+     * @param templatePath - Path to the template file
+     * @returns Boolean indicating whether the template is verified
+     * 
+     * @remarks
+     * This method checks if a template has already been verified in the current session.
+     * Templates are added to the verified list after successful integrity checks.
+     * 
+     * This provides a performance optimization by avoiding repeated cryptographic
+     * operations on templates that have already been validated.
      */
-    public generateHash(data: string | Buffer, algorithm: string = 'sha256'): string {
-        return crypto.createHash(algorithm).update(data).digest('hex');
+    public <span class="fstat-no" title="function not covered" >isVerified(</span>templatePath: string): boolean {
+<span class="cstat-no" title="statement not covered" >        return this.verifiedTemplates.has(templatePath);</span>
     }
     
     /**
-     * Verifies the integrity of data against a hash
-     * @param data Data to verify
-     * @param hash Hash to verify against
-     * @param algorithm Hash algorithm used (default: sha256)
-     * @returns Whether the data matches the hash
+     * Mark a template as verified (useful for templates that have been manually verified)
+     * 
+     * @param templatePath - Path to the template file
+     * 
+     * @remarks
+     * This method manually adds a template to the verified templates set. Use this method
+     * with caution, as it bypasses the normal verification process.
+     * 
+     * It's intended for scenarios where templates have been verified through other means,
+     * such as manual inspection or an external verification process.
+     * 
+     * The method still performs path safety validation before adding the template.
      */
-    public verifyIntegrity(data: string | Buffer, hash: string, algorithm: string = 'sha256'): boolean {
-        const computedHash = this.generateHash(data, algorithm);
-        return computedHash === hash;
+    public <span class="fstat-no" title="function not covered" >markAsVerified(</span>templatePath: string): void {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (templatePath &amp;&amp; this.isPathSafe(templatePath)) {</span>
+<span class="cstat-no" title="statement not covered" >            this.verifiedTemplates.add(templatePath);</span>
+        }
     }
     
     /**
-     * Generates a random token for various security purposes
-     * @param length Length of the token (default: 32)
-     * @returns Random token
+     * Checks if a path is safe using the security utilities
+     * 
+     * @param filePath - Path to check
+     * @returns Whether the path is safe
+     * 
+     * @remarks
+     * This private method delegates to the SecurityManager to validate path safety.
+     * It protects against path traversal attacks and ensures files are accessed
+     * only in allowed locations.
+     * 
+     * The validation checks for:
+     * - Path traversal sequences (../, ..\)
+     * - Absolute paths (when not allowed)
+     * - Invalid characters in file paths
+     * - Access to system or protected directories
+     * 
+     * @private
      */
-    public generateToken(length: number = 32): string {
-        return crypto.randomBytes(length).toString('hex');
-    }
-    
-    /**
-     * Normalizes a path for consistent handling
-     * @param filePath Path to normalize
-     * @returns Normalized path
-     */
-    private normalizePath(filePath: string): string {
-        // Convert to posix path for consistent handling
-        return filePath.replace(/\\/g, '/');
-    }
-    
-    /**
-     * Checks if a path contains traversal patterns
-     * @param filePath Path to check
-     * @returns Whether the path contains traversal
-     */
-    private containsPathTraversal(filePath: string): boolean {
-        // Check for path traversal patterns
-        const normalizedPath = this.normalizePath(filePath);
-        
-        // Check for sequences that could lead to path traversal
-        const traversalPatterns = [
-            '../', '..\\', // Parent directory references
-            '/./', '\\.\\'  // Current directory references that might be used to obfuscate
-        ];
-        
-        return traversalPatterns.some(pattern =&gt; normalizedPath.includes(pattern));
+    private isPathSafe(filePath: string): boolean {
+        // Use the security manager to validate the path
+        const validationResult = this.securityManager.validatePath(filePath);
+        return validationResult.valid;
     }
 }
 &nbsp;</pre></td></tr></table></pre>

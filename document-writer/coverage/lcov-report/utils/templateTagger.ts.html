@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for utils/securityManager.ts</title>
+    <title>Code coverage report for utils/templateTagger.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">utils</a> securityManager.ts</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">utils</a> templateTagger.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">74.84% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>122/163</span>
+                <span class='fraction'>0/205</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.33% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>67/101</span>
+                <span class='fraction'>0/116</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.28% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>25/28</span>
+                <span class='fraction'>0/26</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75.62% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>121/160</span>
+                <span class='fraction'>0/194</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -687,470 +687,12 @@
 <a name='L622'></a><a href='#L622'>622</a>
 <a name='L623'></a><a href='#L623'>623</a>
 <a name='L624'></a><a href='#L624'>624</a>
-<a name='L625'></a><a href='#L625'>625</a>
-<a name='L626'></a><a href='#L626'>626</a>
-<a name='L627'></a><a href='#L627'>627</a>
-<a name='L628'></a><a href='#L628'>628</a>
-<a name='L629'></a><a href='#L629'>629</a>
-<a name='L630'></a><a href='#L630'>630</a>
-<a name='L631'></a><a href='#L631'>631</a>
-<a name='L632'></a><a href='#L632'>632</a>
-<a name='L633'></a><a href='#L633'>633</a>
-<a name='L634'></a><a href='#L634'>634</a>
-<a name='L635'></a><a href='#L635'>635</a>
-<a name='L636'></a><a href='#L636'>636</a>
-<a name='L637'></a><a href='#L637'>637</a>
-<a name='L638'></a><a href='#L638'>638</a>
-<a name='L639'></a><a href='#L639'>639</a>
-<a name='L640'></a><a href='#L640'>640</a>
-<a name='L641'></a><a href='#L641'>641</a>
-<a name='L642'></a><a href='#L642'>642</a>
-<a name='L643'></a><a href='#L643'>643</a>
-<a name='L644'></a><a href='#L644'>644</a>
-<a name='L645'></a><a href='#L645'>645</a>
-<a name='L646'></a><a href='#L646'>646</a>
-<a name='L647'></a><a href='#L647'>647</a>
-<a name='L648'></a><a href='#L648'>648</a>
-<a name='L649'></a><a href='#L649'>649</a>
-<a name='L650'></a><a href='#L650'>650</a>
-<a name='L651'></a><a href='#L651'>651</a>
-<a name='L652'></a><a href='#L652'>652</a>
-<a name='L653'></a><a href='#L653'>653</a>
-<a name='L654'></a><a href='#L654'>654</a>
-<a name='L655'></a><a href='#L655'>655</a>
-<a name='L656'></a><a href='#L656'>656</a>
-<a name='L657'></a><a href='#L657'>657</a>
-<a name='L658'></a><a href='#L658'>658</a>
-<a name='L659'></a><a href='#L659'>659</a>
-<a name='L660'></a><a href='#L660'>660</a>
-<a name='L661'></a><a href='#L661'>661</a>
-<a name='L662'></a><a href='#L662'>662</a>
-<a name='L663'></a><a href='#L663'>663</a>
-<a name='L664'></a><a href='#L664'>664</a>
-<a name='L665'></a><a href='#L665'>665</a>
-<a name='L666'></a><a href='#L666'>666</a>
-<a name='L667'></a><a href='#L667'>667</a>
-<a name='L668'></a><a href='#L668'>668</a>
-<a name='L669'></a><a href='#L669'>669</a>
-<a name='L670'></a><a href='#L670'>670</a>
-<a name='L671'></a><a href='#L671'>671</a>
-<a name='L672'></a><a href='#L672'>672</a>
-<a name='L673'></a><a href='#L673'>673</a>
-<a name='L674'></a><a href='#L674'>674</a>
-<a name='L675'></a><a href='#L675'>675</a>
-<a name='L676'></a><a href='#L676'>676</a>
-<a name='L677'></a><a href='#L677'>677</a>
-<a name='L678'></a><a href='#L678'>678</a>
-<a name='L679'></a><a href='#L679'>679</a>
-<a name='L680'></a><a href='#L680'>680</a>
-<a name='L681'></a><a href='#L681'>681</a>
-<a name='L682'></a><a href='#L682'>682</a>
-<a name='L683'></a><a href='#L683'>683</a>
-<a name='L684'></a><a href='#L684'>684</a>
-<a name='L685'></a><a href='#L685'>685</a>
-<a name='L686'></a><a href='#L686'>686</a>
-<a name='L687'></a><a href='#L687'>687</a>
-<a name='L688'></a><a href='#L688'>688</a>
-<a name='L689'></a><a href='#L689'>689</a>
-<a name='L690'></a><a href='#L690'>690</a>
-<a name='L691'></a><a href='#L691'>691</a>
-<a name='L692'></a><a href='#L692'>692</a>
-<a name='L693'></a><a href='#L693'>693</a>
-<a name='L694'></a><a href='#L694'>694</a>
-<a name='L695'></a><a href='#L695'>695</a>
-<a name='L696'></a><a href='#L696'>696</a>
-<a name='L697'></a><a href='#L697'>697</a>
-<a name='L698'></a><a href='#L698'>698</a>
-<a name='L699'></a><a href='#L699'>699</a>
-<a name='L700'></a><a href='#L700'>700</a>
-<a name='L701'></a><a href='#L701'>701</a>
-<a name='L702'></a><a href='#L702'>702</a>
-<a name='L703'></a><a href='#L703'>703</a>
-<a name='L704'></a><a href='#L704'>704</a>
-<a name='L705'></a><a href='#L705'>705</a>
-<a name='L706'></a><a href='#L706'>706</a>
-<a name='L707'></a><a href='#L707'>707</a>
-<a name='L708'></a><a href='#L708'>708</a>
-<a name='L709'></a><a href='#L709'>709</a>
-<a name='L710'></a><a href='#L710'>710</a>
-<a name='L711'></a><a href='#L711'>711</a>
-<a name='L712'></a><a href='#L712'>712</a>
-<a name='L713'></a><a href='#L713'>713</a>
-<a name='L714'></a><a href='#L714'>714</a>
-<a name='L715'></a><a href='#L715'>715</a>
-<a name='L716'></a><a href='#L716'>716</a>
-<a name='L717'></a><a href='#L717'>717</a>
-<a name='L718'></a><a href='#L718'>718</a>
-<a name='L719'></a><a href='#L719'>719</a>
-<a name='L720'></a><a href='#L720'>720</a>
-<a name='L721'></a><a href='#L721'>721</a>
-<a name='L722'></a><a href='#L722'>722</a>
-<a name='L723'></a><a href='#L723'>723</a>
-<a name='L724'></a><a href='#L724'>724</a>
-<a name='L725'></a><a href='#L725'>725</a>
-<a name='L726'></a><a href='#L726'>726</a>
-<a name='L727'></a><a href='#L727'>727</a>
-<a name='L728'></a><a href='#L728'>728</a>
-<a name='L729'></a><a href='#L729'>729</a>
-<a name='L730'></a><a href='#L730'>730</a>
-<a name='L731'></a><a href='#L731'>731</a>
-<a name='L732'></a><a href='#L732'>732</a>
-<a name='L733'></a><a href='#L733'>733</a>
-<a name='L734'></a><a href='#L734'>734</a>
-<a name='L735'></a><a href='#L735'>735</a>
-<a name='L736'></a><a href='#L736'>736</a>
-<a name='L737'></a><a href='#L737'>737</a>
-<a name='L738'></a><a href='#L738'>738</a>
-<a name='L739'></a><a href='#L739'>739</a>
-<a name='L740'></a><a href='#L740'>740</a>
-<a name='L741'></a><a href='#L741'>741</a>
-<a name='L742'></a><a href='#L742'>742</a>
-<a name='L743'></a><a href='#L743'>743</a>
-<a name='L744'></a><a href='#L744'>744</a>
-<a name='L745'></a><a href='#L745'>745</a>
-<a name='L746'></a><a href='#L746'>746</a>
-<a name='L747'></a><a href='#L747'>747</a>
-<a name='L748'></a><a href='#L748'>748</a>
-<a name='L749'></a><a href='#L749'>749</a>
-<a name='L750'></a><a href='#L750'>750</a>
-<a name='L751'></a><a href='#L751'>751</a>
-<a name='L752'></a><a href='#L752'>752</a>
-<a name='L753'></a><a href='#L753'>753</a>
-<a name='L754'></a><a href='#L754'>754</a>
-<a name='L755'></a><a href='#L755'>755</a>
-<a name='L756'></a><a href='#L756'>756</a>
-<a name='L757'></a><a href='#L757'>757</a>
-<a name='L758'></a><a href='#L758'>758</a>
-<a name='L759'></a><a href='#L759'>759</a>
-<a name='L760'></a><a href='#L760'>760</a>
-<a name='L761'></a><a href='#L761'>761</a>
-<a name='L762'></a><a href='#L762'>762</a>
-<a name='L763'></a><a href='#L763'>763</a>
-<a name='L764'></a><a href='#L764'>764</a>
-<a name='L765'></a><a href='#L765'>765</a>
-<a name='L766'></a><a href='#L766'>766</a>
-<a name='L767'></a><a href='#L767'>767</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<a name='L625'></a><a href='#L625'>625</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1169,121 +711,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1295,40 +730,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1337,10 +745,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1358,54 +771,70 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1413,63 +842,216 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1482,32 +1064,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1521,6 +1086,148 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1528,837 +1235,704 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">52x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">55x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as vscode from 'vscode';
-import * as path from 'path';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * templateTagger.ts
+ * Utility for managing tags and metadata for document templates
+ */
+&nbsp;
+import * as vscode from 'vscode';
+<span class="cstat-no" title="statement not covered" >import { DocumentTemplate, DocumentFormat } from '../models/documentTemplate';</span>
 &nbsp;
 /**
- * Options for path validation
+ * Interface for tag metadata
  */
-export interface PathValidationOptions {
+export interface TagMetadata {
     /**
-     * List of allowed file extensions
+     * Tag name
      */
-    allowedExtensions?: string[];
+    name: string;
     
     /**
-     * List of allowed base directories
+     * Tag color (CSS color)
      */
-    allowedBaseDirs?: string[];
+    color?: string;
     
     /**
-     * Whether to allow absolute paths
+     * Tag description
      */
-    allowAbsolutePaths?: boolean;
+    description?: string;
     
     /**
-     * Whether to allow path traversal
+     * Count of templates with this tag
      */
-    allowTraversal?: boolean;
+    count: number;
     
     /**
-     * Whether to enforce extension check
+     * Is this a system tag
      */
-    enforceExtension?: boolean;
+    isSystem?: boolean;
 }
 &nbsp;
 /**
- * Result of path validation
+ * TemplateTagger class for managing document template tags
  */
-export interface PathValidationResult {
+<span class="cstat-no" title="statement not covered" >export class T</span>emplateTagger {
     /**
-     * Whether the path is valid
+     * Singleton instance
      */
-    valid: boolean;
+    private static instance: TemplateTagger;
     
     /**
-     * Validation message (error or confirmation)
+     * Map of tag names to tag metadata
      */
-    message: string;
+    private tagMetadata: Map&lt;string, TagMetadata&gt; = <span class="cstat-no" title="statement not covered" >new Map();</span>
     
     /**
-     * Validation errors if any
+     * System tags that cannot be removed
      */
-    errors?: string[];
-}
-&nbsp;
-/**
- * Configuration for encryption
- */
-export interface EncryptionConfig {
-    /**
-     * Algorithm to use for encryption (default: aes-256-cbc)
-     */
-    algorithm?: string;
-    
-    /**
-     * Initialization vector length (default: 16 bytes)
-     */
-    ivLength?: number;
-    
-    /**
-     * Key derivation iterations (default: 10000)
-     */
-    iterations?: number;
-    
-    /**
-     * Key length in bytes (default: 32)
-     */
-    keyLength?: number;
-    
-    /**
-     * Hash algorithm for key derivation (default: sha256)
-     */
-    digest?: string;
-}
-&nbsp;
-/**
- * Stored credential item
- */
-export interface StoredCredential {
-    /**
-     * When the credential was created
-     */
-    createdAt: number;
-    
-    /**
-     * When the credential expires (if applicable)
-     */
-    expiresAt?: number;
-    
-    /**
-     * The encrypted value
-     */
-    value: string;
-    
-    /**
-     * Initialization vector used for encryption
-     */
-    iv: string;
-    
-    /**
-     * Salt used for key derivation
-     */
-    salt: string;
-    
-    /**
-     * Information about what type of credential this is
-     */
-    type: 'api-key' | 'password' | 'token' | 'certificate' | 'other';
-    
-    /**
-     * Optional metadata
-     */
-    metadata?: Record&lt;string, any&gt;;
-}
-&nbsp;
-/**
- * SecurityManager provides centralized security services throughout the application
- * It handles input validation, sanitization, and secure storage operations
- */
-export class SecurityManager {
-    private context: vscode.ExtensionContext;
-    
-    // Default allowed extensions
-    private defaultAllowedExtensions: string[] = [
-        '.docx', '.pdf', '.txt', '.json', '.md', '.html', '.xml', '.csv'
+    private readonly systemTags: string[] = <span class="cstat-no" title="statement not covered" >[</span>
+        'favorite',
+        'recent',
+        'business',
+        'technical',
+        'academic',
+        'personal'
     ];
     
-    // Default encryption configuration
-    private defaultEncryptionConfig: EncryptionConfig = {
-        algorithm: 'aes-256-cbc',
-        ivLength: 16,
-        iterations: 10000,
-        keyLength: 32,
-        digest: 'sha256'
+    /**
+     * Default tag colors
+     */
+    private readonly defaultTagColors: { [key: string]: string } = <span class="cstat-no" title="statement not covered" >{</span>
+        'favorite': '#FFD700', // Gold
+        'recent': '#87CEFA',   // Light sky blue
+        'business': '#4682B4', // Steel blue
+        'technical': '#2E8B57', // Sea green
+        'academic': '#9370DB', // Medium purple
+        'personal': '#FF6347'  // Tomato
     };
     
-    // Master key identifier for the application
-    private readonly MASTER_KEY_ID = 'document-writer-master-key';
+    /**
+     * Storage context for persisting tag data
+     */
+    private storageContext?: vscode.Memento;
     
     /**
-     * Creates a new SecurityManager instance
-     * @param context The extension context
+     * Private constructor for singleton pattern
      */
-    constructor(context: vscode.ExtensionContext) {
-        this.context = context;
+<span class="fstat-no" title="function not covered" >    private constructor(s</span>torageContext?: vscode.Memento) {
+<span class="cstat-no" title="statement not covered" >        this.storageContext = storageContext;</span>
+<span class="cstat-no" title="statement not covered" >        this.loadTagMetadata();</span>
+<span class="cstat-no" title="statement not covered" >        this.initializeSystemTags();</span>
     }
     
     /**
-     * Validates a file path against security constraints
-     * @param filePath The path to validate
-     * @param options Validation options
-     * @returns Validation result
+     * Get the singleton instance
      */
-    public validatePath(filePath: string, options: PathValidationOptions = {}): PathValidationResult {
-        if (!filePath) {
-            return {
-                valid: false,
-                message: 'Path cannot be empty',
-                errors: ['Empty path provided']
-            };
+    public <span class="fstat-no" title="function not covered" >static </span>getInstance(storageContext?: vscode.Memento): TemplateTagger {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!TemplateTagger.instance) {</span>
+<span class="cstat-no" title="statement not covered" >            TemplateTagger.instance = new TemplateTagger(storageContext);</span>
         }
-        
-        const errors: string[] = [];
-        const normalizedPath = this.normalizePath(filePath);
-        
-        // Check if path is absolute when not allowed
-        if (path.isAbsolute(normalizedPath) &amp;&amp; options.allowAbsolutePaths === false) {
-            errors.push('Absolute paths are not allowed');
-        }
-        
-        // Check for path traversal attempts if not allowed
-        if (!options.allowTraversal &amp;&amp; this.containsPathTraversal(normalizedPath)) {
-            errors.push('Path traversal is not allowed');
-        }
-        
-        // Check file extension if enforced
-        if (options.enforceExtension !== false) {
-            const ext = path.extname(normalizedPath).toLowerCase();
-            const allowedExts = options.allowedExtensions || this.defaultAllowedExtensions;
-            
-            if (!allowedExts.includes(ext)) {
-                errors.push(`File extension "${ext}" is not allowed. Allowed extensions: ${allowedExts.join(', ')}`);
-            }
-        }
-        
-        // Check if path is within allowed directories if specified
-        if (options.allowedBaseDirs &amp;&amp; options.allowedBaseDirs.length &gt; 0) {
-            const isWithinAllowedDir = options.allowedBaseDirs.some(dir =&gt; {
-                const normalizedDir = this.normalizePath(dir);
-                return normalizedPath.startsWith(normalizedDir);
-            });
-            
-            if (!isWithinAllowedDir) {
-                errors.push('Path is not within allowed directories');
-            }
-        }
-        
-        // Return validation result
-        if (errors.length &gt; 0) {
-            return {
-                valid: false,
-                message: errors[0],
-                errors
-            };
-        }
-        
-        return {
-            valid: true,
-            message: 'Path validation successful'
-        };
+<span class="cstat-no" title="statement not covered" >        return TemplateTagger.instance;</span>
     }
     
     /**
-     * Sanitizes a file path to prevent path traversal and other issues
-     * @param filePath Path to sanitize
-     * @param baseDir Base directory for resolving relative paths
-     * @returns Sanitized path
+     * Initialize system tags
      */
-    public sanitizePath(filePath: string, baseDir: string = ''): string {
-        if (!filePath) {
-            return '';
-        }
-        
-        // Normalize the path to handle different separators
-        let normalizedPath = this.normalizePath(filePath);
-        
-        // Resolve relative paths
-        if (!path.isAbsolute(normalizedPath) &amp;&amp; baseDir) {
-            normalizedPath = path.join(baseDir, normalizedPath);
-        }
-        
-        // Remove any remaining relative components by converting to absolute and back
-        const absolutePath = path.resolve(normalizedPath);
-        
-        // Make sure the path is within the baseDir if provided
-        if (baseDir &amp;&amp; !absolutePath.startsWith(this.normalizePath(baseDir))) {
-            // If outside baseDir, return just the filename to prevent traversal
-            return path.join(baseDir, path.basename(absolutePath));
-        }
-        
-        return absolutePath;
-    }
-    
-    /**
-     * Sanitizes input to prevent XSS and injection attacks
-     * @param input String to sanitize
-     * @returns Sanitized string
-     */
-    public sanitizeInput(input: string): string {
-        if (!input) {
-            return '';
-        }
-        
-        // Basic HTML encoding of special characters
-        return input
-            .replace(/&lt;/g, '&amp;lt;')
-            .replace(/&gt;/g, '&amp;gt;')
-            .replace(/"/g, '&amp;quot;')
-            .replace(/'/g, '&amp;#39;');
-    }
-    
-    /**
-     * Stores sensitive data securely using VS Code's secret storage
-     * @param key Key to store data under
-     * @param value Value to store
-     * @returns Promise that resolves when storage is complete
-     */
-    public async storeSecureData(key: string, value: string): Promise&lt;void&gt; {
-        if (!key || !value) {
-            throw new Error('Key and value must be provided for secure storage');
-        }
-        
-        try {
-            await this.context.secrets.store(key, value);
-        } catch (error) {
-            console.error('Failed to store secure data:', error);
-            throw new Error(`Failed to store secure data: ${error instanceof Error ? error.message : <span class="branch-1 cbranch-no" title="branch not covered" >String(error)}</span>`);
-        }
-    }
-    
-    /**
-     * Retrieves sensitive data from secure storage
-     * @param key Key to retrieve
-     * @returns Promise that resolves to the stored value or undefined if not found
-     */
-    public async getSecureData(key: string): Promise&lt;string | undefined&gt; {
-        if (!key) {
-            throw new Error('Key must be provided to retrieve secure data');
-        }
-        
-        try {
-            return await this.context.secrets.get(key);
-        } catch (error) {
-            console.error('Failed to retrieve secure data:', error);
-            throw new Error(`Failed to retrieve secure data: ${error instanceof Error ? error.message : <span class="branch-1 cbranch-no" title="branch not covered" >String(error)}</span>`);
-        }
-    }
-    
-    /**
-     * Deletes sensitive data from secure storage
-     * @param key Key to delete
-     * @returns Promise that resolves when deletion is complete
-     */
-    public async deleteSecureData(key: string): Promise&lt;void&gt; {
-        if (!key) {
-            throw new Error('Key must be provided to delete secure data');
-        }
-        
-        try {
-            await this.context.secrets.delete(key);
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to delete secure data:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to delete secure data: ${error instanceof Error ? error.message : String(error)}`);</span>
-        }
-    }
-    
-    /**
-     * Stores an API key securely with encryption
-     * @param serviceId Identifier for the service (e.g., 'github', 'openai')
-     * @param apiKey The API key to store
-     * @param expiryDays Optional number of days until the key expires
-     * @param metadata Optional metadata about the API key
-     * @returns Promise that resolves when storage is complete
-     */
-    public async storeApiKey(
-        serviceId: string, 
-        apiKey: string, 
-        expiryDays?: number,
-        metadata?: Record&lt;string, any&gt;
-    ): Promise&lt;void&gt; {
-        if (!serviceId || !apiKey) {
-            throw new Error('Service ID and API key must be provided');
-        }
-        
-        const storageKey = `api-key-${serviceId}`;
-        const credential: StoredCredential = {
-            createdAt: Date.now(),
-            expiresAt: expiryDays ? Date.now() + (expiryDays * 24 * 60 * 60 * 1000) : undefined,
-            type: 'api-key',
-            metadata: metadata || {},
-            value: '', // Will be set during encryption
-            iv: '',    // Will be set during encryption
-            salt: ''   // Will be set during encryption
-        };
-        
-        await this.encryptAndStoreCredential(storageKey, apiKey, credential);
-    }
-    
-    /**
-     * Retrieves an API key that was stored securely
-     * @param serviceId Identifier for the service
-     * @returns Promise that resolves to the API key or undefined if not found or expired
-     */
-    public async getApiKey(serviceId: string): Promise&lt;string | undefined&gt; {
-        const storageKey = `api-key-${serviceId}`;
-        return this.getAndDecryptCredential(storageKey);
-    }
-    
-    /**
-     * Stores user credentials securely with encryption
-     * @param service Name of the service or system
-     * @param username Username
-     * @param password Password
-     * @param expiryDays Optional number of days until the credentials expire
-     * @returns Promise that resolves when storage is complete
-     */
-    public async storeCredentials(
-        service: string,
-        username: string,
-        password: string,
-        expiryDays?: number
-    ): Promise&lt;void&gt; {
-        if (!service || !username || !password) {
-            throw new Error('Service name, username, and password must be provided');
-        }
-        
-        const storageKey = `credentials-${service}-${username}`;
-        const credential: StoredCredential = {
-            createdAt: Date.now(),
-            expiresAt: expiryDays ? <span class="branch-0 cbranch-no" title="branch not covered" >Date.now() + (expiryDays * 24 * 60 * 60 * 1000) </span>: undefined,
-            type: 'password',
-            metadata: { username },
-            value: '', // Will be set during encryption
-            iv: '',    // Will be set during encryption
-            salt: ''   // Will be set during encryption
-        };
-        
-        await this.encryptAndStoreCredential(storageKey, password, credential);
-    }
-    
-    /**
-     * Retrieves user credentials that were stored securely
-     * @param service Name of the service or system
-     * @param username Username
-     * @returns Promise that resolves to the password or undefined if not found or expired
-     */
-    public async getCredentials(service: string, username: string): Promise&lt;string | undefined&gt; {
-        const storageKey = `credentials-${service}-${username}`;
-        return this.getAndDecryptCredential(storageKey);
-    }
-    
-    /**
-     * Stores structured data (JSON object) securely with encryption
-     * @param key Storage key
-     * @param data Object to store
-     * @param expiryDays Optional number of days until the data expires
-     * @returns Promise that resolves when storage is complete
-     */
-    public async storeSecureObject&lt;T&gt;(key: string, data: T, expiryDays?: number): Promise&lt;void&gt; {
-        if (!key || data === undefined) {
-            throw new Error('Key and data object must be provided');
-        }
-        
-        const jsonData = JSON.stringify(data);
-        const storageKey = `secure-object-${key}`;
-        const credential: StoredCredential = {
-            createdAt: Date.now(),
-            expiresAt: expiryDays ? <span class="branch-0 cbranch-no" title="branch not covered" >Date.now() + (expiryDays * 24 * 60 * 60 * 1000) </span>: undefined,
-            type: 'other',
-            value: '', // Will be set during encryption
-            iv: '',    // Will be set during encryption
-            salt: ''   // Will be set during encryption
-        };
-        
-        await this.encryptAndStoreCredential(storageKey, jsonData, credential);
-    }
-    
-    /**
-     * Retrieves a structured data object that was stored securely
-     * @param key Storage key
-     * @returns Promise that resolves to the object or undefined if not found or expired
-     */
-    public async getSecureObject&lt;T&gt;(key: string): Promise&lt;T | undefined&gt; {
-        const storageKey = `secure-object-${key}`;
-        const jsonData = await this.getAndDecryptCredential(storageKey);
-        
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (!jsonData) {
-<span class="cstat-no" title="statement not covered" >            return undefined;</span>
-        }
-        
-        try {
-            return JSON.parse(jsonData) as T;
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to parse secure object:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to parse secure object: ${error instanceof Error ? error.message : String(error)}`);</span>
-        }
-    }
-    
-    /**
-     * Rotates encryption keys and re-encrypts all stored data
-     * This should be called periodically to enhance security
-     * @returns Promise that resolves when key rotation is complete
-     */
-    public <span class="fstat-no" title="function not covered" >async </span>rotateEncryptionKeys(): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >        try {</span>
-            // Generate a new master key
-            const newMasterKey = <span class="cstat-no" title="statement not covered" >crypto.randomBytes(32).toString('hex');</span>
-            
-            // Get all stored keys
-            const allKeys = <span class="cstat-no" title="statement not covered" >await this.getAllStoredKeys();</span>
-            
-            // Find all secure credential keys
-            const credentialKeys = <span class="cstat-no" title="statement not covered" >allKeys.filter(<span class="fstat-no" title="function not covered" >key </span>=&gt; </span>
-<span class="cstat-no" title="statement not covered" >                key.startsWith('api-key-') || </span>
-                key.startsWith('credentials-') ||
-                key.startsWith('secure-object-')
-            );
-            
-            // Re-encrypt each credential with the new key
-<span class="cstat-no" title="statement not covered" >            for (const key of credentialKeys) {</span>
-                // Get the credential using old key
-                const rawData = <span class="cstat-no" title="statement not covered" >await this.context.secrets.get(key);</span>
-<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (!rawData) <span class="cstat-no" title="statement not covered" >continue;</span></span>
-                
-                const credential = <span class="cstat-no" title="statement not covered" >JSON.parse(rawData) as StoredCredential;</span>
-                
-                // Get the original value
-                const value = <span class="cstat-no" title="statement not covered" >await this.getAndDecryptCredential(key);</span>
-<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (!value) <span class="cstat-no" title="statement not covered" >continue;</span></span>
-                
-                // Store with new master key (temporarily store the new master key)
-<span class="cstat-no" title="statement not covered" >                await this.context.secrets.store('temp-master-key', newMasterKey);</span>
-                const currentMasterKey = <span class="cstat-no" title="statement not covered" >await this.context.secrets.get(this.MASTER_KEY_ID);</span>
-<span class="cstat-no" title="statement not covered" >                await this.context.secrets.store(this.MASTER_KEY_ID, newMasterKey);</span>
-                
-                // Re-encrypt with new master key
-<span class="cstat-no" title="statement not covered" >                await this.encryptAndStoreCredential(key, value, credential);</span>
-                
-                // Restore the current master key
-<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (currentMasterKey) {</span>
-<span class="cstat-no" title="statement not covered" >                    await this.context.secrets.store(this.MASTER_KEY_ID, currentMasterKey);</span>
+    private <span class="fstat-no" title="function not covered" >initializeSystemTags(</span>): void {
+<span class="cstat-no" title="statement not covered" >        for (const tag of this.systemTags) {</span>
+<span class="cstat-no" title="statement not covered" >            if (!this.tagMetadata.has(tag)) {</span>
+<span class="cstat-no" title="statement not covered" >                this.tagMetadata.set(tag, {</span>
+                    name: tag,
+                    color: this.defaultTagColors[tag] || '#CCCCCC',
+                    count: 0,
+                    isSystem: true,
+                    description: this.getSystemTagDescription(tag)
+                });
+            } else {
+                // Ensure existing tag is marked as system
+                const metadata = <span class="cstat-no" title="statement not covered" >this.tagMetadata.get(tag)!;</span>
+<span class="cstat-no" title="statement not covered" >                metadata.isSystem = true;</span>
+<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (!metadata.color) {</span>
+<span class="cstat-no" title="statement not covered" >                    metadata.color = this.defaultTagColors[tag] || '#CCCCCC';</span>
+                }
+<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (!metadata.description) {</span>
+<span class="cstat-no" title="statement not covered" >                    metadata.description = this.getSystemTagDescription(tag);</span>
                 }
             }
-            
-            // Finally update the master key
-<span class="cstat-no" title="statement not covered" >            await this.context.secrets.store(this.MASTER_KEY_ID, newMasterKey);</span>
-            
-            // Clean up
-<span class="cstat-no" title="statement not covered" >            await this.context.secrets.delete('temp-master-key');</span>
-            
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to rotate encryption keys:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to rotate encryption keys: ${error instanceof Error ? error.message : String(error)}`);</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        this.saveTagMetadata();</span>
+    }
+    
+    /**
+     * Get description for system tag
+     */
+    private <span class="fstat-no" title="function not covered" >getSystemTagDescription(</span>tag: string): string {
+<span class="cstat-no" title="statement not covered" >        switch (tag) {</span>
+            case 'favorite':
+<span class="cstat-no" title="statement not covered" >                return 'Marked as favorite template';</span>
+            case 'recent':
+<span class="cstat-no" title="statement not covered" >                return 'Recently used template';</span>
+            case 'business':
+<span class="cstat-no" title="statement not covered" >                return 'Business-related document';</span>
+            case 'technical':
+<span class="cstat-no" title="statement not covered" >                return 'Technical documentation';</span>
+            case 'academic':
+<span class="cstat-no" title="statement not covered" >                return 'Academic or research document';</span>
+            case 'personal':
+<span class="cstat-no" title="statement not covered" >                return 'Personal document';</span>
+            default:
+<span class="cstat-no" title="statement not covered" >                return `System tag: ${tag}`;</span>
         }
     }
     
     /**
-     * Encrypts a value using a derived key
-     * @param value Value to encrypt
-     * @param salt Salt for key derivation
-     * @param config Encryption configuration
-     * @returns Encrypted data with IV
+     * Load tag metadata from storage
      */
-    private async encrypt(
-        value: string, 
-        salt: Buffer, 
-        config: EncryptionConfig = this.defaultEncryptionConfig
-    ): Promise&lt;{ encrypted: Buffer, iv: Buffer }&gt; {
-        // Get master encryption key
-        const masterKey = await this.getMasterKey();
-        
-        // Derive encryption key from master key
-        const key = crypto.pbkdf2Sync(
-            masterKey,
-            salt,
-            config.iterations || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.iterations!,</span>
-            config.keyLength || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.keyLength!,</span>
-            config.digest || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.digest!</span>
-        );
-        
-        // Generate random IV
-        const iv = crypto.randomBytes(config.ivLength || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.ivLength!)</span>;
-        
-        // Create cipher and encrypt
-        const cipher = crypto.createCipheriv(
-            config.algorithm || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.algorithm!,</span>
-            key,
-            iv
-        );
-        
-        const encrypted = Buffer.concat([
-            cipher.update(Buffer.from(value, 'utf8')),
-            cipher.final()
-        ]);
-        
-        return { encrypted, iv };
-    }
-    
-    /**
-     * Decrypts a value using a derived key
-     * @param encrypted Encrypted data
-     * @param iv Initialization vector
-     * @param salt Salt used for key derivation
-     * @param config Encryption configuration
-     * @returns Decrypted value
-     */
-    private async decrypt(
-        encrypted: Buffer,
-        iv: Buffer,
-        salt: Buffer,
-        config: EncryptionConfig = this.defaultEncryptionConfig
-    ): Promise&lt;string&gt; {
-        // Get master encryption key
-        const masterKey = await this.getMasterKey();
-        
-        // Derive encryption key from master key
-        const key = crypto.pbkdf2Sync(
-            masterKey,
-            salt,
-            config.iterations || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.iterations!,</span>
-            config.keyLength || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.keyLength!,</span>
-            config.digest || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.digest!</span>
-        );
-        
-        // Create decipher and decrypt
-        const decipher = crypto.createDecipheriv(
-            config.algorithm || <span class="branch-1 cbranch-no" title="branch not covered" >this.defaultEncryptionConfig.algorithm!,</span>
-            key,
-            iv
-        );
-        
-        const decrypted = Buffer.concat([
-            decipher.update(encrypted),
-            decipher.final()
-        ]);
-        
-        return decrypted.toString('utf8');
-    }
-    
-    /**
-     * Gets or creates a master encryption key
-     * @returns Master key
-     */
-    private async getMasterKey(): Promise&lt;string&gt; {
-        // Try to get existing master key
-        let masterKey = await this.context.secrets.get(this.MASTER_KEY_ID);
-        
-        // If no master key exists, create one
-        if (!masterKey) {
-            masterKey = crypto.randomBytes(32).toString('hex');
-            await this.context.secrets.store(this.MASTER_KEY_ID, masterKey);
-        }
-        
-        return masterKey;
-    }
-    
-    /**
-     * Encrypts a credential and stores it
-     * @param key Storage key
-     * @param value Value to encrypt
-     * @param credential Credential object to update with encryption details
-     */
-    private async encryptAndStoreCredential(
-        key: string, 
-        value: string, 
-        credential: StoredCredential
-    ): Promise&lt;void&gt; {
-        try {
-            // Generate random salt
-            const salt = crypto.randomBytes(16);
+    private <span class="fstat-no" title="function not covered" >loadTagMetadata(</span>): void {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (this.storageContext) {</span>
+            const savedMetadata = <span class="cstat-no" title="statement not covered" >this.storageContext.get&lt;Record&lt;string, TagMetadata&gt;&gt;('templateTags', {});</span>
             
-            // Encrypt the value
-            const { encrypted, iv } = await this.encrypt(value, salt);
-            
-            // Update credential with encryption details
-            credential.value = encrypted.toString('base64');
-            credential.iv = iv.toString('base64');
-            credential.salt = salt.toString('base64');
-            
-            // Store the credential
-            await this.context.secrets.store(key, JSON.stringify(credential));
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to encrypt and store credential:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to encrypt and store credential: ${error instanceof Error ? error.message : String(error)}`);</span>
+<span class="cstat-no" title="statement not covered" >            this.tagMetadata.clear();</span>
+<span class="cstat-no" title="statement not covered" >            for (const [tag, metadata] of Object.entries(savedMetadata)) {</span>
+<span class="cstat-no" title="statement not covered" >                this.tagMetadata.set(tag, metadata);</span>
+            }
         }
     }
     
     /**
-     * Retrieves and decrypts a credential
-     * @param key Storage key
-     * @returns Decrypted value or undefined if not found or expired
+     * Save tag metadata to storage
      */
-    private async getAndDecryptCredential(key: string): Promise&lt;string | undefined&gt; {
-        try {
-            // Get the stored credential
-            const rawData = await this.context.secrets.get(key);
-            <span class="missing-if-branch" title="if path not taken" >I</span>if (!rawData) {
-<span class="cstat-no" title="statement not covered" >                return undefined;</span>
+    private <span class="fstat-no" title="function not covered" >saveTagMetadata(</span>): void {
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (this.storageContext) {</span>
+            const metadataObject: Record&lt;string, TagMetadata&gt; = <span class="cstat-no" title="statement not covered" >{};</span>
+            
+<span class="cstat-no" title="statement not covered" >            for (const [tag, metadata] of this.tagMetadata.entries()) {</span>
+<span class="cstat-no" title="statement not covered" >                metadataObject[tag] = metadata;</span>
             }
             
-            // Parse the credential
-            const credential = JSON.parse(rawData) as StoredCredential;
-            
-            // Check if credential has expired
-            if (credential.expiresAt &amp;&amp; credential.expiresAt &lt; Date.now()) {
-                // Automatically delete expired credentials
-                await this.context.secrets.delete(key);
-                return undefined;
-            }
-            
-            // Decrypt the value
-            return await this.decrypt(
-                Buffer.from(credential.value, 'base64'),
-                Buffer.from(credential.iv, 'base64'),
-                Buffer.from(credential.salt, 'base64')
-            );
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to get and decrypt credential:', error);</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to get and decrypt credential: ${error instanceof Error ? error.message : String(error)}`);</span>
+<span class="cstat-no" title="statement not covered" >            this.storageContext.update('templateTags', metadataObject);</span>
         }
     }
     
     /**
-     * Gets all keys stored in the secret storage
-     * @returns Array of keys
+     * Add tag to a template
+     * @param template Template to tag
+     * @param tag Tag to add
+     * @returns True if tag was added, false if already present
      */
-    private <span class="fstat-no" title="function not covered" >async </span>getAllStoredKeys(): Promise&lt;string[]&gt; {
-<span class="cstat-no" title="statement not covered" >        try {</span>
-            // This is a workaround since VS Code API doesn't provide a direct way to list all keys
-            // We'll use reflection to access the underlying storage if possible
+    public <span class="fstat-no" title="function not covered" >addTag(</span>template: DocumentTemplate, tag: string): boolean {
+        // Normalize tag (lowercase, trim, no spaces)
+<span class="cstat-no" title="statement not covered" >        tag = this.normalizeTag(tag);</span>
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!tag) {</span>
+<span class="cstat-no" title="statement not covered" >            return false;</span>
+        }
+        
+        // Initialize tags array if needed
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!template.metadata.tags) {</span>
+<span class="cstat-no" title="statement not covered" >            template.metadata.tags = [];</span>
+        }
+        
+        // Check if tag already exists
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (template.metadata.tags.includes(tag)) {</span>
+<span class="cstat-no" title="statement not covered" >            return false;</span>
+        }
+        
+        // Add tag to template
+<span class="cstat-no" title="statement not covered" >        template.metadata.tags.push(tag);</span>
+        
+        // Update tag metadata
+<span class="cstat-no" title="statement not covered" >        this.updateTagCount(tag);</span>
+        
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+    }
+    
+    /**
+     * Remove tag from a template
+     * @param template Template to modify
+     * @param tag Tag to remove
+     * @returns True if tag was removed, false if not found or is system tag
+     */
+    public <span class="fstat-no" title="function not covered" >removeTag(</span>template: DocumentTemplate, tag: string): boolean {
+        // Normalize tag
+<span class="cstat-no" title="statement not covered" >        tag = this.normalizeTag(tag);</span>
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!tag || !template.metadata.tags) {</span>
+<span class="cstat-no" title="statement not covered" >            return false;</span>
+        }
+        
+        // Check if the tag exists
+        const index = <span class="cstat-no" title="statement not covered" >template.metadata.tags.indexOf(tag);</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (index === -1) {</span>
+<span class="cstat-no" title="statement not covered" >            return false;</span>
+        }
+        
+        // Remove tag
+<span class="cstat-no" title="statement not covered" >        template.metadata.tags.splice(index, 1);</span>
+        
+        // Update tag metadata
+<span class="cstat-no" title="statement not covered" >        this.updateTagCount(tag, -1);</span>
+        
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+    }
+    
+    /**
+     * Update tag count
+     * @param tag Tag to update
+     * @param delta Change in count (default 1)
+     */
+    private <span class="fstat-no" title="function not covered" >updateTagCount(</span>tag: string, delta: number = <span class="branch-0 cbranch-no" title="branch not covered" >1)</span>: void {
+<span class="cstat-no" title="statement not covered" >        if (!this.tagMetadata.has(tag)) {</span>
+            // Create new tag metadata
+<span class="cstat-no" title="statement not covered" >            this.tagMetadata.set(tag, {</span>
+                name: tag,
+                count: Math.max(0, delta),
+                isSystem: this.systemTags.includes(tag),
+                color: this.defaultTagColors[tag] || this.generateTagColor(tag)
+            });
+        } else {
+            // Update existing tag metadata
+            const metadata = <span class="cstat-no" title="statement not covered" >this.tagMetadata.get(tag)!;</span>
+<span class="cstat-no" title="statement not covered" >            metadata.count = Math.max(0, metadata.count + delta);</span>
             
-            // Try to access the storage directly - this may not work in all VS Code versions
-            const secretStorage = (<span class="cstat-no" title="statement not covered" >this.context.secrets as any)._storage;</span>
-<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (secretStorage &amp;&amp; typeof secretStorage.getKeys === 'function') {</span>
-<span class="cstat-no" title="statement not covered" >                return await secretStorage.getKeys();</span>
+            // If count is zero and not a system tag, consider removing metadata
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (metadata.count === 0 &amp;&amp; !metadata.isSystem) {</span>
+<span class="cstat-no" title="statement not covered" >                this.tagMetadata.delete(tag);</span>
             }
-            
-            // If direct access is not available, return an empty array
-            // In a real implementation, you might want to maintain a separate index of keys
-<span class="cstat-no" title="statement not covered" >            console.warn('Unable to list all stored keys - direct access to secret storage not available');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        this.saveTagMetadata();</span>
+    }
+    
+    /**
+     * Generate a consistent color for a tag based on its name
+     * @param tag Tag name
+     * @returns CSS color
+     */
+    private <span class="fstat-no" title="function not covered" >generateTagColor(</span>tag: string): string {
+        // Generate a deterministic hash from the tag name
+        let hash = <span class="cstat-no" title="statement not covered" >0;</span>
+<span class="cstat-no" title="statement not covered" >        for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; tag.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >            hash = tag.charCodeAt(i) + ((hash &lt;&lt; 5) - hash);</span>
+        }
+        
+        // Convert to a pastel color
+        const h = <span class="cstat-no" title="statement not covered" >Math.abs(hash) % 360;</span>
+        const s = <span class="cstat-no" title="statement not covered" >50 + (Math.abs(hash) % 30);</span> // 50-80%
+        const l = <span class="cstat-no" title="statement not covered" >60 + (Math.abs(hash) % 20);</span> // 60-80%
+        
+<span class="cstat-no" title="statement not covered" >        return `hsl(${h}, ${s}%, ${l}%)`;</span>
+    }
+    
+    /**
+     * Set tag color
+     * @param tag Tag name
+     * @param color CSS color
+     */
+    public <span class="fstat-no" title="function not covered" >setTagColor(</span>tag: string, color: string): void {
+<span class="cstat-no" title="statement not covered" >        tag = this.normalizeTag(tag);</span>
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!tag) {</span>
+<span class="cstat-no" title="statement not covered" >            return;</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        if (this.tagMetadata.has(tag)) {</span>
+            const metadata = <span class="cstat-no" title="statement not covered" >this.tagMetadata.get(tag)!;</span>
+<span class="cstat-no" title="statement not covered" >            metadata.color = color;</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >            this.tagMetadata.set(tag, {</span>
+                name: tag,
+                color: color,
+                count: 0,
+                isSystem: this.systemTags.includes(tag)
+            });
+        }
+        
+<span class="cstat-no" title="statement not covered" >        this.saveTagMetadata();</span>
+    }
+    
+    /**
+     * Set tag description
+     * @param tag Tag name
+     * @param description Description
+     */
+    public <span class="fstat-no" title="function not covered" >setTagDescription(</span>tag: string, description: string): void {
+<span class="cstat-no" title="statement not covered" >        tag = this.normalizeTag(tag);</span>
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!tag) {</span>
+<span class="cstat-no" title="statement not covered" >            return;</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        if (this.tagMetadata.has(tag)) {</span>
+            const metadata = <span class="cstat-no" title="statement not covered" >this.tagMetadata.get(tag)!;</span>
+<span class="cstat-no" title="statement not covered" >            metadata.description = description;</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >            this.tagMetadata.set(tag, {</span>
+                name: tag,
+                description: description,
+                count: 0,
+                isSystem: this.systemTags.includes(tag)
+            });
+        }
+        
+<span class="cstat-no" title="statement not covered" >        this.saveTagMetadata();</span>
+    }
+    
+    /**
+     * Get all tags with metadata
+     * @returns Array of tag metadata
+     */
+    public <span class="fstat-no" title="function not covered" >getAllTags(</span>): TagMetadata[] {
+<span class="cstat-no" title="statement not covered" >        return Array.from(this.tagMetadata.values())</span>
+            .filter(<span class="fstat-no" title="function not covered" >metadata </span>=&gt; <span class="cstat-no" title="statement not covered" >metadata.count &gt; 0 || metadata.isSystem)</span>
+            .sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; {
+                // System tags first, then by count (descending), then by name
+<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (a.isSystem &amp;&amp; !b.isSystem) <span class="cstat-no" title="statement not covered" >return -1;</span></span>
+<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (!a.isSystem &amp;&amp; b.isSystem) <span class="cstat-no" title="statement not covered" >return 1;</span></span>
+<span class="cstat-no" title="statement not covered" >                <span class="missing-if-branch" title="if path not taken" >I</span>if (a.count !== b.count) <span class="cstat-no" title="statement not covered" >return b.count - a.count;</span></span>
+<span class="cstat-no" title="statement not covered" >                return a.name.localeCompare(b.name);</span>
+            });
+    }
+    
+    /**
+     * Get tag metadata
+     * @param tag Tag name
+     * @returns Tag metadata or undefined if not found
+     */
+    public <span class="fstat-no" title="function not covered" >getTagMetadata(</span>tag: string): TagMetadata | undefined {
+<span class="cstat-no" title="statement not covered" >        tag = this.normalizeTag(tag);</span>
+<span class="cstat-no" title="statement not covered" >        return this.tagMetadata.get(tag);</span>
+    }
+    
+    /**
+     * Get templates with tag
+     * @param tag Tag to search for
+     * @param templates Array of templates to search
+     * @returns Templates with the specified tag
+     */
+    public <span class="fstat-no" title="function not covered" >getTemplatesWithTag(</span>tag: string, templates: DocumentTemplate[]): DocumentTemplate[] {
+<span class="cstat-no" title="statement not covered" >        tag = this.normalizeTag(tag);</span>
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!tag) {</span>
 <span class="cstat-no" title="statement not covered" >            return [];</span>
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to get all stored keys:', error);</span>
-<span class="cstat-no" title="statement not covered" >            return [];</span>
         }
-    }
-    
-    /**
-     * Generates a cryptographic hash for integrity checking
-     * @param data Data to hash
-     * @param algorithm Hash algorithm to use (default: sha256)
-     * @returns Hex-encoded hash
-     */
-    public generateHash(data: string | Buffer, algorithm: string = 'sha256'): string {
-        return crypto.createHash(algorithm).update(data).digest('hex');
-    }
-    
-    /**
-     * Verifies the integrity of data against a hash
-     * @param data Data to verify
-     * @param hash Hash to verify against
-     * @param algorithm Hash algorithm used (default: sha256)
-     * @returns Whether the data matches the hash
-     */
-    public verifyIntegrity(data: string | Buffer, hash: string, algorithm: string = 'sha256'): boolean {
-        const computedHash = this.generateHash(data, algorithm);
-        return computedHash === hash;
-    }
-    
-    /**
-     * Generates a random token for various security purposes
-     * @param length Length of the token (default: 32)
-     * @returns Random token
-     */
-    public generateToken(length: number = 32): string {
-        return crypto.randomBytes(length).toString('hex');
-    }
-    
-    /**
-     * Normalizes a path for consistent handling
-     * @param filePath Path to normalize
-     * @returns Normalized path
-     */
-    private normalizePath(filePath: string): string {
-        // Convert to posix path for consistent handling
-        return filePath.replace(/\\/g, '/');
-    }
-    
-    /**
-     * Checks if a path contains traversal patterns
-     * @param filePath Path to check
-     * @returns Whether the path contains traversal
-     */
-    private containsPathTraversal(filePath: string): boolean {
-        // Check for path traversal patterns
-        const normalizedPath = this.normalizePath(filePath);
         
-        // Check for sequences that could lead to path traversal
-        const traversalPatterns = [
-            '../', '..\\', // Parent directory references
-            '/./', '\\.\\'  // Current directory references that might be used to obfuscate
-        ];
+<span class="cstat-no" title="statement not covered" >        return templates.filter(<span class="fstat-no" title="function not covered" >template </span>=&gt; </span>
+<span class="cstat-no" title="statement not covered" >            template.metadata.tags?.includes(tag)</span>
+        );
+    }
+    
+    /**
+     * Normalize tag (lowercase, trim, replace spaces with hyphens)
+     * @param tag Tag to normalize
+     * @returns Normalized tag
+     */
+    private <span class="fstat-no" title="function not covered" >normalizeTag(</span>tag: string): string {
+<span class="cstat-no" title="statement not covered" >        return tag.toLowerCase().trim().replace(/\s+/g, '-');</span>
+    }
+    
+    /**
+     * Suggest tags for a template based on content
+     * @param template Template to analyze
+     * @returns Array of suggested tags
+     */
+    public <span class="fstat-no" title="function not covered" >suggestTags(</span>template: DocumentTemplate): string[] {
+        const suggestions: string[] = <span class="cstat-no" title="statement not covered" >[];</span>
         
-        return traversalPatterns.some(pattern =&gt; normalizedPath.includes(pattern));
+        // Simple rule-based suggestions
+        const nameLower = <span class="cstat-no" title="statement not covered" >template.name.toLowerCase();</span>
+        const formatLower = <span class="cstat-no" title="statement not covered" >template.format.toString().toLowerCase();</span>
+        const descLower = <span class="cstat-no" title="statement not covered" >template.description.toLowerCase();</span>
+        const categoryLower = <span class="cstat-no" title="statement not covered" >template.metadata.category.toLowerCase();</span>
+        
+        // Add category-based tags
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (categoryLower.includes('business') || </span>
+            nameLower.includes('business') || 
+            descLower.includes('business')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('business');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (categoryLower.includes('technical') || </span>
+            nameLower.includes('technical') || 
+            descLower.includes('technical')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('technical');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (categoryLower.includes('academic') || </span>
+            nameLower.includes('academic') || 
+            descLower.includes('academic') ||
+            nameLower.includes('research') || 
+            descLower.includes('research')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('academic');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (categoryLower.includes('personal') || </span>
+            nameLower.includes('personal') || 
+            descLower.includes('personal')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('personal');</span>
+        }
+        
+        // Add document format tags
+<span class="cstat-no" title="statement not covered" >        switch(template.format) {</span>
+            case DocumentFormat.DOCX:
+<span class="cstat-no" title="statement not covered" >                suggestions.push('word');</span>
+<span class="cstat-no" title="statement not covered" >                break;</span>
+            case DocumentFormat.HTML:
+<span class="cstat-no" title="statement not covered" >                suggestions.push('html');</span>
+<span class="cstat-no" title="statement not covered" >                break;</span>
+            case DocumentFormat.MARKDOWN:
+<span class="cstat-no" title="statement not covered" >                suggestions.push('markdown');</span>
+<span class="cstat-no" title="statement not covered" >                break;</span>
+            case DocumentFormat.PDF:
+<span class="cstat-no" title="statement not covered" >                suggestions.push('pdf');</span>
+<span class="cstat-no" title="statement not covered" >                break;</span>
+        }
+        
+        // Add document type tags based on name and description
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (nameLower.includes('letter') || </span>
+            descLower.includes('letter')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('letter');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (nameLower.includes('report') || </span>
+            descLower.includes('report')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('report');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (nameLower.includes('paper') || </span>
+            descLower.includes('paper')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('paper');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (nameLower.includes('manual') || </span>
+            descLower.includes('manual')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('manual');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (nameLower.includes('proposal') || </span>
+            descLower.includes('proposal')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('proposal');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (nameLower.includes('specification') || </span>
+            descLower.includes('specification') ||
+            nameLower.includes('spec')) {
+<span class="cstat-no" title="statement not covered" >            suggestions.push('specification');</span>
+        }
+        
+<span class="cstat-no" title="statement not covered" >        return [...new Set(suggestions)]; </span>// Remove duplicates
+    }
+    
+    /**
+     * Apply suggested tags to a template
+     * @param template Template to tag
+     * @returns Number of tags added
+     */
+    public <span class="fstat-no" title="function not covered" >applyTagSuggestions(</span>template: DocumentTemplate): number {
+        const suggestions = <span class="cstat-no" title="statement not covered" >this.suggestTags(template);</span>
+        let tagsAdded = <span class="cstat-no" title="statement not covered" >0;</span>
+        
+<span class="cstat-no" title="statement not covered" >        for (const tag of suggestions) {</span>
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (this.addTag(template, tag)) {</span>
+<span class="cstat-no" title="statement not covered" >                tagsAdded++;</span>
+            }
+        }
+        
+<span class="cstat-no" title="statement not covered" >        return tagsAdded;</span>
+    }
+    
+    /**
+     * Get tag color
+     * @param tag Tag name
+     * @returns CSS color
+     */
+    public <span class="fstat-no" title="function not covered" >getTagColor(</span>tag: string): string {
+<span class="cstat-no" title="statement not covered" >        tag = this.normalizeTag(tag);</span>
+        
+        const metadata = <span class="cstat-no" title="statement not covered" >this.tagMetadata.get(tag);</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (metadata?.color) {</span>
+<span class="cstat-no" title="statement not covered" >            return metadata.color;</span>
+        }
+        
+        // Return default color or generate one
+<span class="cstat-no" title="statement not covered" >        return this.defaultTagColors[tag] || this.generateTagColor(tag);</span>
+    }
+    
+    /**
+     * Get CSS class for tag element
+     * @param tag Tag name
+     * @returns CSS class name
+     */
+    public <span class="fstat-no" title="function not covered" >getTagCssClass(</span>tag: string): string {
+<span class="cstat-no" title="statement not covered" >        tag = this.normalizeTag(tag);</span>
+<span class="cstat-no" title="statement not covered" >        return `document-tag-${tag}`;</span>
+    }
+    
+    /**
+     * Generate CSS for all tags
+     * @returns CSS string
+     */
+    public <span class="fstat-no" title="function not covered" >generateTagsCss(</span>): string {
+        let css = <span class="cstat-no" title="statement not covered" >'';</span>
+        
+<span class="cstat-no" title="statement not covered" >        for (const [tag, metadata] of this.tagMetadata.entries()) {</span>
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (metadata.color) {</span>
+<span class="cstat-no" title="statement not covered" >                css += `</span>
+.document-tag-${tag} {
+    background-color: ${metadata.color};
+    color: ${this.getContrastColor(metadata.color)};
+}`;
+            }
+        }
+        
+<span class="cstat-no" title="statement not covered" >        return css;</span>
+    }
+    
+    /**
+     * Get contrasting text color (black or white) for a background color
+     * @param backgroundColor Background color (CSS color string)
+     * @returns Text color (black or white)
+     */
+    private <span class="fstat-no" title="function not covered" >getContrastColor(</span>backgroundColor: string): string {
+        // Convert color to RGB
+        let r = <span class="cstat-no" title="statement not covered" >0,</span> g = <span class="cstat-no" title="statement not covered" >0,</span> b = <span class="cstat-no" title="statement not covered" >0;</span>
+        
+        // Handle hex colors
+<span class="cstat-no" title="statement not covered" >        if (backgroundColor.startsWith('#')) {</span>
+            const hex = <span class="cstat-no" title="statement not covered" >backgroundColor.slice(1);</span>
+<span class="cstat-no" title="statement not covered" >            if (hex.length === 3) {</span>
+<span class="cstat-no" title="statement not covered" >                r = parseInt(hex[0] + hex[0], 16);</span>
+<span class="cstat-no" title="statement not covered" >                g = parseInt(hex[1] + hex[1], 16);</span>
+<span class="cstat-no" title="statement not covered" >                b = parseInt(hex[2] + hex[2], 16);</span>
+            } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (hex.length === 6) {</span>
+<span class="cstat-no" title="statement not covered" >                r = parseInt(hex.slice(0, 2), 16);</span>
+<span class="cstat-no" title="statement not covered" >                g = parseInt(hex.slice(2, 4), 16);</span>
+<span class="cstat-no" title="statement not covered" >                b = parseInt(hex.slice(4, 6), 16);</span>
+            }
+        } 
+        // Handle rgb/rgba colors
+        else <span class="cstat-no" title="statement not covered" >if (backgroundColor.startsWith('rgb')) {</span>
+            const match = <span class="cstat-no" title="statement not covered" >backgroundColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);</span>
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (match) {</span>
+<span class="cstat-no" title="statement not covered" >                r = parseInt(match[1]);</span>
+<span class="cstat-no" title="statement not covered" >                g = parseInt(match[2]);</span>
+<span class="cstat-no" title="statement not covered" >                b = parseInt(match[3]);</span>
+            }
+        }
+        // Handle hsl colors (approximate conversion)
+        else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (backgroundColor.startsWith('hsl')) {</span>
+            const match = <span class="cstat-no" title="statement not covered" >backgroundColor.match(/hsla?\((\d+),\s*(\d+)%,\s*(\d+)%/i);</span>
+<span class="cstat-no" title="statement not covered" >            <span class="missing-if-branch" title="if path not taken" >I</span>if (match) {</span>
+                const h = <span class="cstat-no" title="statement not covered" >parseInt(match[1]) / 360;</span>
+                const s = <span class="cstat-no" title="statement not covered" >parseInt(match[2]) / 100;</span>
+                const l = <span class="cstat-no" title="statement not covered" >parseInt(match[3]) / 100;</span>
+                
+                // Convert HSL to RGB
+<span class="cstat-no" title="statement not covered" >                if (s === 0) {</span>
+<span class="cstat-no" title="statement not covered" >                    r = g = b = Math.round(l * 255);</span>
+                } else {
+                    const hue2rgb = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(p</span>: number, q: number, t: number) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >                        <span class="missing-if-branch" title="if path not taken" >I</span>if (t &lt; 0) <span class="cstat-no" title="statement not covered" >t += 1;</span></span>
+<span class="cstat-no" title="statement not covered" >                        <span class="missing-if-branch" title="if path not taken" >I</span>if (t &gt; 1) <span class="cstat-no" title="statement not covered" >t -= 1;</span></span>
+<span class="cstat-no" title="statement not covered" >                        <span class="missing-if-branch" title="if path not taken" >I</span>if (t &lt; 1/6) <span class="cstat-no" title="statement not covered" >return p + (q - p) * 6 * t;</span></span>
+<span class="cstat-no" title="statement not covered" >                        <span class="missing-if-branch" title="if path not taken" >I</span>if (t &lt; 1/2) <span class="cstat-no" title="statement not covered" >return q;</span></span>
+<span class="cstat-no" title="statement not covered" >                        <span class="missing-if-branch" title="if path not taken" >I</span>if (t &lt; 2/3) <span class="cstat-no" title="statement not covered" >return p + (q - p) * (2/3 - t) * 6;</span></span>
+<span class="cstat-no" title="statement not covered" >                        return p;</span>
+                    };
+                    
+                    const q = <span class="cstat-no" title="statement not covered" >l &lt; 0.5 ? l * (1 + s) : l + s - l * s;</span>
+                    const p = <span class="cstat-no" title="statement not covered" >2 * l - q;</span>
+                    
+<span class="cstat-no" title="statement not covered" >                    r = Math.round(hue2rgb(p, q, h + 1/3) * 255);</span>
+<span class="cstat-no" title="statement not covered" >                    g = Math.round(hue2rgb(p, q, h) * 255);</span>
+<span class="cstat-no" title="statement not covered" >                    b = Math.round(hue2rgb(p, q, h - 1/3) * 255);</span>
+                }
+            }
+        }
+        
+        // Calculate perceived brightness
+        // Using the formula: (0.299*R + 0.587*G + 0.114*B)
+        const brightness = <span class="cstat-no" title="statement not covered" >(0.299 * r + 0.587 * g + 0.114 * b) / 255;</span>
+        
+        // Return black for bright colors, white for dark colors
+<span class="cstat-no" title="statement not covered" >        return brightness &gt; 0.5 ? '#000000' : '#FFFFFF';</span>
     }
 }
 &nbsp;</pre></td></tr></table></pre>

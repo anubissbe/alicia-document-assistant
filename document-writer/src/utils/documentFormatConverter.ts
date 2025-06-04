@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
-import { DocumentFormat } from '../core/formatProcessor';
+import { DocumentFormat, FormatConversionOptions } from '../core/formatProcessor';
 import { SecurityManager } from './securityManager';
 import { PathSafetyUtils } from './pathSafetyUtils';
 
@@ -134,9 +134,17 @@ export class DocumentFormatConverter {
     
     /**
      * Constructor
+     * @param context The extension context
      */
-    constructor() {
-        this._securityManager = new SecurityManager();
+    constructor(context?: vscode.ExtensionContext) {
+        // Initialize SecurityManager with the context parameter
+        if (context) {
+            this._securityManager = new SecurityManager(context);
+        } else {
+            // For testing purposes, we'll create a minimal mock implementation
+            // that doesn't use the actual extension context
+            this._securityManager = new SecurityManager({} as vscode.ExtensionContext);
+        }
         this._pathSafetyUtils = new PathSafetyUtils(this._securityManager);
     }
     
@@ -153,22 +161,16 @@ export class DocumentFormatConverter {
         options: DocumentPreviewOptions
     ): Promise<string> {
         try {
-        f source and target formats are the same, no conversion needed
-        sourceFormat === options.targetFormat) {
-            rn this._enhancePreview(content, sourceFormat, options.preview ||  || { 
-                interactive: false,
-                renderMath: false,
-                renderDiagrams: false,
-                highlightSyntax: true,
-                showAnnotations: false
-             );   interactive: false,
-        }
-                renderMath: false,
-                renderDiagrams: false,
-                highlightSyntax: true,
-                showAnnotations: false
-            });
-        }
+            // If source and target formats are the same, no conversion needed
+            if (sourceFormat === options.targetFormat) {
+                return this._enhancePreview(content, sourceFormat, options.preview || { 
+                    interactive: false,
+                    renderMath: false,
+                    renderDiagrams: false,
+                    highlightSyntax: true,
+                    showAnnotations: false
+                });
+            }
             
             // Convert to target format
             const convertedContent = await this._convertFormat(
@@ -179,7 +181,13 @@ export class DocumentFormatConverter {
             );
             
             // Enhance the preview
-            return this._enhancePreview(convertedContent, options.targetFormat, options.preview);
+            return this._enhancePreview(convertedContent, options.targetFormat, options.preview || {
+                interactive: false,
+                renderMath: false,
+                renderDiagrams: false,
+                highlightSyntax: true,
+                showAnnotations: false
+            });
         } catch (error) {
             console.error('Error generating preview:', error);
             throw new Error(`Failed to generate preview: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -195,14 +203,14 @@ export class DocumentFormatConverter {
      * @returns Export result
      */
     public async exportToFile(
-        cont    ent: string,
+        content: string,
         sourceFormat: DocumentFormat,
         targetFormat: DocumentFormat,
         options: DocumentExportOptions
     ): Promise<DocumentExportResult> {
         try {
-                // Validate output path
-            const validPath = this._pathSafetyUtils.resolveDocumentPath(options.outputPath, 'document export');
+            // Validate output path
+            const validPath = this._pathSafetyUtils.resolveDocumentPath(options.outputPath, "export");
             if (!validPath) {
                 return {
                     success: false,
@@ -330,12 +338,12 @@ export class DocumentFormatConverter {
         
         // Markdown to Text
         if (sourceFormat === DocumentFormat.MARKDOWN && targetFormat === DocumentFormat.TEXT) {
-            return this._markdownToText(content);
+            return this._stripMarkdown(content);
         }
         
         // HTML to Text
         if (sourceFormat === DocumentFormat.HTML && targetFormat === DocumentFormat.TEXT) {
-            return this._htmlToText(content);
+            return this._stripHtml(content);
         }
         
         // For other conversions, default to simple content pass-through
@@ -350,7 +358,11 @@ export class DocumentFormatConverter {
      * @param preserveFormatting Whether to preserve formatting
      * @returns The HTML content
      */
-    private _markdownToHtml(markdown: string, preserveFormatting: boolean): string {
+    private _markdownToHtml(markdown: string, preserveFormatting: boolean | FormatConversionOptions): string {
+        // If preserveFormatting is an object, extract the boolean value
+        if (typeof preserveFormatting === 'object') {
+            preserveFormatting = preserveFormatting.preserveFormatting ?? true;
+        }
         // In a full implementation, we would use a Markdown parser
         // For now, implement a simple conversion with regex
         
@@ -456,4 +468,274 @@ export class DocumentFormatConverter {
      */
     private _htmlToMarkdown(html: string, preserveFormatting: boolean): string {
         // In a full implementation, we would use an HTML to Markdown converter
-        // For now, implement a simple conv
+        // This is a simplified implementation for demo purposes
+        
+        // Replace headings
+        let markdown = html
+            .replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n\n')
+            .replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n\n')
+            .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n\n')
+            .replace(/<h4[^>]*>(.*?)<\/h4>/gi, '#### $1\n\n')
+            .replace(/<h5[^>]*>(.*?)<\/h5>/gi, '##### $1\n\n')
+            .replace(/<h6[^>]*>(.*?)<\/h6>/gi, '###### $1\n\n');
+        
+        // Replace paragraphs
+        markdown = markdown.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
+        
+        // Replace bold and italic
+        markdown = markdown
+            .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**')
+            .replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**')
+            .replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*')
+            .replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+        
+        // Replace links
+        markdown = markdown.replace(/<a[^>]*href="(.*?)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+        
+        // Replace images
+        markdown = markdown.replace(/<img[^>]*src="(.*?)"[^>]*alt="(.*?)"[^>]*\/?>/gi, '![$2]($1)');
+        
+        // Replace code blocks
+        markdown = markdown.replace(/<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi, '```\n$1\n```\n\n');
+        
+        // Replace inline code
+        markdown = markdown.replace(/<code[^>]*>(.*?)<\/code>/gi, '`$1`');
+        
+        // Replace lists
+        markdown = markdown
+            .replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, function(match: string, content: string) {
+                return content.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n') + '\n';
+            })
+            .replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, function(match: string, content: string) {
+                let index = 1;
+                return content.replace(/<li[^>]*>(.*?)<\/li>/gi, function(m: string, item: string) {
+                    return `${index++}. ${item}\n`;
+                }) + '\n';
+            });
+        
+        // Clean up HTML tags
+        markdown = markdown.replace(/<[^>]+>/g, '');
+        
+        // Clean up extra whitespace
+        markdown = markdown.replace(/\n{3,}/g, '\n\n');
+        
+        return markdown.trim();
+    }
+    
+    /**
+     * Strip formatting from Markdown
+     * @param markdown Markdown content
+     * @returns Plain text content
+     */
+    private _stripMarkdown(markdown: string): string {
+        // Remove headings
+        let text = markdown
+            .replace(/^#+\s+(.*$)/gm, '$1\n')
+            
+            // Remove bold and italic
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/__(.*?)__/g, '$1')
+            .replace(/_(.*?)_/g, '$1')
+            
+            // Remove links but keep link text
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+            
+            // Remove images
+            .replace(/!\[.*?\]\(.*?\)/g, '')
+            
+            // Remove code blocks but keep content
+            .replace(/```(?:.*?)\n([\s\S]*?)```/g, '$1\n')
+            
+            // Remove inline code but keep content
+            .replace(/`(.*?)`/g, '$1');
+        
+        return text;
+    }
+    
+    /**
+     * Strip HTML tags from content
+     * @param html HTML content
+     * @returns Plain text content
+     */
+    private _stripHtml(html: string): string {
+        // Simple HTML tag removal
+        return html
+            // Remove all HTML tags
+            .replace(/<[^>]+>/g, '')
+            
+            // Fix spacing
+            .replace(/\s+/g, ' ')
+            
+            // Add paragraph breaks
+            .replace(/<\/p>\s*<p>/gi, '\n\n')
+            
+            // Clean up
+            .trim();
+    }
+    
+    /**
+     * Enhance preview with additional features
+     * @param content Content to enhance
+     * @param format Content format
+     * @param options Preview options
+     * @returns Enhanced preview content
+     */
+    private _enhancePreview(content: string, format: DocumentFormat, options: PreviewOptions): string {
+        if (!options) {
+            options = {
+                interactive: false,
+                renderMath: false,
+                renderDiagrams: false,
+                highlightSyntax: true,
+                showAnnotations: false
+            };
+        }
+        
+        // Start with the original content
+        let enhancedContent = content;
+        
+        // Apply enhancements based on format
+        if (format === DocumentFormat.HTML) {
+            // For HTML, we can directly add enhancement scripts
+            
+            // Add math rendering if enabled
+            if (options.renderMath) {
+                enhancedContent = this._addMathSupport(enhancedContent);
+            }
+            
+            // Add diagram rendering if enabled
+            if (options.renderDiagrams) {
+                enhancedContent = this._addDiagramSupport(enhancedContent);
+            }
+            
+            // Add syntax highlighting if enabled
+            if (options.highlightSyntax) {
+                enhancedContent = this._addSyntaxHighlighting(enhancedContent);
+            }
+            
+            // Add annotation support if enabled
+            if (options.showAnnotations) {
+                enhancedContent = this._addAnnotationSupport(enhancedContent);
+            }
+            
+        } else if (format === DocumentFormat.MARKDOWN) {
+            // For Markdown, we need to convert to HTML first to add enhancements
+            enhancedContent = this._markdownToHtml(enhancedContent, true);
+            
+            return this._enhancePreview(enhancedContent, DocumentFormat.HTML, options);
+        } else if (format === DocumentFormat.TEXT) {
+            // For plain text, convert to HTML for preview
+            enhancedContent = `<pre>${enhancedContent}</pre>`;
+            return enhancedContent;
+        }
+        
+        return enhancedContent;
+    }
+    
+    /**
+     * Add math rendering support to HTML content
+     * @param html HTML content
+     * @returns HTML with math support
+     */
+    private _addMathSupport(html: string): string {
+        // Add MathJax support
+        const mathJaxScript = `
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
+            displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
+            processEscapes: true
+        }
+    };
+</script>`;
+        
+        // Insert before closing head tag
+        return html.replace('</head>', `${mathJaxScript}\n</head>`);
+    }
+    
+    /**
+     * Add diagram rendering support to HTML content
+     * @param html HTML content
+     * @returns HTML with diagram support
+     */
+    private _addDiagramSupport(html: string): string {
+        // Add Mermaid.js support
+        const mermaidScript = `
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        mermaid.initialize({ startOnLoad: true });
+    });
+</script>`;
+        
+        // Insert before closing head tag
+        return html.replace('</head>', `${mermaidScript}\n</head>`);
+    }
+    
+    /**
+     * Add syntax highlighting to HTML content
+     * @param html HTML content
+     * @returns HTML with syntax highlighting
+     */
+    private _addSyntaxHighlighting(html: string): string {
+        // Add highlight.js support
+        const highlightScript = `
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+    });
+</script>`;
+        
+        // Insert before closing head tag
+        return html.replace('</head>', `${highlightScript}\n</head>`);
+    }
+    
+    /**
+     * Add annotation support to HTML content
+     * @param html HTML content
+     * @returns HTML with annotation support
+     */
+    private _addAnnotationSupport(html: string): string {
+        // Add custom annotation styling and script
+        const annotationSupport = `
+<style>
+    .annotation {
+        background-color: #fff3cd;
+        padding: 10px;
+        margin: 10px 0;
+        border-left: 4px solid #ffc107;
+        border-radius: 4px;
+    }
+    .annotation-marker {
+        cursor: pointer;
+        background-color: #ffc107;
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.annotation-marker').forEach(marker => {
+            marker.addEventListener('click', () => {
+                const targetId = marker.getAttribute('data-target');
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.style.display = target.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+        });
+    });
+</script>`;
+        
+        // Insert before closing head tag
+        return html.replace('</head>', `${annotationSupport}\n</head>`);
+    }
+}
