@@ -1,4 +1,5 @@
 import { EntityExtractor } from './entityExtractor';
+import { HistoryMessage } from '../providers/conversationHistoryManager';
 
 export interface SuggestionOptions {
     maxSuggestions?: number;

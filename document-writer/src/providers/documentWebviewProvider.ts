@@ -77,7 +77,7 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
         this._extensionUri = extensionUri;
         this._documentService = documentService;
         this._formatProcessor = formatProcessor;
-        this._previewEnhancer = PreviewEnhancer.getInstance(extensionUri);
+        this._previewEnhancer = PreviewEnhancer.getInstance();
         
         // Generate a unique storage key for this instance
         this._storageKey = `documentEditor_${Date.now()}`;

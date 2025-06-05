@@ -3,6 +3,7 @@ import * as path from 'path';
 import { TemplateManagerService } from '../services/templateManagerService';
 import { DocumentService } from '../services/documentService';
 import { CategoryOrganizer, CategoryNode } from '../utils/categoryOrganizer';
+import { DocumentTemplate } from '../models/documentTemplate';
 
 /**
  * Interface for document template category
@@ -17,20 +18,14 @@ export interface TemplateCategory {
 }
 
 /**
- * Interface for document template
+ * Interface for categorized items
  */
-export interface DocumentTemplate {
+export interface CategorizedItem {
     id: string;
-    name: string;
+    label: string;
     description: string;
-    type: string;
-    path: string;
-    iconPath?: string;
-    dateCreated: Date;
-    dateModified: Date;
-    tags?: string[];
-    author?: string;
-    version?: string;
+    category: string;
+    template: DocumentTemplate;
 }
 
 /**

@@ -13,11 +13,15 @@ export interface DocumentTemplate {
     path: string;
     type: string;
     format: DocumentFormat;
+    iconPath?: string;
+    dateCreated: Date;
+    dateModified: Date;
     metadata?: {
         author?: string;
         version?: string;
         lastModified?: Date;
         category?: string;
+        tags?: string[];
         [key: string]: any;
     };
 }

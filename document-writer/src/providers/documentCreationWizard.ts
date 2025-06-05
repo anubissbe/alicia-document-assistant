@@ -1062,7 +1062,7 @@ export class DocumentCreationWizard implements WebviewStateProvider {
      * @param data Optional validation data
      * @returns True if valid, false otherwise
      */
-    private _validateCurrentStep(data?: any): boolean {
+    private _validateCurrentStep(_data?: any): boolean {
         const currentStep = this._state.steps[this._state.currentStepIndex];
         
         switch (currentStep.id) {

@@ -128,15 +128,17 @@ export class CreateDocumentTool extends BaseMCPTool {
                 id: args.templateType,
                 name: args.templateType,
                 description: `Template for ${args.templateType}`,
+                path: templatePath,
+                type: args.templateType,
                 format: this.getFormatFromPath(templatePath),
+                dateCreated: new Date(),
+                dateModified: new Date(),
                 metadata: {
                     author: 'Document Writer',
                     version: '1.0',
                     tags: [args.templateType],
                     category: 'generated'
-                },
-                createdAt: new Date(),
-                updatedAt: new Date()
+                }
             };
 
             // Generate the document
