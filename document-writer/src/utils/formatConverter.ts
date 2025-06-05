@@ -575,7 +575,7 @@ export class FormatConverter {
      * @param options Conversion options
      * @returns The HTML content
      */
-    private async _docxToHtml(content: string, options: FormatConversionOptions): Promise<string> {
+    private async _docxToHtml(content: string, _options: FormatConversionOptions): Promise<string> {
         let tempDir: string | undefined;
         
         try {
@@ -612,7 +612,7 @@ export class FormatConverter {
      * @param options Conversion options
      * @returns The PDF content as base64 string
      */
-    private async _docxToPdf(content: string, options: FormatConversionOptions): Promise<string> {
+    private async _docxToPdf(content: string, _options: FormatConversionOptions): Promise<string> {
         let tempDir: string | undefined;
         
         try {
@@ -649,7 +649,7 @@ export class FormatConverter {
      * @param options Conversion options
      * @returns The text content
      */
-    private async _pdfToText(content: string, options: FormatConversionOptions): Promise<string> {
+    private async _pdfToText(content: string, _options: FormatConversionOptions): Promise<string> {
         let tempDir: string | undefined;
         
         try {
@@ -724,7 +724,7 @@ export class FormatConverter {
      * @param options Conversion options
      * @returns The HTML content
      */
-    private async _pdfToHtml(content: string, options: FormatConversionOptions): Promise<string> {
+    private async _pdfToHtml(content: string, _options: FormatConversionOptions): Promise<string> {
         let tempDir: string | undefined;
         
         try {

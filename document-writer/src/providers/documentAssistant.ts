@@ -850,7 +850,7 @@ export class DocumentAssistant {
                 ];
             } else {
                 // For neutral or mixed sentiment, generate general suggestions
-                suggestions = await this._contentSuggestionEngine.generateSuggestions(
+                suggestions = await this._contentSuggestionEngine.generateMessageSuggestions(
                     message, 
                     contentSuggestionHistory
                 );

@@ -265,6 +265,69 @@ ${formatted}
         return Math.round(millimeters * 56.7);
     }
 
+    /**
+     * Process content from one format to another
+     * @param content The content to process
+     * @param sourceFormat The source format
+     * @param targetFormat The target format
+     * @returns Processed content
+     */
+    public processContent(content: string, sourceFormat: DocumentFormat, targetFormat: DocumentFormat): string {
+        // Basic format conversion logic
+        if (sourceFormat === targetFormat) {
+            return content;
+        }
+
+        // Simple conversion rules
+        if (sourceFormat === DocumentFormat.HTML && targetFormat === DocumentFormat.MARKDOWN) {
+            return this.htmlToMarkdown(content);
+        } else if (sourceFormat === DocumentFormat.MARKDOWN && targetFormat === DocumentFormat.HTML) {
+            return this.markdownToHtml(content);
+        } else if (targetFormat === DocumentFormat.TEXT) {
+            return this.toPlainText(content);
+        }
+
+        // Default: return content as-is
+        return content;
+    }
+
+    private htmlToMarkdown(html: string): string {
+        // Basic HTML to Markdown conversion
+        return html
+            .replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n')
+            .replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n')
+            .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n')
+            .replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n')
+            .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**')
+            .replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*')
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<[^>]*>/g, ''); // Remove remaining HTML tags
+    }
+
+    private markdownToHtml(markdown: string): string {
+        // Basic Markdown to HTML conversion
+        return markdown
+            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/^/, '<p>')
+            .replace(/$/, '</p>');
+    }
+
+    private toPlainText(content: string): string {
+        // Remove HTML tags and clean up
+        return content
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+            .trim();
+    }
+
     private normalizeHTMLIndentation(html: string, spaces: number): string {
         const lines = html.split('\n');
         let indent = 0;

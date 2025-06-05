@@ -373,7 +373,7 @@ export class ContentSuggestionEngine {
      * @param historyMessages Previous conversation messages
      * @returns Array of suggestion strings
      */
-    public async generateSuggestions(
+    public async generateMessageSuggestions(
         message: string,
         _historyMessages: HistoryMessage[] = []
     ): Promise<string[]> {

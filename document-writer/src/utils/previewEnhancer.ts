@@ -410,7 +410,7 @@ export class PreviewEnhancer {
     /**
      * Get theme-specific CSS
      */
-    private getThemeCSS(theme: 'light' | 'dark' | 'auto'): string {
+    private getThemeCSS(_theme: 'light' | 'dark' | 'auto'): string {
         // This will be determined dynamically based on the VSCode theme
         // For now, just return a placeholder
         return `
@@ -464,7 +464,7 @@ export class PreviewEnhancer {
     /**
      * Enhance HTML content
      */
-    private enhanceHtml(html: string, options: PreviewOptions): string {
+    private enhanceHtml(html: string, _options: PreviewOptions): string {
         // Add any HTML-specific enhancements here
         return html;
     }

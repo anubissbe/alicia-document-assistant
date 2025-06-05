@@ -128,7 +128,7 @@ export interface StoredCredential {
  * It handles input validation, sanitization, and secure storage operations
  */
 export class SecurityManager {
-    private context: vscode.ExtensionContext;
+    private context?: vscode.ExtensionContext;
     
     // Default allowed extensions
     private defaultAllowedExtensions: string[] = [
@@ -151,7 +151,7 @@ export class SecurityManager {
      * Creates a new SecurityManager instance
      * @param context The extension context
      */
-    constructor(context: vscode.ExtensionContext) {
+    constructor(context?: vscode.ExtensionContext) {
         this.context = context;
     }
     

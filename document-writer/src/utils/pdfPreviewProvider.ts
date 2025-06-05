@@ -252,7 +252,7 @@ export class PDFPreviewProvider {
      * @param pdfPath PDF file path (for additional context)
      * @returns Estimated page count
      */
-    private _estimatePageCount(pdfBuffer: Buffer, pdfPath: string): number {
+    private _estimatePageCount(pdfBuffer: Buffer, _pdfPath: string): number {
         // In a full implementation, we would use a PDF parsing library
         // For now, make a rough estimate based on buffer size
         // This is not accurate but serves as a placeholder
@@ -281,7 +281,7 @@ export class PDFPreviewProvider {
         pdfPath: string,
         pdfBuffer: Buffer,
         metadata?: PDFMetadata,
-        maxPages: number = 5,
+        _maxPages: number = 5,
         includeThumbnails: boolean = true,
         zoomLevel: number = 1.0
     ): string {
