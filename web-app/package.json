@@ -1,10 +1,12 @@
 {
-  "name": "document-writer-web",
+  "name": "alicia-document-assistant",
   "version": "1.0.0",
-  "description": "Web-based document writer with AI integration",
+  "description": "Alicia - Your Personal Document Assistant with AI integration",
   "main": "index.html",
   "scripts": {
-    "start": "node mcp-server.js",
+    "start": "concurrently \"npm:mcp-server\" \"npm:web-server\"",
+    "start:mcp": "node mcp-server.js",
+    "start:web": "python -m http.server 8000",
     "dev": "concurrently \"node mcp-server.js\" \"python -m http.server 8000\"",
     "mcp-server": "node mcp-server.js",
     "web-server": "python -m http.server 8000"
@@ -16,12 +18,15 @@
     "concurrently": "^8.2.2"
   },
   "keywords": [
+    "alicia",
     "document",
-    "writer",
+    "assistant",
     "ai",
+    "personal",
+    "writer",
     "mcp",
     "websocket"
   ],
-  "author": "Document Writer",
+  "author": "Alicia Team",
   "license": "MIT"
 }

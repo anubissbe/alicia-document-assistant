@@ -95,6 +95,48 @@ class AIClient {
     }
 
     /**
+     * Generate image descriptions for document enhancement
+     */
+    async generateImageDescriptions(documentContent, documentType) {
+        const prompt = `Based on the following ${documentType} document content, suggest 2-3 high-value images, charts, or visualizations that would significantly enhance the document:
+
+${documentContent.substring(0, 2000)}...
+
+For each suggested image, provide:
+1. Type: (photo/chart/diagram/infographic)
+2. Description: A detailed description for generating the image
+3. Placement: Where in the document it should appear
+4. Caption: A suggested caption
+
+Format as JSON array.`;
+
+        try {
+            const response = await this.generateText(prompt, {
+                temperature: 0.6,
+                maxTokens: 1000
+            });
+            
+            // Try to parse JSON, fallback to simple parsing if needed
+            try {
+                return JSON.parse(response);
+            } catch {
+                // Fallback: create simple suggestions
+                return [
+                    {
+                        type: "chart",
+                        description: "bar chart showing key metrics",
+                        placement: "After introduction",
+                        caption: "Key Performance Indicators"
+                    }
+                ];
+            }
+        } catch (error) {
+            console.error('Error generating image descriptions:', error);
+            return [];
+        }
+    }
+
+    /**
      * Generate document content based on document details
      */
     async generateDocument(documentDetails) {
@@ -125,12 +167,95 @@ ${sections.map((section, index) => `${index + 1}. ${section.title}${section.cont
 `;
         }
 
-        prompt += `Format the response as a complete document with proper markdown formatting. Include headers, bullet points, and other formatting as appropriate.`;
+        prompt += `Format the response as a complete document with proper markdown formatting. Include headers, bullet points, and other formatting as appropriate.
 
-        return await this.generateText(prompt, {
+If appropriate for the document type, you may include 1-3 image placeholders in the format: [IMAGE: description of image] where visual content would significantly enhance understanding. Only suggest images if they truly add value to the document.`;
+
+        const content = await this.generateText(prompt, {
             temperature: 0.7,
             maxTokens: 3000
         });
+
+        // If we have the image generator, process image placeholders
+        if (window.documentGenerator && window.documentGenerator.imageGenerator) {
+            return await this.processImagePlaceholders(content, documentDetails.type);
+        }
+
+        return content;
+    }
+
+    /**
+     * Process image placeholders in content
+     */
+    async processImagePlaceholders(content, documentType) {
+        const imageGenerator = window.documentGenerator.imageGenerator;
+        const placeholderRegex = /\[IMAGE:\s*([^\]]+)\]/g;
+        let enhancedContent = content;
+        let matches = [];
+        let match;
+        
+        // First collect all matches to avoid infinite loops
+        while ((match = placeholderRegex.exec(content)) !== null) {
+            matches.push({
+                fullMatch: match[0],
+                description: match[1].trim()
+            });
+        }
+        
+        // Limit to maximum 5 images per document
+        if (matches.length > 5) {
+            console.warn(`Found ${matches.length} image placeholders, limiting to 5`);
+            matches = matches.slice(0, 5);
+        }
+        
+        // Process each match
+        for (const matchData of matches) {
+            const description = matchData.description;
+            
+            try {
+                // Determine image type from description
+                let imageType = 'photo';
+                const lowerDesc = description.toLowerCase();
+                
+                // Check for data-related keywords that suggest a chart
+                if (lowerDesc.includes('chart') || lowerDesc.includes('graph') || 
+                    lowerDesc.includes('data') || lowerDesc.includes('statistics') ||
+                    lowerDesc.includes('metrics') || lowerDesc.includes('percentage') ||
+                    lowerDesc.includes('comparison') || lowerDesc.includes('trend') ||
+                    lowerDesc.includes('analytics') || lowerDesc.includes('numbers') ||
+                    lowerDesc.includes('sales') || lowerDesc.includes('revenue') ||
+                    lowerDesc.includes('performance') || lowerDesc.includes('kpi') ||
+                    lowerDesc.includes('dashboard')) {
+                    imageType = 'chart';
+                    console.log(`[AI CLIENT] Detected chart/data visualization: "${description}"`);
+                } else if (lowerDesc.includes('diagram') || lowerDesc.includes('flow') || 
+                          lowerDesc.includes('process') || lowerDesc.includes('workflow') ||
+                          lowerDesc.includes('architecture') || lowerDesc.includes('schema') ||
+                          lowerDesc.includes('structure') || lowerDesc.includes('hierarchy')) {
+                    imageType = 'diagram';
+                    console.log(`[AI CLIENT] Detected diagram: "${description}"`);
+                } else if (lowerDesc.includes('infographic') || lowerDesc.includes('summary') ||
+                          lowerDesc.includes('overview') || lowerDesc.includes('highlights')) {
+                    imageType = 'infographic';
+                    console.log(`[AI CLIENT] Detected infographic: "${description}"`);
+                } else {
+                    console.log(`[AI CLIENT] Detected photo/illustration: "${description}"`);
+                }
+
+                // Generate the image
+                const imageData = await imageGenerator.generateImage(description, imageType);
+                
+                // Replace placeholder with actual image markdown
+                const imageMarkdown = `\n\n![${imageData.alt}](${imageData.url})\n*${imageData.caption}*\n\n`;
+                enhancedContent = enhancedContent.replace(matchData.fullMatch, imageMarkdown);
+                
+            } catch (error) {
+                console.error('Error generating image:', error);
+                // Keep the placeholder if image generation fails
+            }
+        }
+
+        return enhancedContent;
     }
 
     /**

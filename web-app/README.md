@@ -1,17 +1,28 @@
-# Document Writer Web Application
+# Alicia - Your Personal Document Assistant
 
-A browser-based document creation tool with AI integration and internet search capabilities.
+👩‍💼 Alicia is your intelligent personal document assistant, designed to help you create professional documents effortlessly. With advanced AI capabilities and intuitive design, Alicia transforms the way you write.
+
+## Meet Alicia
+
+Alicia is more than just a document writer - she's your personal assistant who understands your needs and helps you create:
+- 📑 Professional business documents
+- 🔬 Technical documentation
+- 📚 Academic papers
+- 📊 Comprehensive reports
+- ✉️ Formal letters
+- 📝 Custom documents
 
 ## Features
 
-- 🤖 **AI Integration**: Connect to LM Studio for AI-powered document generation
-- 🔍 **Internet Search**: MCP server provides web search functionality
+- 🤖 **AI-Powered Intelligence**: Alicia uses advanced AI to understand your requirements and generate tailored content
+- 🎨 **Smart Visual Generation**: Automatically creates charts, diagrams, and infographics to enhance your documents
+- 🔍 **Research Assistant**: Alicia can search the web and analyze sources to enrich your content
 - 📄 **Multiple Export Formats**: Export to DOCX, PDF, HTML, and Markdown
-- 📎 **File Upload**: Upload Word documents for AI to read and reference
-- 🌐 **URL Research**: Add websites and articles as research sources
-- 💬 **AI Feedback Chat**: Refine documents through interactive AI conversations
-- 📊 **Smart Templates**: Pre-built templates for different document types
-- ✨ **Real-time Preview**: See changes as you make them
+- 📎 **Document Analysis**: Upload existing documents for Alicia to read, understand, and reference
+- 🌐 **URL Intelligence**: Add websites and articles as research sources
+- 💬 **Interactive Refinement**: Chat with Alicia to perfect your documents
+- 📊 **Smart Templates**: Pre-built templates optimized for different document types
+- ✨ **Real-time Preview**: See your document come to life as Alicia works
 
 ## Quick Start
 
@@ -39,19 +50,19 @@ A browser-based document creation tool with AI integration and internet search c
    ```
    Or use any static file server like Live Server in VS Code.
 
-4. **Open the application:**
-   Navigate to `http://localhost:8000` in your browser.
+4. **Meet Alicia:**
+   Navigate to `http://localhost:8000` in your browser to start working with your personal document assistant.
 
-### LM Studio Setup
+### Setting Up Alicia's AI Brain
 
 1. Download and install [LM Studio](https://lmstudio.ai/)
-2. Load a language model (recommended: qwen2.5-coder-7b-instruct-128k)
+2. Load a language model (Alicia works best with: qwen2.5-coder-7b-instruct-128k)
 3. Start the local server on port 1234
-4. The web app will automatically connect
+4. Alicia will automatically connect and be ready to assist you
 
-## Usage
+## Working with Alicia
 
-### Document Creation Wizard
+### Alicia's Document Creation Process
 
 1. **Select Document Type**: Choose from business, technical, academic, report, letter, or custom
 2. **Document Details**: Enter title, description, author, and date
@@ -61,24 +72,24 @@ A browser-based document creation tool with AI integration and internet search c
 6. **AI Generation**: Let AI generate your complete document
 7. **Review & Download**: Preview and download in your preferred format
 
-### Features in Detail
+### How Alicia Helps You
 
-#### File Upload
-- Supports DOCX and PDF files
-- AI extracts text content for reference
-- Summarizes uploaded documents automatically
+#### Document Understanding
+- Upload DOCX and PDF files for Alicia to analyze
+- Alicia extracts and understands the content
+- Get intelligent summaries of uploaded documents
 
-#### Research Assistant
-- Add reference URLs for additional context
-- Web search via MCP server (when available)
-- AI summarizes research content
-- All research is included in document generation context
+#### Alicia's Research Skills
+- Share URLs with Alicia for additional context
+- Alicia can search the web for relevant information
+- Get concise summaries of research materials
+- All research is intelligently incorporated into your documents
 
-#### AI Integration
-- Connects to LM Studio API (OpenAI-compatible)
-- Generates titles, outlines, and complete documents
-- Uses uploaded files and research for enhanced content
-- Multiple generation options and content improvement tools
+#### Alicia's Intelligence
+- Powered by advanced AI through LM Studio
+- Creates compelling titles, structured outlines, and complete documents
+- Learns from your uploaded files and research
+- Offers multiple ways to enhance and perfect your content
 
 ## Technical Architecture
 
@@ -106,23 +117,23 @@ A browser-based document creation tool with AI integration and internet search c
 
 No environment variables required - all configuration is handled in the JavaScript files.
 
-### Customization
+### Customizing Alicia
 
-- **AI Model**: Change model in `ai-client.js`
-- **MCP Port**: Modify port in `mcp-server.js` and `mcp-client.js`
-- **Search Provider**: Update search endpoints in `mcp-server.js`
+- **Alicia's AI Model**: Change model in `ai-client.js`
+- **Communication Port**: Modify port in `mcp-server.js` and `mcp-client.js`
+- **Search Capabilities**: Update search endpoints in `mcp-server.js`
 
 ## Troubleshooting
 
-### AI Connection Issues
+### If Alicia Can't Connect
 - Ensure LM Studio is running on port 1234
-- Check that a model is loaded in LM Studio
+- Check that Alicia's AI model is loaded in LM Studio
 - Verify firewall settings allow localhost connections
 
-### MCP Search Not Working
-- Ensure MCP server is running: `npm run mcp-server`
+### If Alicia Can't Search the Web
+- Ensure Alicia's search server is running: `npm run mcp-server`
 - Check WebSocket connection in browser developer tools
-- Use manual URL addition as fallback
+- You can still manually provide URLs for Alicia to analyze
 
 ### File Upload Issues
 - Ensure files are in supported formats (DOCX, PDF, TXT)
@@ -152,6 +163,10 @@ web-app/
 2. **New AI Features**: Extend `ai-client.js` methods
 3. **New File Types**: Update `file-processor.js` extractors
 4. **New Search Sources**: Modify `mcp-server.js` search methods
+
+## About Alicia
+
+Alicia was created to be your trusted document assistant, combining the power of AI with an intuitive interface to make document creation a pleasure rather than a chore.
 
 ## License
 

@@ -214,7 +214,9 @@ class ResearchAssistant {
         for (const proxy of proxies) {
             try {
                 console.log(`Trying ${proxy.name} proxy...`);
-                const response = await fetch(proxy.url);
+                const response = await fetch(proxy.url, {
+                    signal: AbortSignal.timeout(15000) // 15 second timeout
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -237,7 +239,14 @@ class ResearchAssistant {
                 };
                 
             } catch (error) {
-                console.warn(`${proxy.name} proxy failed:`, error);
+                // Handle QUIC protocol errors and other network issues gracefully
+                if (error.name === 'AbortError') {
+                    console.warn(`${proxy.name} proxy timed out`);
+                } else if (error.message.includes('ERR_QUIC_PROTOCOL_ERROR')) {
+                    console.warn(`${proxy.name} proxy QUIC protocol error - trying next proxy`);
+                } else {
+                    console.warn(`${proxy.name} proxy failed:`, error.message);
+                }
                 lastError = error;
             }
         }

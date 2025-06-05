@@ -1,6 +1,51 @@
 /**
  * Main Application Logic for Document Writer
  */
+
+// Debug mode detection
+const DEBUG_MODE = localStorage.getItem('debugMode') === 'true' || 
+                   window.location.search.includes('debug=true');
+
+if (DEBUG_MODE) {
+    console.log('%c[DEBUG MODE ENABLED]', 'color: #ff6b6b; font-weight: bold; font-size: 14px');
+    console.log('All operations will be logged to console');
+    
+    // Override fetch to log all API calls
+    const originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+        const [url, options] = args;
+        console.log(`%c[API CALL] ${options?.method || 'GET'} ${url}`, 'color: #4ecdc4');
+        if (options?.body) {
+            try {
+                const body = JSON.parse(options.body);
+                console.log('[REQUEST BODY]', body);
+            } catch {}
+        }
+        
+        const startTime = Date.now();
+        try {
+            const response = await originalFetch.apply(this, args);
+            const duration = Date.now() - startTime;
+            console.log(`%c[API RESPONSE] ${url} - ${response.status} (${duration}ms)`, 'color: #45b7d1');
+            return response;
+        } catch (error) {
+            console.error(`%c[API ERROR] ${url}`, 'color: #ff6b6b', error);
+            throw error;
+        }
+    };
+}
+
+// Debug logging helper
+function debugLog(category, message, data = null) {
+    if (!DEBUG_MODE) return;
+    
+    const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+    console.log(`%c[${timestamp}] [${category}]`, 'color: #95afc0; font-weight: bold', message);
+    if (data) {
+        console.log(data);
+    }
+}
+
 class DocumentWriterApp {
     constructor() {
         this.currentStepIndex = 0;
@@ -163,6 +208,12 @@ class DocumentWriterApp {
                 break;
             case 'quickFeedback':
                 this.sendQuickFeedback(target.dataset.feedback);
+                break;
+            case 'addImage':
+                this.showImageDialog();
+                break;
+            case 'regenerateWithImages':
+                this.regenerateDocumentWithImages();
                 break;
         }
     }
@@ -481,7 +532,15 @@ class DocumentWriterApp {
                 ${this.wizardData.generatedContent ? `
                 <div class="final-content">
                     <h3>Final Document Content</h3>
-                    <div class="content-preview" id="final-content-preview" style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); padding: 1rem; background: var(--input-background);">
+                    <div class="content-actions">
+                        <button class="secondary-button" data-action="addImage">
+                            🖼️ Add Image/Chart
+                        </button>
+                        <button class="secondary-button" data-action="regenerateWithImages">
+                            🎨 Auto-Add Visuals
+                        </button>
+                    </div>
+                    <div class="content-preview" id="final-content-preview" style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); padding: 1rem; background: var(--input-background); margin-top: 1rem;">
                         ${window.documentGenerator.markdownToHTML(this.wizardData.generatedContent)}
                     </div>
                 </div>
@@ -728,7 +787,14 @@ class DocumentWriterApp {
                 return;
             }
             
-            const filename = `${this.wizardData.documentTitle || 'document'}.${format}`;
+            // Adjust filename based on actual format
+            let actualFormat = format;
+            if (format === 'docx') {
+                // We're actually generating .doc format for better compatibility
+                actualFormat = 'doc';
+            }
+            
+            const filename = `${this.wizardData.documentTitle || 'document'}.${actualFormat}`;
             
             // Set appropriate MIME type
             let mimeType;
@@ -740,7 +806,7 @@ class DocumentWriterApp {
                     mimeType = 'text/markdown';
                     break;
                 case 'docx':
-                    mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                    mimeType = 'application/msword'; // Using .doc MIME type
                     break;
                 default:
                     mimeType = 'text/plain';
@@ -1095,6 +1161,64 @@ Please revise the document according to this feedback. Maintain the overall stru
     }
 
     /**
+     * Improve document content
+     */
+    async improveContent(improvementType) {
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            showToast('AI not connected', 'error');
+            return;
+        }
+        
+        if (!this.wizardData.generatedContent) {
+            showToast('No content to improve', 'warning');
+            return;
+        }
+        
+        try {
+            showLoading(`Improving document (${improvementType})...`);
+            
+            // Get the current content (either temp or original)
+            const currentContent = this.tempGeneratedContent || this.wizardData.generatedContent;
+            
+            // Call AI to improve the content
+            const improvedContent = await window.aiClient.improveContent(currentContent, improvementType);
+            
+            // Store as temporary content
+            this.tempGeneratedContent = improvedContent;
+            
+            // Update preview
+            this.updateDocumentPreview(improvedContent);
+            
+            hideLoading();
+            
+            // Add to chat history
+            let message = '';
+            switch (improvementType) {
+                case 'grammar':
+                    message = 'I\'ve corrected grammar, spelling, and punctuation errors in your document.';
+                    break;
+                case 'clarity':
+                    message = 'I\'ve rewritten the document to improve clarity and readability.';
+                    break;
+                case 'professional':
+                    message = 'I\'ve adjusted the tone to be more professional and formal.';
+                    break;
+                default:
+                    message = 'I\'ve improved your document.';
+            }
+            
+            this.addChatMessage('ai', message);
+            this.addChatMessage('system', 'Review the changes above. Click "Apply Changes" to keep them or continue editing.');
+            
+            showToast('Document improved! Review changes above.', 'success');
+            
+        } catch (error) {
+            hideLoading();
+            showToast('Error improving content: ' + error.message, 'error');
+        }
+    }
+
+    /**
      * Add message to chat history
      */
     addChatMessage(type, message) {
@@ -1145,6 +1269,213 @@ Please revise the document according to this feedback. Maintain the overall stru
             setTimeout(() => {
                 previewElement.classList.remove('updated');
             }, 1000);
+        }
+    }
+
+    /**
+     * Show image dialog for adding images
+     */
+    showImageDialog() {
+        const dialog = document.createElement('div');
+        dialog.className = 'modal-overlay';
+        dialog.innerHTML = `
+            <div class="modal-content" style="max-width: 600px;">
+                <h2>Add Image or Chart</h2>
+                <div class="image-options">
+                    <div class="form-group">
+                        <label>Image Type</label>
+                        <select id="image-type" class="form-input">
+                            <option value="photo">Stock Photo (AI Generated)</option>
+                            <option value="chart">Chart/Graph (Chart.js)</option>
+                            <option value="diagram">Diagram (AI Generated)</option>
+                            <option value="infographic">Infographic (AI Generated)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="image-description" class="form-input" rows="3" 
+                                placeholder="Describe what you want to show..."></textarea>
+                    </div>
+                    
+                    <div id="chart-config" style="display:none;">
+                        <div class="form-group">
+                            <label>Chart Data (comma-separated values)</label>
+                            <input type="text" id="chart-data" class="form-input" 
+                                   placeholder="10,20,30,40,50">
+                        </div>
+                        <div class="form-group">
+                            <label>Chart Labels (comma-separated)</label>
+                            <input type="text" id="chart-labels" class="form-input" 
+                                   placeholder="Jan,Feb,Mar,Apr,May">
+                        </div>
+                    </div>
+                    
+                    <div class="button-container">
+                        <button class="primary-button" id="generate-image-btn">
+                            Generate Image
+                        </button>
+                        <button class="secondary-button" id="cancel-image-btn">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(dialog);
+        
+        // Show/hide chart config based on type
+        document.getElementById('image-type').addEventListener('change', (e) => {
+            const chartConfig = document.getElementById('chart-config');
+            chartConfig.style.display = e.target.value === 'chart' ? 'block' : 'none';
+        });
+        
+        // Handle generate button
+        document.getElementById('generate-image-btn').addEventListener('click', async () => {
+            const type = document.getElementById('image-type').value;
+            const description = document.getElementById('image-description').value;
+            
+            if (!description.trim()) {
+                showToast('Please provide a description', 'error');
+                return;
+            }
+            
+            try {
+                const isSDEnabled = window.documentGenerator.imageGenerator.stableDiffusionAPI.enabled;
+                let loadingMessage;
+                
+                if (type === 'chart') {
+                    loadingMessage = 'Generating chart...';
+                } else if (isSDEnabled) {
+                    loadingMessage = 'Generating AI image... This may take 30-60 seconds';
+                } else {
+                    loadingMessage = 'Generating placeholder image...';
+                }
+                
+                showLoading(loadingMessage);
+                
+                let imageData;
+                if (type === 'chart') {
+                    const data = document.getElementById('chart-data').value;
+                    const labels = document.getElementById('chart-labels').value;
+                    
+                    const enhancedDescription = `${description} with data: ${data} and labels: ${labels}`;
+                    imageData = await window.documentGenerator.imageGenerator.generateImage(enhancedDescription, 'chart');
+                } else {
+                    imageData = await window.documentGenerator.imageGenerator.generateImage(description, type);
+                }
+                
+                // Insert image into document
+                const imageMarkdown = `\n\n![${imageData.alt}](${imageData.url})\n*${imageData.caption}*\n\n`;
+                this.wizardData.generatedContent += imageMarkdown;
+                
+                // Update preview
+                this.updateDocumentPreview(this.wizardData.generatedContent);
+                
+                hideLoading();
+                document.body.removeChild(dialog);
+                showToast('Image added successfully!', 'success');
+                
+            } catch (error) {
+                hideLoading();
+                showToast('Error generating image: ' + error.message, 'error');
+            }
+        });
+        
+        // Handle cancel button
+        document.getElementById('cancel-image-btn').addEventListener('click', () => {
+            document.body.removeChild(dialog);
+        });
+    }
+
+    /**
+     * Regenerate document with automatic image suggestions
+     */
+    async regenerateDocumentWithImages() {
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            showToast('AI not connected', 'error');
+            return;
+        }
+        
+        debugLog('AUTO_VISUALS', 'Starting automatic visual generation');
+        console.log('\n========== AUTO-ADD VISUALS STARTED ==========');
+        
+        try {
+            showLoading('Analyzing document and adding visuals...');
+            
+            debugLog('AUTO_VISUALS', 'Requesting image suggestions from AI');
+            
+            // Get image suggestions from AI
+            const suggestions = await window.aiClient.generateImageDescriptions(
+                this.wizardData.generatedContent, 
+                this.wizardData.documentType
+            );
+            
+            debugLog('AUTO_VISUALS', `AI suggested ${suggestions.length} images`, suggestions);
+            
+            // Limit to maximum 3 auto-generated images
+            const limitedSuggestions = suggestions.slice(0, 3);
+            console.log(`\n[AUTO-VISUALS] Processing ${limitedSuggestions.length} image suggestions:`);
+            limitedSuggestions.forEach((s, i) => {
+                console.log(`  ${i + 1}. Type: ${s.type}, Description: ${s.description}`);
+            });
+            
+            // Process each suggestion
+            let enhancedContent = this.wizardData.generatedContent;
+            let imagesAdded = 0;
+            
+            for (let i = 0; i < limitedSuggestions.length; i++) {
+                const suggestion = limitedSuggestions[i];
+                console.log(`\n[IMAGE ${i + 1}/${limitedSuggestions.length}] Generating ${suggestion.type}: "${suggestion.description}"`);
+                debugLog('IMAGE_GEN', `Starting generation ${i + 1}/${limitedSuggestions.length}`, suggestion);
+                try {
+                    const imageData = await window.documentGenerator.imageGenerator.generateImage(
+                        suggestion.description, 
+                        suggestion.type
+                    );
+                    
+                    // Find appropriate place to insert image
+                    const imageMarkdown = `\n\n![${imageData.alt}](${imageData.url})\n*${suggestion.caption || imageData.caption}*\n\n`;
+                    
+                    // Simple insertion strategy: add after the section mentioned in placement
+                    if (suggestion.placement) {
+                        const placementRegex = new RegExp(`(${suggestion.placement}[^\n]*\n)`, 'i');
+                        if (placementRegex.test(enhancedContent)) {
+                            enhancedContent = enhancedContent.replace(placementRegex, `$1${imageMarkdown}`);
+                        } else {
+                            // If placement not found, add at the end
+                            enhancedContent += imageMarkdown;
+                        }
+                    } else {
+                        enhancedContent += imageMarkdown;
+                    }
+                    
+                    imagesAdded++;
+                    console.log(`[IMAGE ${i + 1}/${limitedSuggestions.length}] ✓ Successfully generated and added to document`);
+                    debugLog('IMAGE_GEN', `Completed generation ${i + 1}/${limitedSuggestions.length}`);
+                    
+                } catch (error) {
+                    console.error(`[IMAGE ${i + 1}/${limitedSuggestions.length}] ✗ Failed:`, error.message);
+                    debugLog('IMAGE_GEN_ERROR', `Failed generation ${i + 1}/${limitedSuggestions.length}`, error);
+                }
+            }
+            
+            // Update content
+            this.wizardData.generatedContent = enhancedContent;
+            this.updateDocumentPreview(enhancedContent);
+            
+            hideLoading();
+            console.log(`\n========== AUTO-ADD VISUALS COMPLETED ==========`);
+            console.log(`Total images added: ${imagesAdded}`);
+            console.log('==============================================\n');
+            debugLog('AUTO_VISUALS', `Completed - ${imagesAdded} images added`);
+            
+            showToast(`Added ${imagesAdded} visual elements to your document!`, 'success');
+            
+        } catch (error) {
+            hideLoading();
+            showToast('Error adding visuals: ' + error.message, 'error');
         }
     }
 }

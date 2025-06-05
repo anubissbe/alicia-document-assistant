@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Writer - AI Powered</title>
+    <title>Alicia - Your Personal Document Assistant</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app-container">
         <header class="app-header">
-            <h1>📄 Document Writer</h1>
-            <p>AI-Powered Document Creation</p>
+            <h1>👩‍💼 Alicia</h1>
+            <p>Your Personal Document Assistant</p>
             <div class="ai-status" id="ai-status">
                 <span class="status-indicator" id="status-indicator"></span>
                 <span id="status-text">Connecting to LM Studio...</span>
@@ -18,6 +18,10 @@
             <div class="mcp-status" id="mcp-status">
                 <span class="status-indicator" id="mcp-indicator"></span>
                 <span id="mcp-text">Research: Disconnected</span>
+            </div>
+            <div class="sd-status" id="sd-status" style="cursor: pointer;" title="Click to toggle Stable Diffusion">
+                <span class="status-indicator" id="sd-indicator"></span>
+                <span id="sd-text">Image AI: Checking...</span>
             </div>
         </header>
 
@@ -61,8 +65,11 @@
     <!-- Toast notifications -->
     <div class="toast-container" id="toast-container"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="ai-client.js"></script>
     <script src="mcp-client.js"></script>
+    <script src="image-storage.js"></script>
+    <script src="image-generator.js"></script>
     <script src="file-processor.js"></script>
     <script src="research-assistant.js"></script>
     <script src="document-generator.js"></script>

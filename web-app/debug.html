@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Writer - Debug Mode</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff6b6b;
+        }
+        .info {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .button {
+            background: #4ecdc4;
+            color: #1e1e1e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 10px 10px 0;
+            font-family: monospace;
+        }
+        .button:hover {
+            background: #45b7d1;
+        }
+        .warning {
+            background: #ff6b6b;
+        }
+        code {
+            background: #3d3d3d;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .logs {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Document Writer - Debug Mode</h1>
+        
+        <div class="info">
+            <h2>Debug Controls</h2>
+            <p>Debug mode enables verbose logging in both the console window and browser console.</p>
+            
+            <button class="button" onclick="enableDebug()">Enable Debug Mode</button>
+            <button class="button" onclick="disableDebug()">Disable Debug Mode</button>
+            <button class="button" onclick="openApp()">Open App (Debug Mode)</button>
+            <button class="button warning" onclick="clearDebug()">Clear Debug Data</button>
+        </div>
+
+        <div class="info">
+            <h2>How to Use Debug Mode</h2>
+            <ol>
+                <li>Start the application with: <code>start.cmd --debug</code></li>
+                <li>Or click "Enable Debug Mode" above and then "Open App"</li>
+                <li>Open browser console (F12) to see client-side logs</li>
+                <li>Check command window for server-side logs</li>
+            </ol>
+
+            <h3>What Gets Logged:</h3>
+            <ul>
+                <li>All API calls (URL, method, duration)</li>
+                <li>Image generation requests and responses</li>
+                <li>AI text generation requests</li>
+                <li>Error details and stack traces</li>
+                <li>Performance metrics</li>
+                <li>Auto-visual generation process step by step</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h2>Debug Output Preview</h2>
+            <p>When you click "Auto-Add Visuals", you'll see:</p>
+            <pre class="logs" id="logPreview">
+========== AUTO-ADD VISUALS STARTED ==========
+
+[AUTO-VISUALS] Processing 3 image suggestions:
+  1. Type: chart, Description: Monthly sales data comparison
+  2. Type: diagram, Description: Process workflow diagram
+  3. Type: photo, Description: Team collaboration
+
+[IMAGE 1/3] Generating chart: "Monthly sales data comparison"
+[STABLE DIFFUSION] Starting chart generation
+[STABLE DIFFUSION] Enhanced prompt: "professional chart of Monthly sales data..."
+[STABLE DIFFUSION] Sending request to http://192.168.1.25:8000/generate
+[API CALL] POST http://192.168.1.25:8000/generate
+[API RESPONSE] http://192.168.1.25:8000/generate - 200 (1523ms)
+[STABLE DIFFUSION] ✓ Image generated successfully in 1523ms
+[IMAGE 1/3] ✓ Successfully generated and added to document
+
+[IMAGE 2/3] Generating diagram: "Process workflow diagram"
+...
+
+========== AUTO-ADD VISUALS COMPLETED ==========
+Total images added: 3
+==============================================
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        function enableDebug() {
+            localStorage.setItem('debugMode', 'true');
+            alert('Debug mode enabled! Open the app to see debug logs.');
+        }
+
+        function disableDebug() {
+            localStorage.removeItem('debugMode');
+            alert('Debug mode disabled.');
+        }
+
+        function openApp() {
+            localStorage.setItem('debugMode', 'true');
+            window.open('index.html?debug=true', '_blank');
+        }
+
+        function clearDebug() {
+            if (confirm('Clear all debug data and localStorage?')) {
+                localStorage.clear();
+                alert('Debug data cleared!');
+            }
+        }
+
+        // Show current debug status
+        const debugEnabled = localStorage.getItem('debugMode') === 'true';
+        if (debugEnabled) {
+            document.querySelector('h1').textContent += ' [ENABLED]';
+        }
+    </script>
+</body>
+</html>

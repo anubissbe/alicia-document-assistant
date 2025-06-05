@@ -1,33 +1,34 @@
-# Document Writer
+# Alicia - Your Personal Document Assistant
 
-Document Writer is a comprehensive document creation solution available as both a VS Code extension and a standalone web application. It enables the creation, management, and generation of professional documents with AI assistance, integrating seamlessly with LM Studio and Cline AI assistant through the Model Context Protocol (MCP).
+👩‍💼 Meet Alicia, your intelligent personal document assistant. Available as both a VS Code extension and a standalone web application, Alicia transforms the way you create professional documents. With advanced AI capabilities powered by LM Studio and seamless integration with Cline AI assistant through the Model Context Protocol (MCP), Alicia makes document creation effortless and enjoyable.
 
-![Document Writer Logo](document-writer/resources/icon.svg)
+![Alicia Logo](document-writer/resources/icon.svg)
 
-## 🚀 New: Web Application
+## 🚀 Alicia Web Application
 
-In addition to the VS Code extension, Document Writer now includes a fully-featured web application that runs in your browser!
+Alicia is available as a beautiful, intuitive web application that runs right in your browser - no installation required!
 
-### Web App Features
+### What Alicia Can Do For You
 
-- 🤖 **AI Integration** - Connect to LM Studio for AI-powered document generation
-- 🔍 **Internet Search** - MCP server provides web search functionality
-- 📄 **Multiple Export Formats** - Export to DOCX, PDF, HTML, and Markdown
-- 📎 **File Upload** - Upload Word documents for AI to read and reference
-- 🌐 **URL Research** - Add websites and articles as research sources
-- 💬 **AI Feedback Chat** - Refine documents through interactive AI conversations
-- ✨ **Real-time Preview** - See changes as you make them
+- 🤖 **AI-Powered Intelligence** - Alicia connects to LM Studio to understand your needs and generate perfect content
+- 🎨 **Smart Visual Creation** - Automatically generates charts, diagrams, and infographics to enhance your documents
+- 🔍 **Research Assistant** - Alicia searches the web and analyzes sources to enrich your content
+- 📄 **Multiple Export Formats** - Export to DOCX, PDF, HTML, and Markdown with perfect formatting
+- 📎 **Document Understanding** - Upload existing documents for Alicia to read, analyze, and reference
+- 🌐 **URL Intelligence** - Share websites and articles for Alicia to incorporate into your work
+- 💬 **Interactive Refinement** - Chat with Alicia to perfect every detail of your document
+- ✨ **Real-time Preview** - Watch your document come to life as Alicia works her magic
 
-### Quick Start (Web App)
+### Getting Started with Alicia
 
 1. Navigate to the `web-app` directory
 2. Install dependencies: `npm install`
-3. Start MCP server: `npm run mcp-server`
+3. Start Alicia's research server: `npm run mcp-server`
 4. In a new terminal, start web server: `python -m http.server 8000`
-5. Open browser to `http://localhost:8000`
-6. Ensure LM Studio is running on port 1234
+5. Open your browser and meet Alicia at `http://localhost:8000`
+6. Ensure LM Studio is running on port 1234 for Alicia's AI capabilities
 
-## VS Code Extension Features
+## Alicia VS Code Extension
 
 - **Document Generation Engine** - Create professional documents using templates and dynamic content
 - **AI Integration** - Leverage Cline AI assistant for intelligent content generation and document analysis
@@ -38,9 +39,9 @@ In addition to the VS Code extension, Document Writer now includes a fully-featu
 ## Installation
 
 1. Install Visual Studio Code 1.85.0 or higher
-2. Search for "Document Writer" in the VS Code Extensions marketplace
-3. Click Install to add the extension to VS Code
-4. Reload VS Code to activate the extension
+2. Search for "Alicia Document Assistant" in the VS Code Extensions marketplace
+3. Click Install to add Alicia to VS Code
+4. Reload VS Code to activate Alicia
 
 ## Usage
 

@@ -74,7 +74,7 @@ body {
     font-size: 1.1rem;
 }
 
-.ai-status, .mcp-status {
+.ai-status, .mcp-status, .sd-status {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -96,6 +96,11 @@ body {
 .status-indicator.connected {
     background: #4caf50;
     animation: none;
+}
+
+.status-indicator.disconnected {
+    background: #ff5722;
+    animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
@@ -975,4 +980,60 @@ body {
     opacity: 0.6;
     font-style: italic;
     padding: 2rem;
+}
+
+/* Modal overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--background-color);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+/* Content actions */
+.content-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Image preview in documents */
+.document-image {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.document-image img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.document-image figcaption {
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
 }
