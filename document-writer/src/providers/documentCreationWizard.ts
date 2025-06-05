@@ -403,25 +403,41 @@ export class DocumentCreationWizard implements WebviewStateProvider {
             return `
             <div class="empty-step-message">
                 <p>Please select a document type first.</p>
-                <button class="wizard-button secondary" data-action="prevStep">Go Back</button>
+                <button class="secondary-button" data-action="prevStep">Go Back</button>
+            </div>`;
+        }
+        
+        // Get available templates for the selected document type
+        const templates = this._templateService.getTemplates();
+        const filteredTemplates = templates.filter(template => {
+            return template.metadata && template.metadata.category === this._state.documentType;
+        });
+        
+        // If no templates found, show a message with option to continue without template
+        if (filteredTemplates.length === 0) {
+            return `
+            <div class="empty-step-message">
+                <p>No templates found for ${this._state.documentType} documents.</p>
+                <p>You can continue without a template or go back to select a different document type.</p>
+                <div class="button-container">
+                    <button class="secondary-button" data-action="prevStep">Go Back</button>
+                    <button class="primary-button" data-action="skipTemplate">Continue Without Template</button>
+                </div>
             </div>`;
         }
         
         // Otherwise, show templates for the selected document type
         return `
         <div class="template-selection">
-            <div class="template-filter">
-                <input type="text" class="template-search" placeholder="Search templates" />
-                <div class="template-filter-buttons">
-                    <button class="filter-button active" data-filter="all">All</button>
-                    <button class="filter-button" data-filter="recent">Recent</button>
-                    <button class="filter-button" data-filter="favorites">Favorites</button>
-                </div>
-            </div>
-            
+            <p>Select a template for your ${this._state.documentType} document:</p>
             <div class="template-grid" id="template-grid">
-                <!-- Templates will be loaded dynamically -->
-                <div class="template-loading">Loading templates...</div>
+                ${filteredTemplates.map(template => `
+                    <div class="template-card ${this._state.templateId === template.id ? 'selected' : ''}" data-template-id="${template.id}">
+                        <h4>${template.name}</h4>
+                        <p>${template.description}</p>
+                        <small>Format: ${template.format}</small>
+                    </div>
+                `).join('')}
             </div>
         </div>`;
     }
@@ -431,12 +447,12 @@ export class DocumentCreationWizard implements WebviewStateProvider {
      * @returns HTML for document details
      */
     private _getDocumentDetailsHtml(): string {
-        // If no template is selected, show a message
-        if (!this._state.templateId) {
+        // Check if we're past the template selection step (completed or skipped)
+        if (!this._state.steps[1].completed) {
             return `
             <div class="empty-step-message">
-                <p>Please select a template first.</p>
-                <button class="wizard-button secondary" data-action="prevStep">Go Back</button>
+                <p>Please complete the template selection step first.</p>
+                <button class="secondary-button" data-action="prevStep">Go Back</button>
             </div>`;
         }
         
@@ -475,7 +491,7 @@ export class DocumentCreationWizard implements WebviewStateProvider {
             return `
             <div class="empty-step-message">
                 <p>Please enter document details first.</p>
-                <button class="wizard-button secondary" data-action="prevStep">Go Back</button>
+                <button class="secondary-button" data-action="prevStep">Go Back</button>
             </div>`;
         }
         
@@ -491,7 +507,7 @@ export class DocumentCreationWizard implements WebviewStateProvider {
             </div>
             
             <div class="sections-actions">
-                <button class="wizard-button secondary" data-action="addSection">
+                <button class="secondary-button" data-action="addSection">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -563,7 +579,7 @@ export class DocumentCreationWizard implements WebviewStateProvider {
             return `
             <div class="empty-step-message">
                 <p>Please complete all previous steps first.</p>
-                <button class="wizard-button secondary" data-action="prevStep">Go Back</button>
+                <button class="secondary-button" data-action="prevStep">Go Back</button>
             </div>`;
         }
         
@@ -615,8 +631,8 @@ export class DocumentCreationWizard implements WebviewStateProvider {
             </div>
             
             <div class="review-actions">
-                <button class="wizard-button primary" data-action="createDocument">Create Document</button>
-                <button class="wizard-button secondary" data-action="editDocument">Edit</button>
+                <button class="primary-button" data-action="createDocument">Create Document</button>
+                <button class="secondary-button" data-action="editDocument">Edit</button>
             </div>
         </div>`;
     }
@@ -668,14 +684,14 @@ export class DocumentCreationWizard implements WebviewStateProvider {
         
         return `
         <div class="wizard-navigation">
-            <button class="wizard-button secondary" data-action="prevStep" ${isFirstStep ? 'disabled' : ''}>
+            <button class="secondary-button" data-action="prevStep" ${isFirstStep ? 'disabled' : ''}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
                 Previous
             </button>
-            <button class="wizard-button primary" data-action="nextStep" ${isLastStep ? 'disabled' : ''}>
+            <button class="primary-button" data-action="nextStep" ${isLastStep ? 'disabled' : ''}>
                 Next
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -720,6 +736,10 @@ export class DocumentCreationWizard implements WebviewStateProvider {
                         this._selectTemplate(message.templateId);
                         break;
                         
+                    case 'skipTemplate':
+                        this._skipTemplate();
+                        break;
+                        
                     case 'updateDocumentDetails':
                         this._updateDocumentDetails(message.details);
                         break;
@@ -761,6 +781,9 @@ export class DocumentCreationWizard implements WebviewStateProvider {
         
         // Update progress
         this._updateProgress();
+        
+        // Update all step content to reflect the new document type
+        this._updateWizardContent();
         
         // Load templates if we're on the template selection step
         if (this._state.currentStepIndex === 1) {
@@ -827,6 +850,31 @@ export class DocumentCreationWizard implements WebviewStateProvider {
         
         // Update progress
         this._updateProgress();
+        
+        // Update wizard content to reflect the template selection
+        this._updateWizardContent();
+    }
+    
+    /**
+     * Skip template selection
+     */
+    private _skipTemplate(): void {
+        // Clear any selected template
+        this._state.templateId = undefined;
+        
+        // Mark step as completed (skipped)
+        if (this._state.currentStepIndex === 1) {
+            this._state.steps[1].completed = true;
+        }
+        
+        // Save state
+        this.saveState();
+        
+        // Update progress
+        this._updateProgress();
+        
+        // Update wizard content
+        this._updateWizardContent();
     }
     
     /**
@@ -979,12 +1027,41 @@ export class DocumentCreationWizard implements WebviewStateProvider {
                 message: 'Creating document...'
             });
             
+            // Get template if specified
+            let template = null;
+            if (this._state.templateId) {
+                template = this._templateService.getTemplateById(this._state.templateId);
+                if (!template) {
+                    throw new Error(`Template with ID '${this._state.templateId}' not found`);
+                }
+            }
+
             // Create document
-            const document = await this._documentService.createDocument(
-                this._state.documentTitle || 'Untitled Document',
-                this._state.templateId || '',
-                this._state.documentType || DocumentType.Business
-            );
+            let document: any;
+            if (template) {
+                // Create from template
+                const documentData = {
+                    title: this._state.documentTitle || 'Untitled Document',
+                    ...this._state.documentData
+                };
+                
+                // Generate output path
+                const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
+                const outputPath = path.join(workspacePath, 'generated-documents', `${documentData.title}.docx`);
+                
+                document = await this._documentService.createDocumentFromTemplate(template, documentData, outputPath);
+            } else {
+                // Create basic document without template
+                const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
+                const outputDir = path.join(workspacePath, 'generated-documents');
+                
+                document = await this._documentService.createDocument(
+                    this._state.documentTitle || 'Untitled Document',
+                    'md', // default to markdown
+                    outputDir,
+                    `# ${this._state.documentTitle || 'Untitled Document'}\n\nYour content here...`
+                );
+            }
             
             // Mark all steps as completed
             this._state.steps.forEach(step => {
@@ -1005,12 +1082,16 @@ export class DocumentCreationWizard implements WebviewStateProvider {
             
         } catch (error) {
             console.error('Error creating document:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             
-            // Show error message
-            this._panel.webview.postMessage({
+            // Show error message in webview
+            this._panel?.webview.postMessage({
                 command: 'error',
-                message: error instanceof Error ? error.message : 'Unknown error'
+                message: errorMessage
             });
+            
+            // Also show VS Code notification
+            vscode.window.showErrorMessage(`Failed to create document: ${errorMessage}`);
         }
     }
     
@@ -1255,13 +1336,23 @@ export class DocumentCreationWizard implements WebviewStateProvider {
                         progress: ${this._state.progress}
                     };
                     
-                    // Initialize wizard
-                    document.addEventListener('DOMContentLoaded', () => {
-                        initializeWizard(vscode, state);
+                    // Wait for both DOM and external script to be ready
+                    function initWhenReady() {
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', initWhenReady);
+                            return;
+                        }
                         
-                        // Let VS Code know we're ready
-                        vscode.postMessage({ command: 'ready' });
-                    });
+                        if (typeof window.initializeWizard === 'function') {
+                            console.log('Initializing wizard with state:', state);
+                            window.initializeWizard(vscode, state);
+                        } else {
+                            console.warn('initializeWizard function not found, retrying...');
+                            setTimeout(initWhenReady, 100);
+                        }
+                    }
+                    
+                    initWhenReady();
                 }());
             </script>
         </body>

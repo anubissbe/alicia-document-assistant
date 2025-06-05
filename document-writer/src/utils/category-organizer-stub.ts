@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { DocumentTemplate } from '../providers/documentTreeProvider';
+import { DocumentTemplate } from '../models/documentTemplate';
 
 /**
  * A simplified version of the CategoryOrganizer class

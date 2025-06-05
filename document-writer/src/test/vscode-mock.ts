@@ -115,7 +115,7 @@ export const ViewColumn = {
 
 // Mock for Disposable
 export const Disposable = {
-    from: jest.fn().mockImplementation((...disposables) => ({
+    from: jest.fn().mockImplementation((..._disposables) => ({
         dispose: jest.fn()
     }))
 };

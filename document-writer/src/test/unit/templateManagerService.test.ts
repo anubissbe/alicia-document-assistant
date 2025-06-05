@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { TemplateManagerService } from '../../services/templateManagerService.js';
 import { DocumentTemplate } from '../../models/documentTemplate.js';
+import { DocumentFormat } from '../../models/documentFormat.js';
 import { SecurityManager } from '../../utils/securityManager.js';
 
 // Mock dependencies
@@ -43,6 +44,9 @@ describe('TemplateManagerService', () => {
         description: 'A test template',
         path: '/path/to/template.docx',
         type: 'docx',
+        format: DocumentFormat.DOCX,
+        dateCreated: new Date(),
+        dateModified: new Date(),
         metadata: {
             author: 'Test Author',
             version: '1.0',
@@ -211,6 +215,9 @@ describe('TemplateManagerService', () => {
                 description: 'A new template',
                 path: '/path/to/new/template.docx',
                 type: 'docx',
+                format: DocumentFormat.DOCX,
+                dateCreated: new Date(),
+                dateModified: new Date(),
                 metadata: {
                     author: 'Test Author',
                     version: '1.0',

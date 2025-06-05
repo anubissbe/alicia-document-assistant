@@ -53,17 +53,19 @@ describe('DocumentService Performance Tests', () => {
             id: 'large_template',
             name: 'Large Test Template',
             description: 'A large template for performance testing',
+            path: '/path/to/large_template.docx',
+            type: 'performance-test',
             format: DocumentFormat.DOCX,
-            templatePath: '/path/to/large_template.docx',
+            iconPath: undefined,
+            dateCreated: new Date(),
+            dateModified: new Date(),
+            tags: ['test', 'performance'],
             metadata: {
                 author: 'Test Author',
                 version: '1.0',
                 tags: ['test', 'performance'],
                 category: 'Performance Test'
-            },
-            sections,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            }
         };
     }
     
@@ -75,15 +77,17 @@ describe('DocumentService Performance Tests', () => {
             sections.push({
                 id: `section_${i}`,
                 title: `Section ${i}`,
-                content: `This is the content for section ${i}. `.repeat(100) // ~3KB of text per section
+                content: `This is the content for section ${i}. `.repeat(100), // ~3KB of text per section
+                order: i
             });
         }
         
         return {
             title: 'Large Test Document',
             type: 'Performance Test',
-            template: 'large_template',
             author: 'Test User',
+            content: sections.map(s => s.content).join('\n\n'),
+            path: `/test/document-${Date.now()}.md`,
             sections
         };
     }
@@ -191,7 +195,7 @@ describe('DocumentService Performance Tests', () => {
             
             // Verify document creation
             expect(document).toBeDefined();
-            expect(document.sections.length).toBe(50);
+            expect(document.sections?.length).toBe(50);
             
             // Test should be fast (less than 100ms)
             expect(endTime - startTime).toBeLessThan(100);
@@ -320,7 +324,7 @@ describe('DocumentService Performance Tests', () => {
             const template = createLargeTemplate(10);
             mockTemplateManager.getTemplateById.mockReturnValue(template);
             
-            const documents = Array.from({ length: 10 }, (_, i) => 
+            const documents = Array.from({ length: 10 }, () => 
                 createLargeDocumentData(10)
             );
             
@@ -372,14 +376,16 @@ describe('DocumentService Performance Tests', () => {
             const largeContentDocument: DocumentData = {
                 title: 'Large Content Document',
                 type: 'Performance Test',
-                template: 'large_template',
                 author: 'Test User',
+                content: 'This is a test. '.repeat(100000),
+                path: `/test/large-document-${Date.now()}.md`,
                 sections: [
                     {
                         id: 'section_1',
                         title: 'Large Section',
                         // Create approximately 1MB of text
-                        content: 'This is a test. '.repeat(100000)
+                        content: 'This is a test. '.repeat(100000),
+                        order: 1
                     }
                 ]
             };

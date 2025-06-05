@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { ContentSuggestionEngine, SuggestionFeedback } from '../../core/contentSuggestionEngine';
-import { FeedbackLearningEngine } from '../../core/feedbackLearningEngine';
+import { ContentSuggestionEngine } from '../../core/contentSuggestionEngine';
+import { FeedbackLearningEngine, SuggestionFeedback } from '../../core/feedbackLearningEngine';
 
 // Mock file system for test isolation
 jest.mock('fs', () => ({
@@ -185,7 +185,7 @@ describe('Feedback Learning Integration', () => {
             });
             
             // Mock strength multipliers based on previous feedback
-            getStrengthSpy.mockImplementation((type, suggestion, docType) => {
+            getStrengthSpy.mockImplementation((type, suggestion, _docType) => {
                 // Similar to the content suggestion that was accepted
                 if (type === 'content' && suggestion === initialSuggestions.contentSuggestions[0]) {
                     return 1.1; // Higher multiplier for previously accepted suggestion

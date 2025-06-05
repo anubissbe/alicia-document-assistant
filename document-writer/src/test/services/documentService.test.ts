@@ -45,17 +45,19 @@ describe('DocumentService', () => {
             id: 'test-template',
             name: 'Test Template',
             description: 'A test template',
+            path: '/path/to/template.docx',
+            type: 'test',
             format: DocumentFormat.DOCX,
-            templatePath: '/path/to/template.docx',
+            iconPath: undefined,
+            dateCreated: new Date(),
+            dateModified: new Date(),
+            tags: ['test'],
             metadata: {
                 author: 'Test Author',
                 version: '1.0',
                 tags: ['test'],
                 category: 'Test'
-            },
-            sections: [],
-            createdAt: new Date(),
-            updatedAt: new Date()
+            }
         };
         
         const mockData = {
@@ -74,7 +76,7 @@ describe('DocumentService', () => {
             await documentService.generateDocument(mockTemplate, mockData, outputPath);
             
             // Verify the correct methods were called
-            expect(fs.readFileSync).toHaveBeenCalledWith(mockTemplate.templatePath, 'binary');
+            expect(fs.readFileSync).toHaveBeenCalledWith(mockTemplate.path, 'binary');
             expect(fs.writeFileSync).toHaveBeenCalled();
         });
         
@@ -118,17 +120,19 @@ describe('DocumentService', () => {
                 id: 'test-template',
                 name: 'Test: Template? With* Invalid/Characters',
                 description: 'A test template',
+                path: '/path/to/template.md',
+                type: 'test',
                 format: DocumentFormat.MARKDOWN,
-                templatePath: '/path/to/template.md',
+                iconPath: undefined,
+                dateCreated: new Date(),
+                dateModified: new Date(),
+                tags: ['test'],
                 metadata: {
                     author: 'Test Author',
                     version: '1.0',
                     tags: ['test'],
                     category: 'Test'
-                },
-                sections: [],
-                createdAt: new Date(),
-                updatedAt: new Date()
+                }
             };
             
             (fs.readFileSync as jest.Mock).mockReturnValueOnce('# {{title}}\n\n{{content}}');
@@ -150,17 +154,19 @@ describe('DocumentService', () => {
                 id: 'md-template',
                 name: 'Markdown Template',
                 description: 'A markdown template',
+                path: '/path/to/template.md',
+                type: 'markdown',
                 format: DocumentFormat.MARKDOWN,
-                templatePath: '/path/to/template.md',
+                iconPath: undefined,
+                dateCreated: new Date(),
+                dateModified: new Date(),
+                tags: ['markdown'],
                 metadata: {
                     author: 'Test Author',
                     version: '1.0',
                     tags: ['markdown'],
                     category: 'Documentation'
-                },
-                sections: [],
-                createdAt: new Date(),
-                updatedAt: new Date()
+                }
             };
             
             const templateContent = '# {{title}}\n\nAuthor: {{author}}\n\n{{content}}';

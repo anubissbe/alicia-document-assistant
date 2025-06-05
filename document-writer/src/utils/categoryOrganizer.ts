@@ -551,7 +551,7 @@ export class CategoryOrganizer {
      * @param iconPath Icon path
      * @param sortOrder Sort order
      */
-    public createCategory(categoryName: string, parentCategory: string | null, description?: string, iconPath?: string, sortOrder?: number): void {
+    public createCategory(categoryName: string, _parentCategory: string | null, _description?: string, _iconPath?: string, _sortOrder?: number): void {
         if (!this.categoriesWithTemplates.has(categoryName)) {
             this.categoriesWithTemplates.set(categoryName, []);
             this.addCustomCategory(categoryName);

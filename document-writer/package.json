@@ -90,6 +90,11 @@
     },
     "commands": [
       {
+        "command": "document-writer.test",
+        "title": "Test Extension",
+        "category": "Document Writer"
+      },
+      {
         "command": "document-writer.createDocument",
         "title": "Create New Document",
         "category": "Document Writer",

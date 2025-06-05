@@ -209,6 +209,197 @@ body {
     border-left: 4px solid var(--error-color);
 }
 
+/* Card styles for document types and templates */
+.document-type-card, .template-card {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--vscode-list-inactiveSelectionBackground);
+}
+
+.document-type-card:hover, .template-card:hover {
+    border-color: var(--focus-border);
+    background-color: var(--vscode-list-hoverBackground);
+}
+
+.document-type-card.selected, .template-card.selected {
+    border-color: var(--primary-color);
+    background-color: var(--vscode-list-activeSelectionBackground);
+    color: var(--vscode-list-activeSelectionForeground);
+}
+
+.document-type-card h3, .template-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.document-type-card p, .template-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--vscode-descriptionForeground);
+}
+
+.document-type-card.selected p, .template-card.selected p {
+    color: var(--vscode-list-activeSelectionForeground);
+}
+
+/* Step content styling */
+.step-content {
+    padding: 1rem 0;
+}
+
+.step-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.step-description {
+    margin-bottom: 1.5rem;
+    color: var(--vscode-descriptionForeground);
+}
+
+/* Success message styling */
+.success-message {
+    background-color: rgba(0, 255, 0, 0.1);
+    color: var(--success-color);
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 2px;
+    border-left: 4px solid var(--success-color);
+    display: none;
+}
+
+/* Disabled button styling */
+.primary-button:disabled, .secondary-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.primary-button:disabled:hover, .secondary-button:disabled:hover {
+    background-color: var(--primary-color);
+}
+
+/* Step progress styling */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.step-number {
+    background-color: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.step-number.completed {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.step-number.active {
+    background-color: var(--primary-color);
+    color: var(--vscode-button-foreground);
+}
+
+/* Wizard navigation */
+.wizard-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: 1px solid var(--border-color);
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+.wizard-navigation .primary-button,
+.wizard-navigation .secondary-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.wizard-navigation .primary-button svg,
+.wizard-navigation .secondary-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Template selection styles */
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.template-card {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--vscode-list-inactiveSelectionBackground);
+}
+
+.template-card:hover {
+    border-color: var(--focus-border);
+    background-color: var(--vscode-list-hoverBackground);
+}
+
+.template-card.selected {
+    border-color: var(--primary-color);
+    background-color: var(--vscode-list-activeSelectionBackground);
+    color: var(--vscode-list-activeSelectionForeground);
+}
+
+.template-card h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.template-card p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--vscode-descriptionForeground);
+}
+
+.template-card.selected p {
+    color: var(--vscode-list-activeSelectionForeground);
+}
+
+.template-card small {
+    font-size: 0.8rem;
+    color: var(--vscode-descriptionForeground);
+}
+
+.template-card.selected small {
+    color: var(--vscode-list-activeSelectionForeground);
+}
+
+/* Button container */
+.button-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    margin-top: 1rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
     .wizard-container {
@@ -226,5 +417,9 @@ body {
     
     .primary-button, .secondary-button {
         width: 100%;
+    }
+    
+    .document-type-card, .template-card {
+        padding: 0.75rem;
     }
 }

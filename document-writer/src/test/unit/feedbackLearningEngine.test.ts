@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FeedbackLearningEngine } from '../../core/feedbackLearningEngine';
-import { SuggestionFeedback } from '../../core/contentSuggestionEngine';
+import { SuggestionFeedback } from '../../core/feedbackLearningEngine';
 
 // Mock file system for test isolation
 jest.mock('fs', () => ({

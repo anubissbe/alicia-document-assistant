@@ -47,6 +47,23 @@ export interface DocumentMetadata {
  */
 export interface Document extends DocumentMetadata {
     content: string;
+    sections?: DocumentSection[];
+}
+
+/**
+ * DocumentData interface (alias for Document)
+ */
+export interface DocumentData extends Document {}
+
+/**
+ * DocumentSection interface
+ */
+export interface DocumentSection {
+    id: string;
+    title: string;
+    content: string;
+    order: number;
+    metadata?: Record<string, any>;
 }
 
 /**
@@ -58,7 +75,7 @@ export class DocumentService {
     /**
      * Constructor
      */
-    constructor() {
+    constructor(private _context?: vscode.ExtensionContext, private _templateManager?: any) {
         // Initialize any required resources
     }
     
@@ -558,28 +575,96 @@ export class DocumentService {
      * @param document The document to generate
      * @returns The path to the generated document
      */
-    public async generateDocument(document: any): Promise<string> {
+    public async generateDocument(template: any, data?: any, outputPath?: string): Promise<string> {
         try {
-            const outputDir = vscode.workspace.getConfiguration('documentWriter').get('outputPath') as string || './generated-documents';
-            const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
-            const resolvedOutputDir = outputDir.startsWith('./') ? path.join(workspacePath, outputDir.substring(2)) : outputDir;
-            
-            // Ensure output directory exists
-            if (!fs.existsSync(resolvedOutputDir)) {
-                await fs.promises.mkdir(resolvedOutputDir, { recursive: true });
+            // Check for unsupported format
+            if (template.format === 'UNSUPPORTED') {
+                throw new Error('Unsupported document format');
             }
             
-            // Generate filename based on document type
-            const fileName = `${document.title || 'document'}.${document.type === 'markdown' ? 'md' : 'txt'}`;
-            const outputPath = path.join(resolvedOutputDir, fileName);
+            // Use provided output path or generate one
+            let finalOutputPath = outputPath;
+            if (!finalOutputPath) {
+                const outputDir = vscode.workspace.getConfiguration('documentWriter').get('outputPath') as string || './generated-documents';
+                const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+                const resolvedOutputDir = outputDir.startsWith('./') ? path.join(workspacePath, outputDir.substring(2)) : outputDir;
+                
+                // Ensure output directory exists
+                if (!fs.existsSync(resolvedOutputDir)) {
+                    await fs.promises.mkdir(resolvedOutputDir, { recursive: true });
+                }
+                
+                // Generate filename based on template
+                const fileName = `${template.name || 'document'}.${template.type === 'markdown' ? 'md' : 'txt'}`;
+                finalOutputPath = path.join(resolvedOutputDir, fileName);
+            }
+            
+            // Generate content from template and data
+            let content = template.content || '';
+            if (data && typeof data === 'object') {
+                // Simple template replacement
+                for (const [key, value] of Object.entries(data)) {
+                    content = content.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
+                }
+            }
             
             // Write document content
-            await fs.promises.writeFile(outputPath, document.content || '', 'utf8');
+            await fs.promises.writeFile(finalOutputPath, content, 'utf8');
             
-            return outputPath;
+            return finalOutputPath;
         } catch (error) {
             console.error('Error generating document:', error);
             throw new Error(`Failed to generate document: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+    }
+
+    /**
+     * Create document from template
+     */
+    public async createDocumentFromTemplate(template: any, data?: any, outputPath?: string): Promise<Document> {
+        const document: Document = {
+            path: outputPath || path.join(process.cwd(), `document-${Date.now()}.md`),
+            title: data?.title || 'Untitled Document',
+            content: data?.content || template.content || '',
+            type: template.type || 'markdown',
+            dateCreated: new Date(),
+            dateModified: new Date(),
+            author: data?.author || 'Unknown',
+            tags: data?.tags || []
+        };
+
+        await this.saveDocument(document);
+        return document;
+    }
+
+    /**
+     * Read a document from file system
+     * @param documentPath The path to the document
+     * @returns The document content
+     */
+    public async readDocument(documentPath: string): Promise<Document> {
+        try {
+            const content = await fs.promises.readFile(documentPath, 'utf8');
+            const stats = await fs.promises.stat(documentPath);
+            
+            return {
+                path: documentPath,
+                title: path.basename(documentPath, path.extname(documentPath)),
+                content: content,
+                type: path.extname(documentPath).slice(1) || 'txt',
+                dateCreated: stats.birthtime,
+                dateModified: stats.mtime
+            };
+        } catch (error) {
+            console.error('Error reading document:', error);
+            throw new Error(`Failed to read document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+
+    /**
+     * Load document
+     */
+    public async loadDocument(filePath: string): Promise<Document> {
+        return await this.readDocument(filePath);
     }
 }

@@ -609,4 +609,57 @@ export class PreviewEnhancer {
             </div>
         `;
     }
+
+    /**
+     * Get preview loading HTML
+     */
+    public getPreviewLoadingHtml(_webview?: any, message?: string): string {
+        return `
+            <div class="loading-spinner-container">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">${message || 'Loading preview...'}</div>
+            </div>
+        `;
+    }
+
+    /**
+     * Get preview error HTML
+     */
+    public getPreviewErrorHtml(_webview: any, title?: string, error?: Error | string): string {
+        const errorMessage = error || 'Unknown error';
+        const displayTitle = title || 'Error loading preview';
+        
+        return `
+            <div class="preview-error-container">
+                <div class="preview-error-icon">
+                    <i class="codicon codicon-error"></i>
+                </div>
+                <div class="preview-error-message">
+                    <h3>${displayTitle}</h3>
+                    <p>${typeof errorMessage === 'string' ? errorMessage : errorMessage.message}</p>
+                </div>
+                <div class="preview-error-actions">
+                    <button class="retry-button">Retry</button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Get responsive preview container
+     */
+    public getResponsivePreviewContainer(content: string, options?: { className?: string; title?: string; showHeader?: boolean }): string {
+        const className = options?.className || '';
+        const title = options?.title || '';
+        const showHeader = options?.showHeader || false;
+        
+        return `
+            <div class="responsive-preview-container ${className}">
+                ${showHeader && title ? `<div class="preview-header"><h3>${title}</h3></div>` : ''}
+                <div class="preview-content">
+                    ${content}
+                </div>
+            </div>
+        `;
+    }
 }

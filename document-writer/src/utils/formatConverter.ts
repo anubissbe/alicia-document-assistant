@@ -23,6 +23,7 @@ export interface FormatConversionOptions {
     preserveStyles?: boolean;
     preserveImages?: boolean;
     preserveLinks?: boolean;
+    preserveFormatting?: boolean;
     embedFonts?: boolean;
     addMetadata?: boolean;
     metadata?: Record<string, any>;
@@ -45,6 +46,37 @@ export interface FormatConversionCapability {
     isDirectConversion: boolean;
     qualityLoss: 'none' | 'minimal' | 'moderate' | 'significant';
     requiresExternalLibraries: boolean;
+}
+
+/**
+ * HTML export options
+ */
+export interface HtmlExportOptions extends FormatConversionOptions {
+    includeCSS?: boolean;
+    includeJS?: boolean;
+    minify?: boolean;
+    charset?: string;
+    doctype?: string;
+}
+
+/**
+ * Markdown export options
+ */
+export interface MarkdownExportOptions extends FormatConversionOptions {
+    includeYamlFrontMatter?: boolean;
+    convertTableToMarkdown?: boolean;
+    preserveLineBreaks?: boolean;
+    headingStyle?: 'atx' | 'setext';
+}
+
+/**
+ * PDF export options
+ */
+export interface PdfExportOptions extends FormatConversionOptions {
+    quality?: number;
+    compression?: 'none' | 'low' | 'medium' | 'high';
+    watermark?: string;
+    password?: string;
 }
 
 /**
@@ -287,11 +319,7 @@ export class FormatConverter {
         
         // If it's a direct conversion, use FormatProcessor
         if (capability?.isDirectConversion) {
-            return this._formatProcessor.processContent(content, sourceFormat, targetFormat, {
-                preserveFormatting: options.preserveStyles,
-                includeStyles: options.preserveStyles,
-                preserveImages: options.preserveImages
-            });
+            return this._formatProcessor.processContent(content, sourceFormat, targetFormat);
         }
         
         // For indirect conversions, we need to use specialized methods
@@ -337,6 +365,47 @@ export class FormatConverter {
                 throw new Error(`Conversion from ${sourceFormat} to ${targetFormat} is not implemented`);
         }
     }
+
+    /**
+     * Convert document to HTML
+     * @param document The document to convert
+     * @returns HTML representation of the document
+     */
+    public documentToHtml(document: any): string {
+        // Basic document to HTML conversion
+        if (typeof document === 'string') {
+            return document;
+        }
+        
+        if (document && document.content) {
+            return document.content;
+        }
+        
+        // Fallback: stringify the document and wrap in basic HTML
+        return `
+            <html>
+                <head>
+                    <title>${document?.title || 'Document'}</title>
+                </head>
+                <body>
+                    <pre>${JSON.stringify(document, null, 2)}</pre>
+                </body>
+            </html>
+        `;
+    }
+
+    /**
+     * Convert markdown to HTML
+     * @param markdownContent The markdown content
+     * @returns HTML representation
+     */
+    public markdownToHtml(markdownContent: string): string {
+        return this._formatProcessor.processContent(
+            markdownContent, 
+            DocumentFormat.MARKDOWN, 
+            DocumentFormat.HTML
+        );
+    }
     
     /**
      * Convert Markdown to DOCX
@@ -350,11 +419,7 @@ export class FormatConverter {
             const html = this._formatProcessor.processContent(
                 content,
                 DocumentFormat.MARKDOWN,
-                DocumentFormat.HTML,
-                {
-                    preserveFormatting: options.preserveStyles,
-                    includeStyles: options.preserveStyles
-                }
+                DocumentFormat.HTML
             );
             
             // Then convert HTML to DOCX
@@ -377,11 +442,7 @@ export class FormatConverter {
             const html = this._formatProcessor.processContent(
                 content,
                 DocumentFormat.MARKDOWN,
-                DocumentFormat.HTML,
-                {
-                    preserveFormatting: options.preserveStyles,
-                    includeStyles: options.preserveStyles
-                }
+                DocumentFormat.HTML
             );
             
             // Then convert HTML to PDF
@@ -398,7 +459,7 @@ export class FormatConverter {
      * @param options Conversion options
      * @returns The DOCX content as base64 string
      */
-    private async _htmlToDocx(content: string, options: FormatConversionOptions): Promise<string> {
+    private async _htmlToDocx(content: string, _options: FormatConversionOptions): Promise<string> {
         try {
             // In a real implementation, we would use a library like html-to-docx
             // For this implementation, we'll return a placeholder template
@@ -448,7 +509,7 @@ export class FormatConverter {
      * @param options Conversion options
      * @returns The PDF content as base64 string
      */
-    private async _htmlToPdf(content: string, options: FormatConversionOptions): Promise<string> {
+    private async _htmlToPdf(_content: string, _options: FormatConversionOptions): Promise<string> {
         try {
             // In a real implementation, we would use a library like puppeteer or html-pdf
             // For this implementation, we'll use a placeholder
@@ -491,7 +552,7 @@ export class FormatConverter {
         }
     }
     
-    private async _docxToText(content: string, options: FormatConversionOptions): Promise<string> {
+    private async _docxToText(_content: string, _options: FormatConversionOptions): Promise<string> {
         let tempDir: string | undefined;
         
         try {
@@ -501,7 +562,7 @@ export class FormatConverter {
             const tempTextPath = path.join(tempDir, 'document.txt');
             
             // Write the DOCX content to a temporary file
-            const docxBuffer = Buffer.from(content, 'base64');
+            const docxBuffer = Buffer.from(_content, 'base64');
             await writeFile(tempFilePath, docxBuffer);
             
             // In a real implementation, we would use a library like mammoth

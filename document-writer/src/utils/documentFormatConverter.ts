@@ -5,6 +5,7 @@ import { promisify } from 'util';
 import { DocumentFormat } from '../models/documentFormat';
 import { SecurityManager } from './securityManager';
 import { PathSafetyUtils } from './pathSafetyUtils';
+import { FormatConversionOptions } from './formatConverter';
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -466,7 +467,7 @@ export class DocumentFormatConverter {
      * @param preserveFormatting Whether to preserve formatting
      * @returns The Markdown content
      */
-    private _htmlToMarkdown(html: string, preserveFormatting: boolean): string {
+    private _htmlToMarkdown(html: string, _preserveFormatting: boolean): string {
         // In a full implementation, we would use an HTML to Markdown converter
         // This is a simplified implementation for demo purposes
         
@@ -503,12 +504,12 @@ export class DocumentFormatConverter {
         
         // Replace lists
         markdown = markdown
-            .replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, function(match: string, content: string) {
+            .replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, function(_match: string, content: string) {
                 return content.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n') + '\n';
             })
-            .replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, function(match: string, content: string) {
+            .replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, function(_match: string, content: string) {
                 let index = 1;
-                return content.replace(/<li[^>]*>(.*?)<\/li>/gi, function(m: string, item: string) {
+                return content.replace(/<li[^>]*>(.*?)<\/li>/gi, function(_m: string, item: string) {
                     return `${index++}. ${item}\n`;
                 }) + '\n';
             });

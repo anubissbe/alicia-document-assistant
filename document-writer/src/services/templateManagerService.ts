@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DocumentTemplate, SecurityLevel } from '../models/documentTemplate';
+import { DocumentFormat } from '../models/documentFormat';
 import { SecurityManager } from '../utils/securityManager';
 
 /**
@@ -171,18 +172,24 @@ export class TemplateManagerService {
         // Determine the format based on file extension
         const format = this._getFormatFromFilePath(filePath);
         
+        // Determine category based on template name
+        const category = this._getCategoryFromTemplateName(name);
+        
         // Create a new template
         return await this.addTemplate({
             name,
             description,
-            type: format,
+            type: format.toLowerCase(),
+            format: format,
             path: filePath,
+            dateCreated: new Date(),
+            dateModified: new Date(),
             metadata: {
                 author: 'Unknown',
                 version: '1.0',
                 lastModified: new Date(),
                 tags: [],
-                category: 'General'
+                category: category
             }
         });
     }
@@ -319,22 +326,50 @@ export class TemplateManagerService {
     }
     
     /**
+     * Determine the category from a template name
+     * @param templateName The name of the template
+     */
+    private _getCategoryFromTemplateName(templateName: string): string {
+        const nameLower = templateName.toLowerCase();
+        
+        if (nameLower.includes('business') || nameLower.includes('letter') || 
+            nameLower.includes('proposal') || nameLower.includes('memo')) {
+            return 'business';
+        } else if (nameLower.includes('technical') || nameLower.includes('spec') || 
+                   nameLower.includes('manual') || nameLower.includes('hld') ||
+                   nameLower.includes('documentation')) {
+            return 'technical';
+        } else if (nameLower.includes('academic') || nameLower.includes('research') || 
+                   nameLower.includes('paper') || nameLower.includes('thesis')) {
+            return 'academic';
+        } else if (nameLower.includes('report')) {
+            return 'report';
+        } else if (nameLower.includes('personal') || nameLower.includes('resume') || 
+                   nameLower.includes('cv')) {
+            return 'custom';
+        }
+        
+        // Default to business for unknown templates
+        return 'business';
+    }
+    
+    /**
      * Determine the document format from a file path
      * @param filePath The path to the template file
      */
-    private _getFormatFromFilePath(filePath: string): string {
+    private _getFormatFromFilePath(filePath: string): DocumentFormat {
         const extension = path.extname(filePath).toLowerCase();
         
         switch (extension) {
             case '.docx':
-                return 'docx';
+                return DocumentFormat.DOCX;
             case '.md':
-                return 'markdown';
+                return DocumentFormat.MARKDOWN;
             case '.html':
             case '.htm':
-                return 'html';
+                return DocumentFormat.HTML;
             case '.pdf':
-                return 'pdf';
+                return DocumentFormat.PDF;
             default:
                 throw new Error(`Unsupported file extension: ${extension}`);
         }
@@ -363,5 +398,90 @@ export class TemplateManagerService {
         
         // Write to the export location
         await fs.promises.writeFile(filePath, templateContent, 'utf8');
+    }
+
+    /**
+     * Save a template with content
+     * @param template The template to save
+     * @param content The content to save to the template
+     */
+    public async saveTemplate(template: DocumentTemplate, content: string): Promise<void> {
+        // Validate the template path
+        const pathValidation = this._securityManager.validatePath(template.path);
+        if (!pathValidation.valid) {
+            throw new Error(`Invalid template path: ${template.path}`);
+        }
+
+        // Write the content to the template file
+        await fs.promises.writeFile(template.path, content, 'utf8');
+
+        // Update the template's last modified date
+        template.dateModified = new Date();
+        if (template.metadata) {
+            template.metadata.lastModified = new Date();
+        }
+
+        // Update the template in the collection
+        const index = this._templates.findIndex(t => t.id === template.id);
+        if (index >= 0) {
+            this._templates[index] = template;
+            await this._saveTemplates();
+        }
+    }
+
+    /**
+     * Generate a preview for a template
+     * @param template The template to generate a preview for
+     */
+    public async generateTemplatePreview(template: DocumentTemplate): Promise<string> {
+        try {
+            // Read the template file content
+            const content = await fs.promises.readFile(template.path, 'utf8');
+            
+            // Generate a simple preview based on the template format
+            switch (template.format) {
+                case DocumentFormat.DOCX:
+                    return `<div class="template-preview docx-preview">
+                        <h3>${template.name}</h3>
+                        <p><em>DOCX Template</em></p>
+                        <p>${template.description}</p>
+                        <div class="template-info">
+                            <small>Path: ${template.path}</small>
+                        </div>
+                    </div>`;
+                    
+                case DocumentFormat.MARKDOWN:
+                    return `<div class="template-preview markdown-preview">
+                        <h3>${template.name}</h3>
+                        <p><em>Markdown Template</em></p>
+                        <p>${template.description}</p>
+                        <pre class="content-preview">${content.substring(0, 200)}...</pre>
+                    </div>`;
+                    
+                case DocumentFormat.HTML:
+                    return `<div class="template-preview html-preview">
+                        <h3>${template.name}</h3>
+                        <p><em>HTML Template</em></p>
+                        <p>${template.description}</p>
+                        <div class="content-preview">${content.substring(0, 200)}...</div>
+                    </div>`;
+                    
+                default:
+                    return `<div class="template-preview default-preview">
+                        <h3>${template.name}</h3>
+                        <p><em>${template.format} Template</em></p>
+                        <p>${template.description}</p>
+                        <div class="template-info">
+                            <small>Path: ${template.path}</small>
+                        </div>
+                    </div>`;
+            }
+        } catch (error) {
+            return `<div class="template-preview error-preview">
+                <h3>${template.name}</h3>
+                <p class="error">Error generating preview: ${error}</p>
+                <p>${template.description}</p>
+            </div>`;
+        }
     }
 }

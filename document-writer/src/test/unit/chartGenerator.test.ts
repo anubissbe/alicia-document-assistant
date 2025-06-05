@@ -142,7 +142,7 @@ jest.mock('canvas', () => {
     
     const mockCanvas = {
         getContext: jest.fn().mockReturnValue(mockContext),
-        toBuffer: jest.fn().mockImplementation((format = 'image/png') => Buffer.from('mock image buffer')),
+        toBuffer: jest.fn().mockImplementation((_format = 'image/png') => Buffer.from('mock image buffer')),
         toDataURL: jest.fn().mockReturnValue('data:image/png;base64,mockdata'),
         width: 800,
         height: 500

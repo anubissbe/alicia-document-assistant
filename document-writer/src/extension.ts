@@ -19,6 +19,14 @@ import { SentimentAnalyzer } from './core/sentimentAnalyzer';
 export function activate(context: vscode.ExtensionContext) {
     try {
         console.log('Document Writer extension is activating...');
+        vscode.window.showInformationMessage('Document Writer extension activated successfully!');
+        
+        // Register a simple test command first
+        context.subscriptions.push(
+            vscode.commands.registerCommand('document-writer.test', () => {
+                vscode.window.showInformationMessage('Document Writer test command works!');
+            })
+        );
         
         // Initialize core services
         const templateManager = new TemplateManagerService(context);

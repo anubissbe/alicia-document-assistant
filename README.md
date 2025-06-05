@@ -1,16 +1,39 @@
 # Document Writer
 
-Document Writer is a powerful VS Code extension that enables the creation, management, and generation of professional documents with AI assistance. It integrates seamlessly with Cline AI assistant through the Model Context Protocol (MCP) to provide intelligent document generation capabilities.
+Document Writer is a comprehensive document creation solution available as both a VS Code extension and a standalone web application. It enables the creation, management, and generation of professional documents with AI assistance, integrating seamlessly with LM Studio and Cline AI assistant through the Model Context Protocol (MCP).
 
 ![Document Writer Logo](document-writer/resources/icon.svg)
 
-## Features
+## 🚀 New: Web Application
+
+In addition to the VS Code extension, Document Writer now includes a fully-featured web application that runs in your browser!
+
+### Web App Features
+
+- 🤖 **AI Integration** - Connect to LM Studio for AI-powered document generation
+- 🔍 **Internet Search** - MCP server provides web search functionality
+- 📄 **Multiple Export Formats** - Export to DOCX, PDF, HTML, and Markdown
+- 📎 **File Upload** - Upload Word documents for AI to read and reference
+- 🌐 **URL Research** - Add websites and articles as research sources
+- 💬 **AI Feedback Chat** - Refine documents through interactive AI conversations
+- ✨ **Real-time Preview** - See changes as you make them
+
+### Quick Start (Web App)
+
+1. Navigate to the `web-app` directory
+2. Install dependencies: `npm install`
+3. Start MCP server: `npm run mcp-server`
+4. In a new terminal, start web server: `python -m http.server 8000`
+5. Open browser to `http://localhost:8000`
+6. Ensure LM Studio is running on port 1234
+
+## VS Code Extension Features
 
 - **Document Generation Engine** - Create professional documents using templates and dynamic content
 - **AI Integration** - Leverage Cline AI assistant for intelligent content generation and document analysis
 - **Chart Generation** - Include dynamic charts and visualizations in your documents
 - **Template Management** - Organize and use document templates with metadata
-- **Multi-Format Support** - Generate documents in DOCX format (with PDF and HTML planned)
+- **Multi-Format Support** - Generate documents in multiple formats
 
 ## Installation
 
@@ -116,9 +139,10 @@ The project is being implemented in phases:
 
 1. ✅ **Phase 1: Foundation Setup** - Project configuration, extension structure, document engine, template management, basic DOCX generation
 2. ✅ **Phase 2: AI Integration** - Cline MCP integration, template engine, chart generation, AI document generation, MCP tools
-3. 🚧 **Phase 3: User Interface Development** - Webview interfaces, document creation wizard, chat-based assistant, tree view provider
-4. 📝 **Phase 4: Advanced Features** - Multi-format support, enhanced AI capabilities, testing and optimization
-5. 📝 **Phase 5: Polish and Release** - Documentation, example templates, publishing preparation
+3. ✅ **Phase 3: User Interface Development** - Webview interfaces, document creation wizard, chat-based assistant, tree view provider
+4. ✅ **Phase 3.5: Web Application** - Standalone browser-based version with full AI integration
+5. ✅ **Phase 4: Advanced Features** - Multi-format support (DOCX, PDF, HTML, Markdown), enhanced AI capabilities, feedback chat system
+6. 🚧 **Phase 5: Polish and Release** - Documentation, example templates, publishing preparation
 
 ## License
 
@@ -134,11 +158,28 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## Recent Updates
+
+### Web Application (New!)
+- ✅ Complete browser-based document creation interface
+- ✅ LM Studio integration for AI-powered generation
+- ✅ MCP server for internet search capabilities
+- ✅ File upload support (DOCX, PDF, TXT)
+- ✅ URL research and content extraction
+- ✅ AI feedback chat for document refinement
+- ✅ Export to DOCX, PDF, HTML, and Markdown
+
+### VS Code Extension
+- ✅ Fixed Document Creation Wizard issues
+- ✅ Resolved template loading problems
+- ✅ Fixed JavaScript/CSS mismatches in webviews
+- ✅ Improved error handling and user feedback
+
 ## Todo
 
-- Implement PDF generation using puppeteer
-- Add support for HTML document generation
-- Enhance AI content generation capabilities
-- Improve chart integration and visualization options
+- Polish VS Code extension UI based on web app improvements
+- Add more document templates for common use cases
+- Implement real-time collaboration features
+- Add support for more file formats (ODT, RTF)
 - Finalize documentation and example templates
 - Prepare the extension for release on VS Code marketplace

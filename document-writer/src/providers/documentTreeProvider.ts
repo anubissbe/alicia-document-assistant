@@ -4,6 +4,7 @@ import { TemplateManagerService } from '../services/templateManagerService';
 import { DocumentService } from '../services/documentService';
 import { CategoryOrganizer, CategoryNode } from '../utils/categoryOrganizer';
 import { DocumentTemplate } from '../models/documentTemplate';
+import { DocumentFormat } from '../models/documentFormat';
 
 /**
  * Interface for document template category
@@ -447,6 +448,7 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                             description: 'A professional business report template',
                             type: 'business-report',
                             path: '/path/to/business-report.docx',
+                            format: DocumentFormat.DOCX,
                             dateCreated: new Date('2025-01-15'),
                             dateModified: new Date('2025-05-20'),
                             tags: ['report', 'business']
@@ -457,6 +459,7 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                             description: 'A formal business letter template',
                             type: 'letter',
                             path: '/path/to/letter.docx',
+                            format: DocumentFormat.DOCX,
                             dateCreated: new Date('2025-02-10'),
                             dateModified: new Date('2025-05-15'),
                             tags: ['letter', 'business']
@@ -475,6 +478,7 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                             description: 'A detailed technical specification template',
                             type: 'technical-specification',
                             path: '/path/to/technical-specification.docx',
+                            format: DocumentFormat.DOCX,
                             dateCreated: new Date('2025-03-05'),
                             dateModified: new Date('2025-05-10'),
                             tags: ['technical', 'specification']
@@ -485,6 +489,7 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                             description: 'A comprehensive user manual template',
                             type: 'manual',
                             path: '/path/to/user-manual.docx',
+                            format: DocumentFormat.DOCX,
                             dateCreated: new Date('2025-04-12'),
                             dateModified: new Date('2025-06-01'),
                             tags: ['technical', 'manual']
@@ -503,6 +508,7 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<DocumentTre
                             description: 'A formal academic research paper template',
                             type: 'academic-paper',
                             path: '/path/to/research-paper.docx',
+                            format: DocumentFormat.DOCX,
                             dateCreated: new Date('2025-01-20'),
                             dateModified: new Date('2025-04-15'),
                             tags: ['academic', 'research']

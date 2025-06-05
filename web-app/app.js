@@ -1,0 +1,1201 @@
+/**
+ * Main Application Logic for Document Writer
+ */
+class DocumentWriterApp {
+    constructor() {
+        this.currentStepIndex = 0;
+        this.steps = [
+            {
+                id: 'document-type',
+                title: 'Select Document Type',
+                description: 'Choose the type of document you want to create',
+                completed: false
+            },
+            {
+                id: 'document-details',
+                title: 'Document Details',
+                description: 'Enter basic document information',
+                completed: false
+            },
+            {
+                id: 'content-sections',
+                title: 'Content Sections',
+                description: 'Define the content sections for your document',
+                completed: false
+            },
+            {
+                id: 'ai-generation',
+                title: 'AI Generation',
+                description: 'Generate content using AI',
+                completed: false
+            },
+            {
+                id: 'review',
+                title: 'Review & Download',
+                description: 'Review your document and download it',
+                completed: false
+            }
+        ];
+        
+        this.wizardData = {
+            documentType: null,
+            documentTitle: '',
+            documentData: {
+                description: '',
+                author: '',
+                date: new Date().toISOString().split('T')[0]
+            },
+            sections: [],
+            generatedContent: ''
+        };
+        
+        this.chatHistory = [];
+        this.tempGeneratedContent = null;
+        
+        this.init();
+    }
+
+    /**
+     * Initialize the application
+     */
+    init() {
+        this.updateStepsNavigation();
+        this.updateWizardContent();
+        this.updateProgress();
+        this.setupEventListeners();
+        
+        // Check AI connection status periodically
+        setInterval(() => {
+            if (window.aiClient) {
+                window.aiClient.checkConnection();
+            }
+        }, 30000); // Check every 30 seconds
+    }
+
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+        // Handle document type selection
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('document-type-card')) {
+                this.selectDocumentType(e.target.dataset.type);
+            }
+            
+            if (e.target.classList.contains('template-card')) {
+                this.selectTemplate(e.target.dataset.templateId);
+            }
+            
+            if (e.target.classList.contains('step-nav-item')) {
+                const stepIndex = parseInt(e.target.dataset.stepIndex);
+                if (stepIndex !== this.currentStepIndex) {
+                    this.goToStep(stepIndex);
+                }
+            }
+            
+            // Handle action buttons
+            const action = e.target.dataset.action;
+            if (action) {
+                this.handleAction(action, e.target);
+            }
+        });
+
+        // Handle form inputs
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('form-input')) {
+                this.updateFormData(e.target.name, e.target.value);
+            }
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + Enter to send feedback
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                const feedbackInput = document.getElementById('feedback-input');
+                if (feedbackInput && document.activeElement === feedbackInput) {
+                    e.preventDefault();
+                    this.sendFeedback();
+                }
+            }
+        });
+    }
+
+    /**
+     * Handle various actions
+     */
+    handleAction(action, target) {
+        switch (action) {
+            case 'addSection':
+                this.addSection();
+                break;
+            case 'removeSection':
+                this.removeSection(target.dataset.index);
+                break;
+            case 'generateSection':
+                this.generateSectionContent(target.dataset.index);
+                break;
+            case 'generateDocument':
+                this.generateDocument();
+                break;
+            case 'downloadDocument':
+                this.downloadDocument(target.dataset.format);
+                break;
+            case 'previewDocument':
+                this.previewDocument();
+                break;
+            case 'improveContent':
+                this.improveContent(target.dataset.type);
+                break;
+            case 'generateTitle':
+                this.generateTitleSuggestions();
+                break;
+            case 'analyzeResources':
+                this.analyzeUploadedResources();
+                break;
+            case 'generateOutline':
+                this.generateDocumentOutline();
+                break;
+            case 'sendFeedback':
+                this.sendFeedback();
+                break;
+            case 'applyChanges':
+                this.applyChanges();
+                break;
+            case 'quickFeedback':
+                this.sendQuickFeedback(target.dataset.feedback);
+                break;
+        }
+    }
+
+    /**
+     * Update steps navigation
+     */
+    updateStepsNavigation() {
+        const container = document.getElementById('steps-navigation');
+        container.innerHTML = this.steps.map((step, index) => `
+            <div class="step-nav-item ${index === this.currentStepIndex ? 'current' : ''} ${step.completed ? 'completed' : ''}" 
+                 data-step-index="${index}">
+                <div class="step-nav-number">
+                    ${step.completed ? '✓' : index + 1}
+                </div>
+                <div class="step-nav-title">${step.title}</div>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Update wizard content based on current step
+     */
+    updateWizardContent() {
+        const container = document.getElementById('wizard-content');
+        const step = this.steps[this.currentStepIndex];
+        
+        let content = '';
+        switch (step.id) {
+            case 'document-type':
+                content = this.getDocumentTypeStepHTML();
+                break;
+            case 'document-details':
+                content = this.getDocumentDetailsStepHTML();
+                break;
+            case 'content-sections':
+                content = this.getContentSectionsStepHTML();
+                break;
+            case 'ai-generation':
+                content = this.getAIGenerationStepHTML();
+                break;
+            case 'review':
+                content = this.getReviewStepHTML();
+                break;
+        }
+        
+        container.innerHTML = `
+            <div class="step-content">
+                <h2 class="step-title">${step.title}</h2>
+                <p class="step-description">${step.description}</p>
+                ${content}
+            </div>
+        `;
+        
+        // Initialize components for specific steps
+        if (step.id === 'document-details') {
+            // Initialize file upload and research components
+            setTimeout(() => {
+                if (window.fileProcessor) {
+                    window.fileProcessor.createFileUploadUI('file-upload-container');
+                }
+                if (window.researchAssistant) {
+                    window.researchAssistant.createResearchUI('research-container');
+                }
+            }, 100);
+        }
+        
+        this.updateNavigationButtons();
+    }
+
+    /**
+     * Get document type step HTML
+     */
+    getDocumentTypeStepHTML() {
+        const types = [
+            { type: 'business', icon: '💼', title: 'Business', description: 'Business reports, proposals, and letters' },
+            { type: 'technical', icon: '⚙️', title: 'Technical', description: 'Technical documentation and specifications' },
+            { type: 'academic', icon: '🎓', title: 'Academic', description: 'Academic papers and research documents' },
+            { type: 'report', icon: '📊', title: 'Report', description: 'General reports and analysis documents' },
+            { type: 'letter', icon: '✉️', title: 'Letter', description: 'Formal and informal letters' },
+            { type: 'custom', icon: '📄', title: 'Custom', description: 'Create a custom document' }
+        ];
+        
+        return `
+            <div class="document-type-grid">
+                ${types.map(type => `
+                    <div class="document-type-card ${this.wizardData.documentType === type.type ? 'selected' : ''}" 
+                         data-type="${type.type}">
+                        <div class="card-icon">${type.icon}</div>
+                        <div class="card-title">${type.title}</div>
+                        <div class="card-description">${type.description}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    /**
+     * Get document details step HTML
+     */
+    getDocumentDetailsStepHTML() {
+        const hasResearchOrFiles = (window.researchContext && window.researchContext.length > 0) || 
+                                   (window.uploadedDocuments && window.uploadedDocuments.length > 0);
+        
+        return `
+            <div class="document-details-form">
+                <div class="form-group">
+                    <label for="documentTitle">Document Title *</label>
+                    <input type="text" id="documentTitle" name="documentTitle" class="form-input" 
+                           value="${this.wizardData.documentTitle}" placeholder="Enter document title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentDescription">Description</label>
+                    <textarea id="documentDescription" name="documentDescription" class="form-input" 
+                              placeholder="Enter document description">${this.wizardData.documentData.description}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentAuthor">Author</label>
+                    <input type="text" id="documentAuthor" name="documentAuthor" class="form-input" 
+                           value="${this.wizardData.documentData.author}" placeholder="Enter author name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentDate">Date</label>
+                    <input type="date" id="documentDate" name="documentDate" class="form-input" 
+                           value="${this.wizardData.documentData.date}">
+                </div>
+
+                <!-- File Upload Section -->
+                <div id="file-upload-container"></div>
+
+                <!-- Research Assistant Section -->
+                <div id="research-container"></div>
+
+                ${window.aiClient && window.aiClient.isConnected ? `
+                <div class="ai-assistance">
+                    <h4>🤖 AI Assistance</h4>
+                    <p>AI can help improve your document with ${hasResearchOrFiles ? 'research data and uploaded files' : 'suggestions'}.</p>
+                    <div class="button-container">
+                        <button class="generate-button" data-action="generateTitle">Generate Title Suggestions</button>
+                        ${hasResearchOrFiles ? '<button class="secondary-button" data-action="analyzeResources">Analyze Resources</button>' : ''}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * Get content sections step HTML
+     */
+    getContentSectionsStepHTML() {
+        return `
+            <div class="content-sections">
+                <div class="sections-intro">
+                    <p>Define the content sections for your document. You can add, remove, and customize sections as needed.</p>
+                </div>
+                
+                <div class="sections-list" id="sections-list">
+                    ${this.getSectionsListHTML()}
+                </div>
+                
+                <div class="button-container">
+                    <button class="secondary-button" data-action="addSection">
+                        ➕ Add Section
+                    </button>
+                    ${window.aiClient && window.aiClient.isConnected ? `
+                    <button class="generate-button" data-action="generateOutline">
+                        🤖 Generate AI Outline
+                    </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Get sections list HTML
+     */
+    getSectionsListHTML() {
+        if (this.wizardData.sections.length === 0) {
+            return `
+                <div class="empty-step-message">
+                    <p>No sections defined yet. Click "Add Section" to create your first section.</p>
+                </div>
+            `;
+        }
+        
+        return this.wizardData.sections.map((section, index) => `
+            <div class="section-item" data-index="${index}">
+                <div class="section-header">
+                    <input type="text" value="${section.title}" class="section-title-input form-input" 
+                           onchange="app.updateSectionTitle(${index}, this.value)" placeholder="Section title">
+                    <div class="section-actions">
+                        ${window.aiClient && window.aiClient.isConnected ? `
+                        <button class="secondary-button" data-action="generateSection" data-index="${index}">
+                            🤖 Generate
+                        </button>
+                        ` : ''}
+                        <button class="secondary-button" data-action="removeSection" data-index="${index}">
+                            🗑️ Remove
+                        </button>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <textarea class="form-input section-content-input" placeholder="Section content (optional)" 
+                              onchange="app.updateSectionContent(${index}, this.value)">${section.content || ''}</textarea>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Get AI generation step HTML
+     */
+    getAIGenerationStepHTML() {
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            return `
+                <div class="empty-step-message">
+                    <h3>⚠️ AI Not Connected</h3>
+                    <p>LM Studio is not running or not accessible. Please ensure LM Studio is running on port 1234.</p>
+                    <p>You can still proceed to review and download your document with the sections you've defined.</p>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="ai-generation">
+                <div class="ai-assistance">
+                    <h3>🤖 AI Document Generation</h3>
+                    <p>Let AI generate your complete document based on the information you've provided.</p>
+                    
+                    <div class="generation-options">
+                        <h4>Generation Options:</h4>
+                        <div class="form-group">
+                            <label>
+                                <input type="radio" name="generationType" value="full" checked>
+                                Generate complete document with all sections
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="radio" name="generationType" value="sections">
+                                Generate content for empty sections only
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button class="generate-button" data-action="generateDocument">
+                        🚀 Generate Document with AI
+                    </button>
+                </div>
+                
+                ${this.wizardData.generatedContent ? `
+                <div class="generated-content">
+                    <h4>Generated Content:</h4>
+                    <div class="content-preview">
+                        ${this.wizardData.generatedContent.substring(0, 500)}...
+                    </div>
+                    <div class="button-container">
+                        <button class="secondary-button" data-action="improveContent" data-type="grammar">
+                            📝 Improve Grammar
+                        </button>
+                        <button class="secondary-button" data-action="improveContent" data-type="clarity">
+                            🔍 Improve Clarity
+                        </button>
+                        <button class="secondary-button" data-action="improveContent" data-type="professional">
+                            💼 Make More Professional
+                        </button>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * Get review step HTML
+     */
+    getReviewStepHTML() {
+        return `
+            <div class="document-review">
+                <div class="review-summary">
+                    <h3>Document Summary</h3>
+                    <div class="summary-grid">
+                        <div><strong>Type:</strong> ${this.wizardData.documentType}</div>
+                        <div><strong>Title:</strong> ${this.wizardData.documentTitle}</div>
+                        <div><strong>Author:</strong> ${this.wizardData.documentData.author || 'Not specified'}</div>
+                        <div><strong>Sections:</strong> ${this.wizardData.sections.length}</div>
+                    </div>
+                </div>
+                
+                <div class="download-options">
+                    <h3>Download Options</h3>
+                    <div class="button-container">
+                        <button class="primary-button" data-action="downloadDocument" data-format="docx">
+                            📘 Download DOCX
+                        </button>
+                        <button class="primary-button" data-action="downloadDocument" data-format="pdf">
+                            📕 Download PDF
+                        </button>
+                        <button class="secondary-button" data-action="downloadDocument" data-format="html">
+                            📄 Download HTML
+                        </button>
+                        <button class="secondary-button" data-action="downloadDocument" data-format="markdown">
+                            📝 Download Markdown
+                        </button>
+                        <button class="secondary-button" data-action="previewDocument">
+                            👁️ Preview Document
+                        </button>
+                    </div>
+                </div>
+                
+                ${this.wizardData.generatedContent ? `
+                <div class="final-content">
+                    <h3>Final Document Content</h3>
+                    <div class="content-preview" id="final-content-preview" style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); padding: 1rem; background: var(--input-background);">
+                        ${window.documentGenerator.markdownToHTML(this.wizardData.generatedContent)}
+                    </div>
+                </div>
+                
+                ${window.aiClient && window.aiClient.isConnected ? `
+                <div class="feedback-chat">
+                    <h3>🤖 AI Feedback & Adjustments</h3>
+                    <p>Provide feedback to refine your document. The AI will adjust the content based on your input.</p>
+                    
+                    <div class="chat-history" id="chat-history">
+                        <!-- Chat messages will appear here -->
+                    </div>
+                    
+                    <div class="chat-input-area">
+                        <textarea id="feedback-input" class="form-input" placeholder="E.g., 'Make the introduction more formal', 'Add more details about implementation', 'Shorten the conclusion'..." rows="3"></textarea>
+                        <small style="opacity: 0.7;">Press Ctrl+Enter (Cmd+Enter on Mac) to send</small>
+                        <div class="button-container">
+                            <button class="primary-button" data-action="sendFeedback">
+                                💬 Send Feedback
+                            </button>
+                            <button class="secondary-button" data-action="applyChanges">
+                                ✅ Apply Changes to Document
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <h4>Quick Actions:</h4>
+                        <div class="button-container">
+                            <button class="secondary-button small" data-action="quickFeedback" data-feedback="make-formal">
+                                Make More Formal
+                            </button>
+                            <button class="secondary-button small" data-action="quickFeedback" data-feedback="make-concise">
+                                Make More Concise
+                            </button>
+                            <button class="secondary-button small" data-action="quickFeedback" data-feedback="add-details">
+                                Add More Details
+                            </button>
+                            <button class="secondary-button small" data-action="quickFeedback" data-feedback="improve-flow">
+                                Improve Flow
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                ` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * Update navigation buttons
+     */
+    updateNavigationButtons() {
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        
+        prevBtn.disabled = this.currentStepIndex === 0;
+        nextBtn.disabled = this.currentStepIndex === this.steps.length - 1 || !this.isCurrentStepValid();
+        
+        if (this.currentStepIndex === this.steps.length - 1) {
+            nextBtn.style.display = 'none';
+        } else {
+            nextBtn.style.display = 'inline-flex';
+        }
+    }
+
+    /**
+     * Check if current step is valid
+     */
+    isCurrentStepValid() {
+        const step = this.steps[this.currentStepIndex];
+        
+        switch (step.id) {
+            case 'document-type':
+                return !!this.wizardData.documentType;
+            case 'document-details':
+                return !!this.wizardData.documentTitle.trim();
+            case 'content-sections':
+                return true; // Always valid, sections are optional
+            case 'ai-generation':
+                return true; // Always valid
+            case 'review':
+                return true; // Always valid
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Update progress
+     */
+    updateProgress() {
+        const completedSteps = this.steps.filter(step => step.completed).length;
+        const progress = Math.round((completedSteps / this.steps.length) * 100);
+        
+        document.getElementById('progress-value').style.width = `${progress}%`;
+        document.getElementById('progress-text').textContent = `${progress}% Complete`;
+    }
+
+    /**
+     * Select document type
+     */
+    selectDocumentType(type) {
+        this.wizardData.documentType = type;
+        this.steps[0].completed = true;
+        
+        // Auto-populate sections based on document type
+        if (this.wizardData.sections.length === 0) {
+            const defaultSections = window.documentGenerator.getDefaultSections(type);
+            this.wizardData.sections = defaultSections.map(title => ({ title, content: '' }));
+        }
+        
+        this.updateStepsNavigation();
+        this.updateWizardContent();
+        this.updateProgress();
+        
+        showToast(`Selected ${type} document type`, 'success');
+    }
+
+    /**
+     * Update form data
+     */
+    updateFormData(name, value) {
+        if (name === 'documentTitle') {
+            this.wizardData.documentTitle = value;
+            this.steps[1].completed = !!value.trim();
+        } else {
+            this.wizardData.documentData[name] = value;
+        }
+        
+        this.updateStepsNavigation();
+        this.updateNavigationButtons();
+        this.updateProgress();
+    }
+
+    /**
+     * Add new section
+     */
+    addSection() {
+        this.wizardData.sections.push({
+            title: 'New Section',
+            content: ''
+        });
+        
+        this.updateWizardContent();
+        showToast('Section added', 'success');
+    }
+
+    /**
+     * Remove section
+     */
+    removeSection(index) {
+        this.wizardData.sections.splice(index, 1);
+        this.updateWizardContent();
+        showToast('Section removed', 'success');
+    }
+
+    /**
+     * Update section title
+     */
+    updateSectionTitle(index, title) {
+        if (this.wizardData.sections[index]) {
+            this.wizardData.sections[index].title = title;
+        }
+    }
+
+    /**
+     * Update section content
+     */
+    updateSectionContent(index, content) {
+        if (this.wizardData.sections[index]) {
+            this.wizardData.sections[index].content = content;
+        }
+    }
+
+    /**
+     * Generate section content with AI
+     */
+    async generateSectionContent(index) {
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            showToast('AI not connected', 'error');
+            return;
+        }
+
+        const section = this.wizardData.sections[index];
+        if (!section) return;
+
+        try {
+            showLoading(`Generating content for "${section.title}"...`);
+            
+            const content = await window.aiClient.generateSectionContent(section.title, {
+                type: this.wizardData.documentType,
+                title: this.wizardData.documentTitle,
+                description: this.wizardData.documentData.description
+            });
+            
+            section.content = content;
+            hideLoading();
+            this.updateWizardContent();
+            showToast('Section content generated', 'success');
+            
+        } catch (error) {
+            hideLoading();
+            showToast('Error generating section content: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Generate complete document with AI
+     */
+    async generateDocument() {
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            showToast('AI not connected', 'error');
+            return;
+        }
+
+        try {
+            const content = await window.documentGenerator.generateDocument(this.wizardData, 'markdown');
+            this.wizardData.generatedContent = content;
+            this.steps[3].completed = true;
+            
+            this.updateStepsNavigation();
+            this.updateWizardContent();
+            this.updateProgress();
+            
+            showToast('Document generated successfully!', 'success');
+            
+        } catch (error) {
+            showToast('Error generating document: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Download document
+     */
+    async downloadDocument(format) {
+        try {
+            const content = await window.documentGenerator.generateDocument(this.wizardData, format);
+            
+            if (format === 'pdf') {
+                // PDF generation opens print dialog, just show success message
+                showToast('Opening print dialog. Select "Save as PDF" to download.', 'info');
+                return;
+            }
+            
+            const filename = `${this.wizardData.documentTitle || 'document'}.${format}`;
+            
+            // Set appropriate MIME type
+            let mimeType;
+            switch (format) {
+                case 'html':
+                    mimeType = 'text/html';
+                    break;
+                case 'markdown':
+                    mimeType = 'text/markdown';
+                    break;
+                case 'docx':
+                    mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                    break;
+                default:
+                    mimeType = 'text/plain';
+            }
+            
+            window.documentGenerator.downloadDocument(content, filename, mimeType);
+            showToast(`Document downloaded as ${format.toUpperCase()}`, 'success');
+            
+        } catch (error) {
+            showToast('Error downloading document: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Preview document
+     */
+    async previewDocument() {
+        try {
+            const content = await window.documentGenerator.generateDocument(this.wizardData, 'html');
+            window.documentGenerator.previewDocument(content, this.wizardData.documentTitle);
+            
+        } catch (error) {
+            showToast('Error previewing document: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Go to specific step
+     */
+    goToStep(stepIndex) {
+        if (stepIndex >= 0 && stepIndex < this.steps.length) {
+            this.currentStepIndex = stepIndex;
+            this.updateStepsNavigation();
+            this.updateWizardContent();
+        }
+    }
+
+    /**
+     * Generate title suggestions using AI
+     */
+    async generateTitleSuggestions() {
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            showToast('AI not connected', 'error');
+            return;
+        }
+
+        try {
+            showLoading('Generating title suggestions...');
+            
+            const suggestions = await window.aiClient.generateTitleSuggestions(
+                this.wizardData.documentType,
+                this.wizardData.documentData.description || 'No description provided'
+            );
+            
+            hideLoading();
+            
+            // Show suggestions in a prompt
+            const titles = suggestions.split('\n').filter(t => t.trim().length > 0);
+            const selectedTitle = await this.showTitleSuggestions(titles);
+            
+            if (selectedTitle) {
+                this.wizardData.documentTitle = selectedTitle;
+                this.updateFormData('documentTitle', selectedTitle);
+                this.updateWizardContent();
+                showToast('Title updated', 'success');
+            }
+            
+        } catch (error) {
+            hideLoading();
+            showToast('Error generating titles: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Show title suggestions dialog
+     */
+    async showTitleSuggestions(titles) {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>🤖 AI Title Suggestions</h3>
+                    <p>Select a title or use one as inspiration:</p>
+                    <div class="title-suggestions">
+                        ${titles.map((title, index) => `
+                            <div class="title-option" data-title="${title.trim()}">
+                                ${title.trim()}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="modal-actions">
+                        <button class="secondary-button" onclick="this.closest('.modal-overlay').remove(); resolve(null)">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('title-option')) {
+                    const title = e.target.getAttribute('data-title');
+                    modal.remove();
+                    resolve(title);
+                } else if (e.target.classList.contains('modal-overlay')) {
+                    modal.remove();
+                    resolve(null);
+                }
+            });
+            
+            document.body.appendChild(modal);
+        });
+    }
+
+    /**
+     * Analyze uploaded resources and research
+     */
+    async analyzeUploadedResources() {
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            showToast('AI not connected', 'error');
+            return;
+        }
+
+        try {
+            showLoading('Analyzing uploaded resources...');
+            
+            let analysisContext = '';
+            
+            // Add uploaded documents context
+            if (window.fileProcessor && window.uploadedDocuments) {
+                analysisContext += window.fileProcessor.getUploadedDocumentsContext();
+            }
+            
+            // Add research context
+            if (window.researchAssistant && window.researchContext) {
+                analysisContext += window.researchContext;
+            }
+            
+            if (!analysisContext) {
+                hideLoading();
+                showToast('No resources to analyze', 'warning');
+                return;
+            }
+            
+            const prompt = `Based on the following research and documents, please provide:
+1. Key insights and themes
+2. Suggested improvements for the document
+3. Additional sections that might be valuable
+4. Important points to emphasize
+
+${analysisContext}
+
+Document context:
+- Type: ${this.wizardData.documentType}
+- Title: ${this.wizardData.documentTitle}
+- Description: ${this.wizardData.documentData.description}`;
+
+            const analysis = await window.aiClient.generateText(prompt, {
+                temperature: 0.6,
+                maxTokens: 1000
+            });
+            
+            hideLoading();
+            this.showAnalysisResults(analysis);
+            
+        } catch (error) {
+            hideLoading();
+            showToast('Error analyzing resources: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Show analysis results in a modal
+     */
+    showAnalysisResults(analysis) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content large">
+                <h3>🔍 Resource Analysis</h3>
+                <div class="analysis-content">
+                    ${window.documentGenerator.markdownToHTML(analysis)}
+                </div>
+                <div class="modal-actions">
+                    <button class="primary-button" onclick="this.closest('.modal-overlay').remove()">Close</button>
+                </div>
+            </div>
+        `;
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                modal.remove();
+            }
+        });
+        
+        document.body.appendChild(modal);
+    }
+
+    /**
+     * Generate document outline using AI
+     */
+    async generateDocumentOutline() {
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            showToast('AI not connected', 'error');
+            return;
+        }
+
+        try {
+            showLoading('Generating document outline...');
+            
+            const outline = await window.aiClient.generateOutline({
+                title: this.wizardData.documentTitle,
+                type: this.wizardData.documentType,
+                description: this.wizardData.documentData.description
+            });
+            
+            hideLoading();
+            
+            // Parse outline and add as sections
+            const sections = this.parseOutlineToSections(outline);
+            this.wizardData.sections = sections;
+            this.updateWizardContent();
+            
+            showToast(`Generated outline with ${sections.length} sections`, 'success');
+            
+        } catch (error) {
+            hideLoading();
+            showToast('Error generating outline: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Parse AI-generated outline into sections
+     */
+    parseOutlineToSections(outline) {
+        const lines = outline.split('\n');
+        const sections = [];
+        
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            // Look for markdown headers or numbered items
+            if (trimmed.match(/^#+\s+/) || trimmed.match(/^\d+\.\s+/) || trimmed.match(/^-\s+/)) {
+                const title = trimmed.replace(/^#+\s+|^\d+\.\s+|^-\s+/, '').trim();
+                if (title.length > 0) {
+                    sections.push({
+                        title: title,
+                        content: ''
+                    });
+                }
+            }
+        });
+        
+        return sections.length > 0 ? sections : [
+            { title: 'Introduction', content: '' },
+            { title: 'Main Content', content: '' },
+            { title: 'Conclusion', content: '' }
+        ];
+    }
+
+    /**
+     * Send feedback to AI for document adjustments
+     */
+    async sendFeedback() {
+        const feedbackInput = document.getElementById('feedback-input');
+        if (!feedbackInput || !feedbackInput.value.trim()) return;
+
+        const feedback = feedbackInput.value.trim();
+        
+        if (!window.aiClient || !window.aiClient.isConnected) {
+            showToast('AI not connected', 'error');
+            return;
+        }
+
+        try {
+            // Add user message to chat
+            this.addChatMessage('user', feedback);
+            feedbackInput.value = '';
+            
+            showLoading('Processing your feedback...');
+            
+            // Generate revised content based on feedback
+            const prompt = `You are helping to refine a document. Here is the current document:
+
+${this.tempGeneratedContent || this.wizardData.generatedContent}
+
+The user has provided the following feedback:
+"${feedback}"
+
+Please revise the document according to this feedback. Maintain the overall structure and format, but make the requested adjustments. Return the complete revised document.`;
+
+            const revisedContent = await window.aiClient.generateText(prompt, {
+                temperature: 0.5,
+                maxTokens: 4000
+            });
+            
+            // Store as temporary content
+            this.tempGeneratedContent = revisedContent;
+            
+            // Update preview
+            this.updateDocumentPreview(revisedContent);
+            
+            // Add AI response to chat
+            this.addChatMessage('ai', 'I\'ve revised the document based on your feedback. Please review the changes above. Click "Apply Changes" if you\'re satisfied, or provide more feedback.');
+            
+            hideLoading();
+            
+        } catch (error) {
+            hideLoading();
+            showToast('Error processing feedback: ' + error.message, 'error');
+            this.addChatMessage('ai', 'Sorry, I encountered an error while processing your feedback. Please try again.');
+        }
+    }
+
+    /**
+     * Send quick feedback
+     */
+    async sendQuickFeedback(feedbackType) {
+        const feedbackMap = {
+            'make-formal': 'Please make the entire document more formal and professional in tone.',
+            'make-concise': 'Please make the document more concise by removing unnecessary words and condensing the content.',
+            'add-details': 'Please add more details and expand on the key points in the document.',
+            'improve-flow': 'Please improve the flow and transitions between sections for better readability.'
+        };
+        
+        const feedbackText = feedbackMap[feedbackType];
+        if (feedbackText) {
+            document.getElementById('feedback-input').value = feedbackText;
+            await this.sendFeedback();
+        }
+    }
+
+    /**
+     * Apply changes to the document
+     */
+    applyChanges() {
+        if (!this.tempGeneratedContent) {
+            showToast('No changes to apply', 'warning');
+            return;
+        }
+        
+        // Apply the temporary content as the final content
+        this.wizardData.generatedContent = this.tempGeneratedContent;
+        this.tempGeneratedContent = null;
+        
+        // Clear chat history
+        this.chatHistory = [];
+        const chatHistoryElement = document.getElementById('chat-history');
+        if (chatHistoryElement) {
+            chatHistoryElement.innerHTML = '';
+        }
+        
+        showToast('Changes applied successfully!', 'success');
+        this.addChatMessage('system', 'Changes have been applied to your document. You can continue to refine it or download the final version.');
+    }
+
+    /**
+     * Add message to chat history
+     */
+    addChatMessage(type, message) {
+        const chatMessage = {
+            type: type,
+            message: message,
+            timestamp: new Date().toISOString()
+        };
+        
+        this.chatHistory.push(chatMessage);
+        
+        const chatHistoryElement = document.getElementById('chat-history');
+        if (!chatHistoryElement) return;
+        
+        const messageElement = document.createElement('div');
+        messageElement.className = `chat-message ${type}`;
+        
+        const iconMap = {
+            'user': '👤',
+            'ai': '🤖',
+            'system': 'ℹ️'
+        };
+        
+        messageElement.innerHTML = `
+            <div class="message-header">
+                <span class="message-icon">${iconMap[type] || '💬'}</span>
+                <span class="message-type">${type === 'ai' ? 'AI Assistant' : type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                <span class="message-time">${new Date(chatMessage.timestamp).toLocaleTimeString()}</span>
+            </div>
+            <div class="message-content">${message}</div>
+        `;
+        
+        chatHistoryElement.appendChild(messageElement);
+        chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+    }
+
+    /**
+     * Update document preview with new content
+     */
+    updateDocumentPreview(content) {
+        const previewElement = document.getElementById('final-content-preview');
+        if (previewElement) {
+            previewElement.innerHTML = window.documentGenerator.markdownToHTML(content);
+            previewElement.scrollTop = 0;
+            
+            // Add highlight effect
+            previewElement.classList.add('updated');
+            setTimeout(() => {
+                previewElement.classList.remove('updated');
+            }, 1000);
+        }
+    }
+}
+
+/**
+ * Navigation functions
+ */
+function nextStep() {
+    if (app.currentStepIndex < app.steps.length - 1 && app.isCurrentStepValid()) {
+        app.currentStepIndex++;
+        app.updateStepsNavigation();
+        app.updateWizardContent();
+    }
+}
+
+function previousStep() {
+    if (app.currentStepIndex > 0) {
+        app.currentStepIndex--;
+        app.updateStepsNavigation();
+        app.updateWizardContent();
+    }
+}
+
+/**
+ * Utility functions
+ */
+function showLoading(message = 'Loading...') {
+    const overlay = document.getElementById('loading-overlay');
+    const text = document.getElementById('loading-text');
+    text.textContent = message;
+    overlay.style.display = 'flex';
+}
+
+function hideLoading() {
+    document.getElementById('loading-overlay').style.display = 'none';
+}
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        container.removeChild(toast);
+    }, 5000);
+}
+
+// Initialize the application when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    window.app = new DocumentWriterApp();
+});

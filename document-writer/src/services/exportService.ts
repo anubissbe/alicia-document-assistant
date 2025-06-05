@@ -64,14 +64,14 @@ export class ExportService {
             
             // Generate PDF using Puppeteer
             const pdfOptions: PdfExportOptions = {
-                format: 'A4',
+                pageSize: 'A4',
                 margins: {
-                    top: '1cm',
-                    right: '1cm',
-                    bottom: '1cm',
-                    left: '1cm'
+                    top: 25.4,    // 1cm in mm
+                    right: 25.4,
+                    bottom: 25.4,
+                    left: 25.4
                 },
-                printBackground: true
+                preserveStyles: true
             };
             
             const pdf = await this.generatePdfFromHtml(tempHtmlPath, outputPath);
@@ -433,7 +433,7 @@ export class ExportService {
         document: any, 
         title: string, 
         viewColumn: vscode.ViewColumn,
-        showInNewPanel?: boolean
+        _showInNewPanel?: boolean
     ): Promise<vscode.WebviewPanel> {
         // Generate HTML content
         const htmlContent = await this.generateHtml(document);
@@ -470,7 +470,7 @@ export class ExportService {
         document: any, 
         title: string, 
         viewColumn: vscode.ViewColumn,
-        showInNewPanel?: boolean
+        _showInNewPanel?: boolean
     ): Promise<vscode.WebviewPanel> {
         // Generate Markdown content
         const markdownContent = this.generateMarkdown(document);
@@ -635,7 +635,7 @@ export class ExportService {
         document: any, 
         title: string, 
         viewColumn: vscode.ViewColumn,
-        showInNewPanel?: boolean
+        _showInNewPanel?: boolean
     ): Promise<vscode.WebviewPanel> {
         // Create temporary directory if it doesn't exist
         const tempDir = path.join(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '', '.document-writer');

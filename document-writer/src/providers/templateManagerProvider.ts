@@ -138,10 +138,11 @@ export class TemplateManagerProvider {
                         // Save template
                         try {
                             if (message.template) {
-                                const savedTemplate = await this._templateService.saveTemplate(message.template);
+                                const content = message.content || '';
+                                await this._templateService.saveTemplate(message.template, content);
                                 webview.postMessage({
                                     command: 'templateSaved',
-                                    template: savedTemplate
+                                    template: message.template
                                 });
                             }
                         } catch (error) {
@@ -193,12 +194,11 @@ export class TemplateManagerProvider {
                     case 'exportTemplate':
                         // Export template to file
                         try {
-                            if (message.templateId) {
-                                const exportPath = await this._templateService.exportTemplate(message.templateId);
-                                
-                                if (exportPath) {
-                                    vscode.window.showInformationMessage(`Template exported to ${exportPath}`);
-                                }
+                            if (message.templateId && message.exportPath) {
+                                await this._templateService.exportTemplate(message.templateId, message.exportPath);
+                                vscode.window.showInformationMessage(`Template exported to ${message.exportPath}`);
+                            } else {
+                                throw new Error('Template ID and export path are required');
                             }
                         } catch (error) {
                             webview.postMessage({
@@ -224,7 +224,13 @@ export class TemplateManagerProvider {
                             });
                             
                             if (result && result.length > 0) {
-                                const importedTemplate = await this._templateService.importTemplate(result[0].fsPath);
+                                const filePath = result[0].fsPath;
+                                const fileName = path.basename(filePath, path.extname(filePath));
+                                const importedTemplate = await this._templateService.importTemplate(
+                                    filePath,
+                                    fileName,
+                                    `Imported template: ${fileName}`
+                                );
                                 
                                 if (importedTemplate) {
                                     webview.postMessage({
@@ -289,7 +295,13 @@ export class TemplateManagerProvider {
                             });
                             
                             if (result && result.length > 0) {
-                                const importedTemplate = await this._templateService.importTemplate(result[0].fsPath);
+                                const filePath = result[0].fsPath;
+                                const fileName = path.basename(filePath, path.extname(filePath));
+                                const importedTemplate = await this._templateService.importTemplate(
+                                    filePath,
+                                    fileName,
+                                    `Imported template: ${fileName}`
+                                );
                                 
                                 if (importedTemplate) {
                                     webview.postMessage({

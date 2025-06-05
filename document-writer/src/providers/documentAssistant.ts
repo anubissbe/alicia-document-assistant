@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { ConversationHistoryManager } from './conversationHistoryManager';
+import { ConversationHistoryManager, HistoryMessage } from './conversationHistoryManager';
 import { EntityExtractor, MessageIntent } from '../core/entityExtractor';
 import { ContentSuggestionEngine } from '../core/contentSuggestionEngine';
 import { FeedbackLearningEngine } from '../core/feedbackLearningEngine';
@@ -770,21 +770,10 @@ export class DocumentAssistant {
      * @param historyMessages Array of history messages from ConversationHistoryManager
      * @returns Array of history messages compatible with ContentSuggestionEngine
      */
-    private _convertToContentSuggestionHistoryMessages(historyMessages: {role: 'user' | 'assistant', content: string}[]): {
-        content: string;
-        sender: 'user' | 'assistant' | 'system';
-        timestamp: number;
-        intent?: MessageIntent;
-    }[] {
-        return historyMessages.map((message, index) => ({
-            content: message.content,
-            sender: message.role,
-            // Use incrementing timestamps to preserve message order
-            timestamp: Date.now() - (historyMessages.length - index) * 1000,
-            // Try to determine basic intent for user messages
-            intent: message.role === 'user' ? 
-                this._getBasicIntent(message.content) : 
-                undefined
+    private _convertToContentSuggestionHistoryMessages(historyMessages: {role: 'user' | 'assistant', content: string}[]): HistoryMessage[] {
+        return historyMessages.map((message) => ({
+            role: message.role,
+            content: message.content
         }));
     }
     
@@ -893,9 +882,11 @@ export class DocumentAssistant {
             };
             
             this._feedbackLearningEngine.learnFromInteraction(
-                message, 
-                response, 
-                sentiment.score // Use the sentiment score as the numeric feedback value
+                response, // suggestion text
+                true, // accepted (user is engaging with it)
+                'general', // document type
+                message, // context
+                sentiment.score // rating
             );
             
             // If user sentiment is very negative, offer additional help

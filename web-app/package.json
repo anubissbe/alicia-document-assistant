@@ -1,0 +1,27 @@
+{
+  "name": "document-writer-web",
+  "version": "1.0.0",
+  "description": "Web-based document writer with AI integration",
+  "main": "index.html",
+  "scripts": {
+    "start": "node mcp-server.js",
+    "dev": "concurrently \"node mcp-server.js\" \"python -m http.server 8000\"",
+    "mcp-server": "node mcp-server.js",
+    "web-server": "python -m http.server 8000"
+  },
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "document",
+    "writer",
+    "ai",
+    "mcp",
+    "websocket"
+  ],
+  "author": "Document Writer",
+  "license": "MIT"
+}

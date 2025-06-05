@@ -60,8 +60,13 @@ describe('Document Generation Integration', () => {
       id: 'business-letter',
       name: 'Business Letter',
       description: 'A professional business letter template',
+      path: templatePath,
+      type: 'business',
       format: DocumentFormat.DOCX,
-      templatePath: templatePath,
+      iconPath: undefined,
+      dateCreated: new Date(),
+      dateModified: new Date(),
+      tags: ['business', 'letter', 'professional'],
       metadata: {
         author: 'Document Writer',
         version: '1.0.0',
@@ -157,9 +162,7 @@ describe('Document Generation Integration', () => {
           isRequired: true,
           order: 2
         }
-      ],
-      createdAt: new Date(),
-      updatedAt: new Date()
+      ]
     };
     
     const data = {
@@ -209,8 +212,13 @@ Dear {{recipient_name}},
       id: 'md-letter',
       name: 'Markdown Letter',
       description: 'A simple markdown letter template',
+      path: mdTemplatePath,
+      type: 'letter',
       format: DocumentFormat.MARKDOWN,
-      templatePath: mdTemplatePath,
+      iconPath: undefined,
+      dateCreated: new Date(),
+      dateModified: new Date(),
+      tags: ['markdown', 'letter'],
       metadata: {
         author: 'Document Writer',
         version: '1.0.0',
@@ -276,9 +284,7 @@ Dear {{recipient_name}},
           isRequired: true,
           order: 1
         }
-      ],
-      createdAt: new Date(),
-      updatedAt: new Date()
+      ]
     };
     
     const data = {
@@ -314,17 +320,19 @@ Dear {{recipient_name}},
       id: 'html-template',
       name: 'HTML Template',
       description: 'An HTML template',
+      path: 'path/to/template.html',
+      type: 'html',
       format: DocumentFormat.HTML,
-      templatePath: 'path/to/template.html',
+      iconPath: undefined,
+      dateCreated: new Date(),
+      dateModified: new Date(),
+      tags: ['html'],
       metadata: {
         author: 'Document Writer',
         version: '1.0.0',
         tags: ['html'],
         category: 'Web'
-      },
-      sections: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
+      }
     };
     
     const data = { title: 'Test HTML' };
@@ -340,17 +348,19 @@ Dear {{recipient_name}},
       id: 'pdf-template',
       name: 'PDF Template',
       description: 'A PDF template',
+      path: 'path/to/template.pdf',
+      type: 'pdf',
       format: DocumentFormat.PDF,
-      templatePath: 'path/to/template.pdf',
+      iconPath: undefined,
+      dateCreated: new Date(),
+      dateModified: new Date(),
+      tags: ['pdf'],
       metadata: {
         author: 'Document Writer',
         version: '1.0.0',
         tags: ['pdf'],
         category: 'Print'
-      },
-      sections: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
+      }
     };
     
     const data = { title: 'Test PDF' };

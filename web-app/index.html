@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Writer - AI Powered</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>📄 Document Writer</h1>
+            <p>AI-Powered Document Creation</p>
+            <div class="ai-status" id="ai-status">
+                <span class="status-indicator" id="status-indicator"></span>
+                <span id="status-text">Connecting to LM Studio...</span>
+            </div>
+            <div class="mcp-status" id="mcp-status">
+                <span class="status-indicator" id="mcp-indicator"></span>
+                <span id="mcp-text">Research: Disconnected</span>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="wizard-container">
+                <div class="wizard-progress">
+                    <div class="progress-bar">
+                        <div class="progress-value" id="progress-value" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text" id="progress-text">0% Complete</div>
+                </div>
+                
+                <div class="steps-navigation" id="steps-navigation">
+                    <!-- Steps will be generated here -->
+                </div>
+                
+                <div class="wizard-content" id="wizard-content">
+                    <!-- Current step content will be shown here -->
+                </div>
+                
+                <div class="wizard-navigation">
+                    <button class="secondary-button" id="prev-btn" onclick="previousStep()" disabled>
+                        ← Previous
+                    </button>
+                    <button class="primary-button" id="next-btn" onclick="nextStep()">
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loading-text">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="ai-client.js"></script>
+    <script src="mcp-client.js"></script>
+    <script src="file-processor.js"></script>
+    <script src="research-assistant.js"></script>
+    <script src="document-generator.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

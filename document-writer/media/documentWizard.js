@@ -2,321 +2,482 @@
 
 (function() {
     /**
-     * Current form data
+     * Current wizard state
      * @type {Object}
      */
-    const formData = {};
+    let currentState = {};
     
     /**
      * Reference to the VS Code API
      * @type {Object}
      */
-    const vscode = acquireVsCodeApi();
-    
-    // Initialize the webview
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('Document Wizard webview initialized');
-        
-        // Request initial data from the extension
-        vscode.postMessage({
-            command: 'getInitialData'
-        });
-        
-        // Set up form field event listeners
-        setupFormFieldListeners();
-        
-        // Set up button event listeners
-        setupButtonListeners();
-        
-        // Set up file browser button listeners
-        setupFileBrowserListeners();
-    });
+    let vscode;
     
     /**
-     * Set up event listeners for form fields
+     * Initialize the wizard webview
+     * @param {Object} vsCodeApi - VS Code API reference
+     * @param {Object} initialState - Initial wizard state
      */
-    function setupFormFieldListeners() {
-        const form = document.getElementById('wizard-form');
-        if (!form) {
-            console.error('Form element not found');
+    window.initializeWizard = function(vsCodeApi, initialState) {
+        console.log('Initializing Document Creation Wizard', initialState);
+        
+        // Store the VS Code API reference
+        vscode = vsCodeApi;
+        currentState = initialState || {};
+        
+        // Set up event delegation for dynamic content
+        setupEventDelegation();
+        
+        // Update UI based on initial state
+        updateUI();
+        
+        // Log DOM state for debugging
+        console.log('DOM ready, document type cards found:', 
+            document.querySelectorAll('.document-type-card').length);
+        console.log('Template cards found:', 
+            document.querySelectorAll('.template-card').length);
+        
+        // Notify extension that webview is ready
+        vscode.postMessage({
+            command: 'ready'
+        });
+    };
+    
+    /**
+     * Set up event delegation for all wizard interactions
+     */
+    function setupEventDelegation() {
+        document.addEventListener('click', handleClick);
+        document.addEventListener('change', handleChange);
+        document.addEventListener('input', handleInput);
+    }
+    
+    /**
+     * Handle all click events through delegation
+     * @param {Event} event - Click event
+     */
+    function handleClick(event) {
+        console.log('Click detected on:', event.target);
+        
+        const target = event.target;
+        const action = target.getAttribute('data-action');
+        const documentType = target.getAttribute('data-type');
+        const templateId = target.getAttribute('data-template-id');
+        
+        console.log('Target attributes:', {
+            action: action,
+            documentType: documentType,
+            templateId: templateId,
+            classList: target.classList.toString()
+        });
+        
+        // Handle data-action attributes
+        if (action) {
+            console.log('Handling action:', action);
+            event.preventDefault();
+            handleAction(action, target);
             return;
         }
         
-        // Handle text and textarea inputs
-        const textInputs = form.querySelectorAll('input[type="text"], textarea');
-        textInputs.forEach(input => {
-            input.addEventListener('input', (event) => {
-                updateField(event.target.name, event.target.value);
-            });
-        });
+        // Handle document type selection
+        if (documentType) {
+            console.log('Handling document type selection:', documentType);
+            event.preventDefault();
+            selectDocumentType(documentType, target);
+            return;
+        }
         
-        // Handle select inputs
-        const selectInputs = form.querySelectorAll('select');
-        selectInputs.forEach(select => {
-            select.addEventListener('change', (event) => {
-                updateField(event.target.name, event.target.value);
-            });
-        });
+        // Handle template selection
+        if (templateId) {
+            console.log('Handling template selection:', templateId);
+            event.preventDefault();
+            selectTemplate(templateId, target);
+            return;
+        }
         
-        // Handle radio inputs
-        const radioInputs = form.querySelectorAll('input[type="radio"]');
-        radioInputs.forEach(radio => {
-            radio.addEventListener('change', (event) => {
-                if (event.target.checked) {
-                    updateField(event.target.name, event.target.value);
-                }
-            });
-        });
-        
-        // Handle checkbox inputs
-        const checkboxGroups = {};
-        const checkboxInputs = form.querySelectorAll('input[type="checkbox"]');
-        
-        checkboxInputs.forEach(checkbox => {
-            const name = checkbox.name;
+        // Handle clickable cards/items
+        const card = target.closest('.document-type-card, .template-card');
+        if (card) {
+            console.log('Found card:', card);
+            const type = card.getAttribute('data-type');
+            const cardTemplateId = card.getAttribute('data-template-id');
             
-            if (!checkboxGroups[name]) {
-                checkboxGroups[name] = [];
+            console.log('Card attributes:', {
+                type: type,
+                templateId: cardTemplateId
+            });
+            
+            if (type) {
+                event.preventDefault();
+                selectDocumentType(type, card);
+            } else if (cardTemplateId) {
+                event.preventDefault();
+                selectTemplate(cardTemplateId, card);
             }
-            
-            checkboxGroups[name].push(checkbox);
-            
-            checkbox.addEventListener('change', () => {
-                const selectedValues = Array.from(checkboxGroups[name])
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
-                
-                updateField(name, selectedValues);
-            });
-        });
+        } else {
+            console.log('No card found for click target');
+        }
     }
     
     /**
-     * Set up event listeners for buttons
+     * Handle action button clicks
+     * @param {string} action - Action to perform
+     * @param {Element} target - Target element
      */
-    function setupButtonListeners() {
-        // Next button
-        const nextButton = document.getElementById('next-button');
+    function handleAction(action, target) {
+        console.log('Handling action:', action);
+        
+        switch (action) {
+            case 'nextStep':
+                nextStep();
+                break;
+            case 'prevStep':
+                previousStep();
+                break;
+            case 'addSection':
+                addSection();
+                break;
+            case 'editSection':
+                editSection(target);
+                break;
+            case 'removeSection':
+                removeSection(target);
+                break;
+            case 'createDocument':
+                createDocument();
+                break;
+            case 'validateStep':
+                validateCurrentStep();
+                break;
+            case 'skipTemplate':
+                skipTemplate();
+                break;
+            default:
+                console.warn('Unknown action:', action);
+        }
+    }
+    
+    /**
+     * Select document type
+     * @param {string} type - Document type
+     * @param {Element} target - Target element
+     */
+    function selectDocumentType(type, target) {
+        console.log('Selecting document type:', type);
+        
+        // Update visual selection
+        document.querySelectorAll('.document-type-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        if (target) {
+            target.classList.add('selected');
+        }
+        
+        // Update state and notify extension
+        currentState.documentType = type;
+        vscode.postMessage({
+            command: 'setDocumentType',
+            documentType: type
+        });
+        
+        // Enable next button if available
+        const nextButton = document.querySelector('[data-action="nextStep"]');
         if (nextButton) {
-            nextButton.addEventListener('click', () => {
-                validateAndProceed('next');
-            });
-        }
-        
-        // Previous button
-        const prevButton = document.getElementById('prev-button');
-        if (prevButton) {
-            prevButton.addEventListener('click', () => {
-                // No validation needed to go back
-                vscode.postMessage({
-                    command: 'previousStep'
-                });
-            });
-        }
-        
-        // Finish button
-        const finishButton = document.getElementById('finish-button');
-        if (finishButton) {
-            finishButton.addEventListener('click', () => {
-                validateAndProceed('finish');
-            });
+            nextButton.disabled = false;
         }
     }
     
     /**
-     * Set up event listeners for file browser buttons
+     * Select template
+     * @param {string} templateId - Template ID
+     * @param {Element} target - Target element
      */
-    function setupFileBrowserListeners() {
-        const browseButtons = document.querySelectorAll('.browse-button');
+    function selectTemplate(templateId, target) {
+        console.log('Selecting template:', templateId);
         
-        browseButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const id = button.id.replace('browse-', '');
-                
-                vscode.postMessage({
-                    command: 'browseFile',
-                    field: id
-                });
-            });
+        // Update visual selection
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        if (target) {
+            target.classList.add('selected');
+        }
+        
+        // Update state and notify extension
+        currentState.templateId = templateId;
+        vscode.postMessage({
+            command: 'selectTemplate',
+            templateId: templateId
+        });
+        
+        // Enable next button if available
+        const nextButton = document.querySelector('[data-action="nextStep"]');
+        if (nextButton) {
+            nextButton.disabled = false;
+        }
+    }
+    
+    /**
+     * Go to next step
+     */
+    function nextStep() {
+        console.log('Next step');
+        vscode.postMessage({
+            command: 'nextStep'
         });
     }
     
     /**
-     * Update a field in the form data and notify the extension
-     * @param {string} field - The field name
-     * @param {any} value - The field value
+     * Go to previous step
      */
-    function updateField(field, value) {
-        formData[field] = value;
+    function previousStep() {
+        console.log('Previous step');
+        vscode.postMessage({
+            command: 'prevStep'
+        });
+    }
+    
+    /**
+     * Add a new section
+     */
+    function addSection() {
+        console.log('Adding section');
+        vscode.postMessage({
+            command: 'addSection'
+        });
+    }
+    
+    /**
+     * Edit a section
+     * @param {Element} target - Target element
+     */
+    function editSection(target) {
+        const sectionId = target.getAttribute('data-section-id');
+        console.log('Editing section:', sectionId);
+        vscode.postMessage({
+            command: 'editSection',
+            sectionId: sectionId
+        });
+    }
+    
+    /**
+     * Remove a section
+     * @param {Element} target - Target element
+     */
+    function removeSection(target) {
+        const sectionId = target.getAttribute('data-section-id');
+        console.log('Removing section:', sectionId);
+        vscode.postMessage({
+            command: 'removeSection',
+            sectionId: sectionId
+        });
+    }
+    
+    /**
+     * Create the document
+     */
+    function createDocument() {
+        console.log('Creating document');
+        
+        // Collect all form data
+        const formData = collectFormData();
         
         vscode.postMessage({
-            command: 'updateField',
-            field,
-            value
+            command: 'createDocument',
+            formData: formData
         });
     }
     
     /**
-     * Validate the current step and proceed if valid
-     * @param {string} action - 'next' or 'finish'
+     * Validate current step
      */
-    function validateAndProceed(action) {
-        // Request validation from the extension
+    function validateCurrentStep() {
         vscode.postMessage({
             command: 'validateStep'
         });
-        
-        // The response will be handled in the message listener
-        // The extension will validate and send back a message
-        // with the validation result
     }
     
     /**
-     * Show an error message
-     * @param {string} message - The error message
+     * Skip template selection
      */
-    function showError(message) {
-        // Remove any existing error message
-        removeError();
+    function skipTemplate() {
+        console.log('Skipping template selection');
+        vscode.postMessage({
+            command: 'skipTemplate'
+        });
+    }
+    
+    /**
+     * Handle form field changes
+     * @param {Event} event - Change event
+     */
+    function handleChange(event) {
+        const target = event.target;
+        updateFormField(target.name, target.value);
+    }
+    
+    /**
+     * Handle form field input
+     * @param {Event} event - Input event
+     */
+    function handleInput(event) {
+        const target = event.target;
+        updateFormField(target.name, target.value);
+    }
+    
+    /**
+     * Update form field and notify extension
+     * @param {string} fieldName - Field name
+     * @param {string} value - Field value
+     */
+    function updateFormField(fieldName, value) {
+        if (!fieldName) return;
         
-        // Create a new error message
-        const errorElement = document.createElement('div');
-        errorElement.className = 'error-message';
-        errorElement.textContent = message;
+        console.log('Updating field:', fieldName, value);
         
-        // Insert it at the top of the form
-        const form = document.getElementById('wizard-form');
-        if (form) {
-            form.insertBefore(errorElement, form.firstChild);
+        // Update local state
+        if (!currentState.documentData) {
+            currentState.documentData = {};
+        }
+        currentState.documentData[fieldName] = value;
+        
+        // Notify extension
+        vscode.postMessage({
+            command: 'updateDocumentDetails',
+            fieldName: fieldName,
+            value: value
+        });
+    }
+    
+    /**
+     * Collect all form data
+     * @returns {Object} Form data object
+     */
+    function collectFormData() {
+        const formData = {};
+        
+        // Collect all input fields
+        document.querySelectorAll('input, textarea, select').forEach(element => {
+            if (element.name) {
+                formData[element.name] = element.value;
+            }
+        });
+        
+        return formData;
+    }
+    
+    /**
+     * Update UI based on current state
+     */
+    function updateUI() {
+        // Update document type selection
+        if (currentState.documentType) {
+            const typeCard = document.querySelector(`[data-type="${currentState.documentType}"]`);
+            if (typeCard) {
+                typeCard.classList.add('selected');
+            }
+        }
+        
+        // Update template selection
+        if (currentState.templateId) {
+            const templateCard = document.querySelector(`[data-template-id="${currentState.templateId}"]`);
+            if (templateCard) {
+                templateCard.classList.add('selected');
+            }
+        }
+        
+        // Update form fields
+        if (currentState.documentData) {
+            Object.keys(currentState.documentData).forEach(fieldName => {
+                const field = document.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    field.value = currentState.documentData[fieldName];
+                }
+            });
         }
     }
     
     /**
-     * Remove any displayed error message
+     * Handle messages from the extension
      */
-    function removeError() {
-        const errorElement = document.querySelector('.error-message');
-        if (errorElement) {
-            errorElement.remove();
-        }
-    }
-    
-    // Handle messages from the extension
-    window.addEventListener('message', (event) => {
+    window.addEventListener('message', event => {
         const message = event.data;
+        console.log('Received message:', message);
         
         switch (message.command) {
-            case 'initialData':
-                // Update form with initial data
-                Object.assign(formData, message.data);
-                console.log('Received initial data:', formData);
+            case 'updateState':
+                currentState = message.state || {};
+                updateUI();
                 break;
-                
-            case 'validationResult':
-                if (message.isValid) {
-                    // Clear any error message
-                    removeError();
-                    
-                    // Proceed to the next step or finish
-                    if (document.getElementById('next-button')) {
-                        vscode.postMessage({
-                            command: 'nextStep'
-                        });
-                    } else if (document.getElementById('finish-button')) {
-                        vscode.postMessage({
-                            command: 'createDocument'
-                        });
-                    }
-                } else {
-                    // Show error message
-                    showError(message.error);
-                }
+            case 'showError':
+                showError(message.message);
                 break;
-                
-            case 'updateOptions':
-                // Update options for a select or checkbox field
-                const field = message.field;
-                const options = message.options;
-                
-                if (field && options) {
-                    // Handle select elements
-                    const selectElement = document.getElementById(field);
-                    if (selectElement && selectElement.tagName === 'SELECT') {
-                        // Clear existing options except the first one
-                        while (selectElement.options.length > 1) {
-                            selectElement.remove(1);
-                        }
-                        
-                        // Add new options
-                        options.forEach(option => {
-                            const optionElement = document.createElement('option');
-                            optionElement.value = option.value;
-                            optionElement.textContent = option.label;
-                            selectElement.appendChild(optionElement);
-                        });
-                    }
-                    
-                    // Handle checkbox groups
-                    const checkboxContainer = document.querySelector(`[name="${field}"]`).closest('.form-group');
-                    if (checkboxContainer) {
-                        // Get the label element
-                        const labelElement = checkboxContainer.querySelector('label');
-                        
-                        // Clear existing checkboxes
-                        const checkboxOptions = checkboxContainer.querySelectorAll('.checkbox-option');
-                        checkboxOptions.forEach(option => option.remove());
-                        
-                        // Add new checkboxes
-                        options.forEach(option => {
-                            const div = document.createElement('div');
-                            div.className = 'checkbox-option';
-                            
-                            const input = document.createElement('input');
-                            input.type = 'checkbox';
-                            input.id = `${field}-${option.value}`;
-                            input.name = field;
-                            input.value = option.value;
-                            
-                            // Check if this value is in the formData
-                            if (formData[field] && Array.isArray(formData[field]) && 
-                                formData[field].includes(option.value)) {
-                                input.checked = true;
-                            }
-                            
-                            const label = document.createElement('label');
-                            label.htmlFor = input.id;
-                            label.textContent = option.label;
-                            
-                            div.appendChild(input);
-                            div.appendChild(label);
-                            
-                            // Add after the main label
-                            if (labelElement && labelElement.nextSibling) {
-                                checkboxContainer.insertBefore(div, labelElement.nextSibling);
-                            } else {
-                                checkboxContainer.appendChild(div);
-                            }
-                            
-                            // Add event listener
-                            input.addEventListener('change', () => {
-                                const selectedValues = Array.from(
-                                    checkboxContainer.querySelectorAll(`input[name="${field}"]:checked`)
-                                ).map(cb => cb.value);
-                                
-                                updateField(field, selectedValues);
-                            });
-                        });
-                    }
-                }
+            case 'showLoading':
+                showLoading(message.message);
                 break;
-                
-            case 'fileSelected':
-                // Update file input field with selected path
-                const fileField = document.getElementById(message.field);
-                if (fileField) {
-                    fileField.value = message.path;
-                }
+            case 'documentCreated':
+                showSuccess('Document created successfully!');
                 break;
+            default:
+                console.log('Unknown message command:', message.command);
         }
     });
+    
+    /**
+     * Show error message
+     * @param {string} message - Error message
+     */
+    function showError(message) {
+        // Create or update error display
+        let errorDiv = document.getElementById('error-message');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.id = 'error-message';
+            errorDiv.className = 'error-message';
+            document.body.insertBefore(errorDiv, document.body.firstChild);
+        }
+        
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    }
+    
+    /**
+     * Show loading message
+     * @param {string} message - Loading message
+     */
+    function showLoading(message) {
+        // Implementation for loading indicator
+        console.log('Loading:', message);
+    }
+    
+    /**
+     * Show success message
+     * @param {string} message - Success message
+     */
+    function showSuccess(message) {
+        // Create or update success display
+        let successDiv = document.getElementById('success-message');
+        if (!successDiv) {
+            successDiv = document.createElement('div');
+            successDiv.id = 'success-message';
+            successDiv.className = 'success-message';
+            document.body.insertBefore(successDiv, document.body.firstChild);
+        }
+        
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            successDiv.style.display = 'none';
+        }, 3000);
+    }
+    
 })();

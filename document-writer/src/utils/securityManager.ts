@@ -281,7 +281,7 @@ export class SecurityManager {
         }
         
         try {
-            await this.context.secrets.store(key, value);
+            await this.context!.secrets.store(key, value);
         } catch (error) {
             console.error('Failed to store secure data:', error);
             throw new Error(`Failed to store secure data: ${error instanceof Error ? error.message : String(error)}`);
@@ -299,7 +299,7 @@ export class SecurityManager {
         }
         
         try {
-            return await this.context.secrets.get(key);
+            return await this.context!.secrets.get(key);
         } catch (error) {
             console.error('Failed to retrieve secure data:', error);
             throw new Error(`Failed to retrieve secure data: ${error instanceof Error ? error.message : String(error)}`);
@@ -317,7 +317,7 @@ export class SecurityManager {
         }
         
         try {
-            await this.context.secrets.delete(key);
+            await this.context!.secrets.delete(key);
         } catch (error) {
             console.error('Failed to delete secure data:', error);
             throw new Error(`Failed to delete secure data: ${error instanceof Error ? error.message : String(error)}`);
@@ -479,7 +479,7 @@ export class SecurityManager {
             // Re-encrypt each credential with the new key
             for (const key of credentialKeys) {
                 // Get the credential using old key
-                const rawData = await this.context.secrets.get(key);
+                const rawData = await this.context!.secrets.get(key);
                 if (!rawData) continue;
                 
                 const credential = JSON.parse(rawData) as StoredCredential;
@@ -489,24 +489,24 @@ export class SecurityManager {
                 if (!value) continue;
                 
                 // Store with new master key (temporarily store the new master key)
-                await this.context.secrets.store('temp-master-key', newMasterKey);
-                const currentMasterKey = await this.context.secrets.get(this.MASTER_KEY_ID);
-                await this.context.secrets.store(this.MASTER_KEY_ID, newMasterKey);
+                await this.context!.secrets.store('temp-master-key', newMasterKey);
+                const currentMasterKey = await this.context!.secrets.get(this.MASTER_KEY_ID);
+                await this.context!.secrets.store(this.MASTER_KEY_ID, newMasterKey);
                 
                 // Re-encrypt with new master key
                 await this.encryptAndStoreCredential(key, value, credential);
                 
                 // Restore the current master key
                 if (currentMasterKey) {
-                    await this.context.secrets.store(this.MASTER_KEY_ID, currentMasterKey);
+                    await this.context!.secrets.store(this.MASTER_KEY_ID, currentMasterKey);
                 }
             }
             
             // Finally update the master key
-            await this.context.secrets.store(this.MASTER_KEY_ID, newMasterKey);
+            await this.context!.secrets.store(this.MASTER_KEY_ID, newMasterKey);
             
             // Clean up
-            await this.context.secrets.delete('temp-master-key');
+            await this.context!.secrets.delete('temp-master-key');
             
         } catch (error) {
             console.error('Failed to rotate encryption keys:', error);
@@ -603,12 +603,12 @@ export class SecurityManager {
      */
     private async getMasterKey(): Promise<string> {
         // Try to get existing master key
-        let masterKey = await this.context.secrets.get(this.MASTER_KEY_ID);
+        let masterKey = await this.context!.secrets.get(this.MASTER_KEY_ID);
         
         // If no master key exists, create one
         if (!masterKey) {
             masterKey = crypto.randomBytes(32).toString('hex');
-            await this.context.secrets.store(this.MASTER_KEY_ID, masterKey);
+            await this.context!.secrets.store(this.MASTER_KEY_ID, masterKey);
         }
         
         return masterKey;
@@ -638,7 +638,7 @@ export class SecurityManager {
             credential.salt = salt.toString('base64');
             
             // Store the credential
-            await this.context.secrets.store(key, JSON.stringify(credential));
+            await this.context!.secrets.store(key, JSON.stringify(credential));
         } catch (error) {
             console.error('Failed to encrypt and store credential:', error);
             throw new Error(`Failed to encrypt and store credential: ${error instanceof Error ? error.message : String(error)}`);
@@ -653,7 +653,7 @@ export class SecurityManager {
     private async getAndDecryptCredential(key: string): Promise<string | undefined> {
         try {
             // Get the stored credential
-            const rawData = await this.context.secrets.get(key);
+            const rawData = await this.context!.secrets.get(key);
             if (!rawData) {
                 return undefined;
             }
@@ -664,7 +664,7 @@ export class SecurityManager {
             // Check if credential has expired
             if (credential.expiresAt && credential.expiresAt < Date.now()) {
                 // Automatically delete expired credentials
-                await this.context.secrets.delete(key);
+                await this.context!.secrets.delete(key);
                 return undefined;
             }
             
@@ -690,7 +690,7 @@ export class SecurityManager {
             // We'll use reflection to access the underlying storage if possible
             
             // Try to access the storage directly - this may not work in all VS Code versions
-            const secretStorage = (this.context.secrets as any)._storage;
+            const secretStorage = (this.context!.secrets as any)._storage;
             if (secretStorage && typeof secretStorage.getKeys === 'function') {
                 return await secretStorage.getKeys();
             }

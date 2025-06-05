@@ -184,17 +184,10 @@ export class ExportUtils {
             
             // Process content using FormatProcessor
             const formatProcessor = new FormatProcessor();
-            const processedContent = await formatProcessor.processContent(
+            const processedContent = formatProcessor.processContent(
                 content,
                 sourceFormat,
-                options.targetFormat,
-                {
-                    includeStyles: options.includeStyles,
-                    customStyles: options.customStyles,
-                    templatePath: options.templatePath,
-                    metadata: options.metadata,
-                    outputPath: outputPath
-                }
+                options.targetFormat
             );
             
             // Write processed content to file
@@ -248,17 +241,10 @@ export class ExportUtils {
         try {
             // Process content using FormatProcessor
             const formatProcessor = new FormatProcessor();
-            const processedContent = await formatProcessor.processContent(
+            const processedContent = formatProcessor.processContent(
                 content,
                 sourceFormat,
-                targetFormat,
-                {
-                    includeStyles: options.includeStyles !== false, // Default to true
-                    customStyles: options.customStyles,
-                    templatePath: options.templatePath,
-                    preserveImages: options.preserveImages,
-                    imageBasePath: options.imageBasePath
-                }
+                targetFormat
             );
             
             // Apply additional enhancements for previews
@@ -348,7 +334,7 @@ export class ExportUtils {
         const codeBlockRegex = /<pre><code(?:\s+class="language-(\w+)")?>([^<]+)<\/code><\/pre>/g;
         
         // Replace with highlighted code
-        return content.replace(codeBlockRegex, (match, language, code) => {
+        return content.replace(codeBlockRegex, (_match, language, code) => {
             // Insert CSS class for highlighting
             const langClass = language ? ` class="language-${language} hljs"` : ' class="hljs"';
             
