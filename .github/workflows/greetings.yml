@@ -1,0 +1,34 @@
+name: Greetings
+
+on: [pull_request_target, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: |
+          Welcome to Alicia Document Assistant! 👋
+          
+          Thanks for opening your first issue. We appreciate your contribution!
+          Please make sure you've provided all the necessary information using our issue template.
+          
+          A maintainer will review your issue soon. In the meantime, feel free to check out our [Contributing Guide](https://github.com/anubissbe/alicia-document-assistant/blob/main/CONTRIBUTING.md) and join our [Discussions](https://github.com/anubissbe/alicia-document-assistant/discussions).
+          
+        pr-message: |
+          Welcome to Alicia Document Assistant! 🎉
+          
+          Thank you for your first pull request! We're excited to review your contribution.
+          
+          Please ensure:
+          - You've read our [Contributing Guide](https://github.com/anubissbe/alicia-document-assistant/blob/main/CONTRIBUTING.md)
+          - All tests are passing
+          - Your code follows our style guidelines
+          - You've updated relevant documentation
+          
+          A maintainer will review your PR soon. Thanks for helping make Alicia better!

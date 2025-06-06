@@ -8,6 +8,10 @@
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![Node.js](https://img.shields.io/badge/Node.js-14%2B-green)](https://nodejs.org/)
   [![LM Studio](https://img.shields.io/badge/LM%20Studio-Compatible-blue)](https://lmstudio.ai/)
+  [![GitHub Issues](https://img.shields.io/github/issues/anubissbe/alicia-document-assistant)](https://github.com/anubissbe/alicia-document-assistant/issues)
+  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/anubissbe/alicia-document-assistant/pulls)
+  [![Code of Conduct](https://img.shields.io/badge/code%20of-conduct-ff69b4.svg)](https://github.com/anubissbe/alicia-document-assistant/blob/main/CODE_OF_CONDUCT.md)
+  [![Community Standards](https://img.shields.io/badge/community-standards-informational)](https://github.com/anubissbe/alicia-document-assistant/community)
 </div>
 
 ## 🌟 Overview
