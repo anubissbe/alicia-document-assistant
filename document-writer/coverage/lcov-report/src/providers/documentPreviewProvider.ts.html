@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/187</span>
+                <span class='fraction'>0/196</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/186</span>
+                <span class='fraction'>0/195</span>
             </div>
         
             
@@ -993,20 +993,20 @@
 <a name='L928'></a><a href='#L928'>928</a>
 <a name='L929'></a><a href='#L929'>929</a>
 <a name='L930'></a><a href='#L930'>930</a>
-<a name='L931'></a><a href='#L931'>931</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L931'></a><a href='#L931'>931</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1923,20 +1923,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as vscode from 'vscode';
-import * as path from 'path';
-import { DocumentFormatConverter, DocumentPreviewOptions, PreviewOptions } from '../utils/documentFormatConverter';
-import { DocumentFormat } from '../models/documentFormat';
-import { SecurityManager } from '../utils/securityManager';
-import { PathSafetyUtils } from '../utils/pathSafetyUtils';
-import { PDFPreviewProvider } from '../utils/pdfPreviewProvider';
-import { ExportUtils } from '../utils/exportUtils';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import * as vscode from 'vscode';</span>
+<span class="cstat-no" title="statement not covered" >import * as path from 'path';</span>
+<span class="cstat-no" title="statement not covered" >import { DocumentFormatConverter, DocumentPreviewOptions, PreviewOptions } from '../utils/documentFormatConverter';</span>
+<span class="cstat-no" title="statement not covered" >import { DocumentFormat } from '../models/documentFormat';</span>
+<span class="cstat-no" title="statement not covered" >import { SecurityManager } from '../utils/securityManager';</span>
+<span class="cstat-no" title="statement not covered" >import { PathSafetyUtils } from '../utils/pathSafetyUtils';</span>
+<span class="cstat-no" title="statement not covered" >import { PDFPreviewProvider } from '../utils/pdfPreviewProvider';</span>
+<span class="cstat-no" title="statement not covered" >import { ExportUtils } from '../utils/exportUtils';</span>
 &nbsp;
 /**
  * Provider for document previews in different formats
  * Manages the rendering and display of document content in various formats
  */
-export class DocumentPreviewProvider implements vscode.WebviewViewProvider {
+<span class="cstat-no" title="statement not covered" >export class D</span>ocumentPreviewProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = <span class="cstat-no" title="statement not covered" >'document-writer.preview';</span>
     
     private _view?: vscode.WebviewView;
@@ -1982,8 +1982,8 @@ export class DocumentPreviewProvider implements vscode.WebviewViewProvider {
      */
     public <span class="fstat-no" title="function not covered" >resolveWebviewView(</span>
         webviewView: vscode.WebviewView,
-        context: vscode.WebviewViewResolveContext,
-        token: vscode.CancellationToken
+        _context: vscode.WebviewViewResolveContext,
+        _token: vscode.CancellationToken
     ): void | Thenable&lt;void&gt; {
 <span class="cstat-no" title="statement not covered" >        this._view = webviewView;</span>
         
@@ -2860,7 +2860,7 @@ export class DocumentPreviewProvider implements vscode.WebviewViewProvider {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-04T19:30:18.488Z
+                at 2025-06-06T09:31:49.551Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

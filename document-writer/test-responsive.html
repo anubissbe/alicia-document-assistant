@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Design Test</title>
+    <link rel="stylesheet" href="media/documentEditor.css">
+    <link rel="stylesheet" href="media/documentEditor-dark.css">
+    <link rel="stylesheet" href="media/responsive.css">
+    <style>
+        body {
+            background: #1e1e1e;
+            color: #cccccc;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        .test-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .test-panel {
+            border: 2px solid #444;
+            overflow: hidden;
+            height: 600px;
+            background: #252526;
+            position: relative;
+        }
+        
+        .panel-label {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 2px 8px;
+            font-size: 12px;
+            z-index: 10;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        h2 {
+            margin: 0 0 20px 0;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body class="vscode-dark">
+    <h2>Responsive Design Test - Document Writer Extension</h2>
+    
+    <div class="test-container">
+        <!-- Extra Small Panel (Mobile) -->
+        <div class="test-panel" style="width: 320px;">
+            <div class="panel-label">XS - 320px (Mobile)</div>
+            <div class="editor-container" data-breakpoint="xs" style="height: 100%;">
+                <div class="editor-header">
+                    <div class="document-title">Responsive Test Document</div>
+                    <div class="editor-actions">
+                        <button class="action-button">Save</button>
+                        <button class="action-button">Preview</button>
+                        <button class="action-button">Export</button>
+                    </div>
+                </div>
+                <div id="editor-area">
+                    <textarea style="width: 100%; height: calc(100% - 60px); background: #1e1e1e; color: #ccc; border: none; padding: 10px;">
+This is a test of the responsive design.
+
+The panel should adapt to narrow widths.
+
+- Buttons should stack
+- Font sizes should adjust
+- Split view should be disabled
+                    </textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Small Panel -->
+        <div class="test-panel" style="width: 480px;">
+            <div class="panel-label">SM - 480px (Tablet)</div>
+            <div class="editor-container" data-breakpoint="sm" style="height: 100%;">
+                <div class="editor-header">
+                    <div class="document-title">Responsive Test Document</div>
+                    <div class="editor-actions">
+                        <button class="action-button">Save</button>
+                        <button class="action-button">Preview</button>
+                        <button class="action-button">Export</button>
+                    </div>
+                </div>
+                <div id="editor-area">
+                    <textarea style="width: 100%; height: calc(100% - 60px); background: #1e1e1e; color: #ccc; border: none; padding: 10px;">
+This is a medium-width panel test.
+
+The layout should be more comfortable than mobile.
+                    </textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Large Panel -->
+        <div class="test-panel" style="width: 800px;">
+            <div class="panel-label">LG - 800px (Desktop)</div>
+            <div class="editor-container split-view" data-breakpoint="lg" style="height: 100%;">
+                <div class="editor-header">
+                    <div class="document-title">Responsive Test Document</div>
+                    <div class="editor-actions">
+                        <button class="action-button">Save</button>
+                        <button class="action-button">Preview</button>
+                        <button class="action-button">Export</button>
+                    </div>
+                </div>
+                <div id="editor-area" style="grid-column: 1;">
+                    <textarea style="width: 100%; height: 100%; background: #1e1e1e; color: #ccc; border: none; padding: 10px;">
+# Large Panel Test
+
+This panel demonstrates split view capability.
+
+The editor and preview should appear side by side.
+                    </textarea>
+                </div>
+                <div id="preview-area" style="grid-column: 2; background: #2d2d30; padding: 20px;">
+                    <h1>Large Panel Test</h1>
+                    <p>This panel demonstrates split view capability.</p>
+                    <p>The editor and preview should appear side by side.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Collapsible Section Test -->
+        <div class="test-panel" style="width: 400px;">
+            <div class="panel-label">Collapsible Sections</div>
+            <div style="padding: 20px;">
+                <div class="collapsible-section" data-section-id="options">
+                    <div class="collapsible-header">
+                        <span>Document Options</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Template: Business Report</p>
+                        <p>Format: Markdown</p>
+                        <p>Author: Test User</p>
+                    </div>
+                </div>
+                
+                <div class="collapsible-section collapsed" data-section-id="metadata">
+                    <div class="collapsible-header">
+                        <span>Metadata</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Created: Today</p>
+                        <p>Modified: Just now</p>
+                        <p>Word count: 150</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simple collapsible functionality for testing
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const section = header.parentElement;
+                section.classList.toggle('collapsed');
+            });
+        });
+    </script>
+</body>
+</html>

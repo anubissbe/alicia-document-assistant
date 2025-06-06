@@ -292,6 +292,33 @@ Convert between formats at any time:
 
 ## Advanced Features
 
+### User Interface Features
+
+#### Dark Mode Support
+Document Writer automatically adapts to your VS Code theme:
+- Seamlessly integrates with VS Code's light, dark, and high contrast themes
+- All UI elements adjust their colors based on your active theme
+- Charts and visualizations adapt to maintain readability
+
+#### Responsive Design
+The extension adapts to different panel sizes for optimal usability:
+
+**Panel Size Adaptation:**
+- **Narrow panels (240-350px)**: Compact layout with stacked controls
+- **Medium panels (351-600px)**: Balanced layout with essential features
+- **Wide panels (600px+)**: Full feature set with side-by-side views
+
+**Key Responsive Features:**
+- **Collapsible Sections**: Click section headers to expand/collapse content
+- **Adaptive Split View**: Automatically adjusts or disables based on panel width
+- **Touch Support**: Larger touch targets and smooth scrolling for tablets
+- **Font Scaling**: Text size adjusts for readability on different panel sizes
+
+**Using Split View:**
+- Toggle split view with `Alt+P` or the preview button
+- In narrow panels, split view converts to vertical layout
+- Drag VS Code panel borders to resize and see responsive adjustments
+
 ### Document Versioning
 
 Document Writer tracks changes to your documents:

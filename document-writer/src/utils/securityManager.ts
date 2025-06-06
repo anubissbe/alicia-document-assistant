@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import { htmlSanitizer } from './htmlSanitizer';
 
 /**
  * Options for path validation
@@ -261,12 +262,39 @@ export class SecurityManager {
             return '';
         }
         
-        // Basic HTML encoding of special characters
-        return input
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+        // Use the enhanced HTML sanitizer for comprehensive sanitization
+        return htmlSanitizer.sanitizeUserInput(input);
+    }
+
+    /**
+     * Sanitizes HTML content for use in webviews
+     * @param html HTML content to sanitize
+     * @returns Sanitized HTML
+     */
+    public sanitizeHtml(html: string): string {
+        if (!html) {
+            return '';
+        }
+        
+        return htmlSanitizer.sanitizeHtml(html);
+    }
+
+    /**
+     * Sanitizes template data recursively
+     * @param data Template data to sanitize
+     * @returns Sanitized data
+     */
+    public sanitizeTemplateData(data: any): any {
+        return htmlSanitizer.sanitizeTemplateData(data);
+    }
+
+    /**
+     * Generates a Content Security Policy for webviews
+     * @param nonce Optional nonce for script/style sources
+     * @returns CSP string
+     */
+    public generateWebviewCSP(nonce?: string): string {
+        return htmlSanitizer.generateCSP(nonce);
     }
     
     /**

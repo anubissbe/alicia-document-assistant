@@ -71,12 +71,21 @@ export interface DocumentSection {
  */
 export class DocumentService {
     private _documentsCache: Map<string, Document> = new Map();
+    private _statusBarManager?: any; // Will be set via setter
     
     /**
      * Constructor
      */
     constructor(private _context?: vscode.ExtensionContext, private _templateManager?: any) {
         // Initialize any required resources
+    }
+
+    /**
+     * Set the status bar manager for progress tracking
+     * @param statusBarManager The status bar manager instance
+     */
+    public setStatusBarManager(statusBarManager: any): void {
+        this._statusBarManager = statusBarManager;
     }
     
     /**
@@ -152,6 +161,11 @@ export class DocumentService {
         }
 
         try {
+            // Show progress indicator
+            if (this._statusBarManager) {
+                this._statusBarManager.showProgress('Saving document...');
+            }
+
             // Validate write access to directory
             const directory = path.dirname(document.path);
             try {
@@ -169,8 +183,18 @@ export class DocumentService {
             // Update cache
             this._documentsCache.set(document.path, document);
             
+            // Hide progress indicator
+            if (this._statusBarManager) {
+                this._statusBarManager.hideProgress();
+            }
+            
             return document;
         } catch (error) {
+            // Hide progress indicator on error
+            if (this._statusBarManager) {
+                this._statusBarManager.hideProgress();
+            }
+            
             console.error(`Error saving document ${document.path}:`, error);
             if (error instanceof DocumentError) {
                 throw error;

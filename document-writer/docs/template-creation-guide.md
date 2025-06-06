@@ -591,6 +591,41 @@ Sincerely,
 </html>
 ```
 
+### Security Assessment Template
+
+**SecurityAssessment.docx** - A comprehensive security assessment template for cybersecurity professionals:
+
+This template includes sections for:
+- Executive Summary with risk level assessment
+- Assessment scope and methodology documentation
+- System architecture overview
+- Risk analysis including threat modeling and vulnerability assessment
+- Security controls evaluation (access controls, network security, data protection)
+- Compliance assessment (GDPR, SOC2, ISO27001)
+- Mitigation strategies and implementation timeline
+- Incident response planning
+- Security monitoring and metrics
+- Comprehensive appendices with tools used and detailed findings
+
+**Key Features:**
+- 36 comprehensive variables covering all aspects of security assessment
+- Professional risk-level color coding (Critical=Red, High=Orange, Medium=Yellow, Low=Green)
+- Risk summary tables with automated counting
+- Implementation timeline with prioritized actions
+- Compliance checklist framework
+- Cost-benefit analysis with currency formatting
+- Support for multiple security frameworks (NIST, ISO27001, SOC2, GDPR)
+
+**Variables Include:**
+- Assessment metadata (title, author, organization, dates)
+- Risk findings counts (critical, high, medium, low)
+- Technical assessment details (threat model, vulnerabilities, controls)
+- Compliance evaluation results
+- Remediation strategies and timelines
+- Cost estimates and risk reduction metrics
+
+This template is designed for security professionals, auditors, and compliance teams conducting comprehensive security assessments of enterprise systems and infrastructure.
+
 ---
 
 This guide covers the fundamentals of creating templates for the Document Writer extension. By following these guidelines, you can create professional, reusable templates for various document types.

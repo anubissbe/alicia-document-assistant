@@ -120,6 +120,30 @@ export class ClineIntegration implements vscode.Disposable {
     }
 
     /**
+     * Check if the MCP server is running
+     * @returns true if the server is running, false otherwise
+     */
+    public isServerRunning(): boolean {
+        return this.server !== null && this.port > 0;
+    }
+
+    /**
+     * Get the port the server is running on
+     * @returns The port number or 0 if not running
+     */
+    public getServerPort(): number {
+        return this.port;
+    }
+
+    /**
+     * Get the process ID (for display purposes)
+     * @returns The process ID as a string
+     */
+    public getProcessId(): string {
+        return process.pid.toString();
+    }
+
+    /**
      * Handle incoming HTTP requests to the MCP server
      * @param req HTTP request
      * @param res HTTP response

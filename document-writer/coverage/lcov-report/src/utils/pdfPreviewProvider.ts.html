@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/65</span>
+                <span class='fraction'>0/72</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/65</span>
+                <span class='fraction'>0/72</span>
             </div>
         
             
@@ -704,13 +704,13 @@
 <a name='L639'></a><a href='#L639'>639</a>
 <a name='L640'></a><a href='#L640'>640</a>
 <a name='L641'></a><a href='#L641'>641</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -819,7 +819,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1344,13 +1344,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
-import { promisify } from 'util';
+<span class="cstat-no" title="statement not covered" >import * as path from 'path';</span>
+<span class="cstat-no" title="statement not covered" >import * as fs from 'fs';</span>
+<span class="cstat-no" title="statement not covered" >import { promisify } from 'util';</span>
 import { DocumentFormat } from '../models/documentFormat';
-import { SecurityManager } from './securityManager';
-import { PathSafetyUtils } from './pathSafetyUtils';
-import { tmpdir } from 'os';
+<span class="cstat-no" title="statement not covered" >import { SecurityManager } from './securityManager';</span>
+<span class="cstat-no" title="statement not covered" >import { PathSafetyUtils } from './pathSafetyUtils';</span>
+<span class="cstat-no" title="statement not covered" >import { tmpdir } from 'os';</span>
 &nbsp;
 const readFile = <span class="cstat-no" title="statement not covered" >promisify(fs.readFile);</span>
 const writeFile = <span class="cstat-no" title="statement not covered" >promisify(fs.writeFile);</span>
@@ -1459,7 +1459,7 @@ export interface PDFMetadata {
 /**
  * PDFPreviewProvider handles generating HTML previews of PDF documents
  */
-export class PDFPreviewProvider {
+<span class="cstat-no" title="statement not covered" >export class P</span>DFPreviewProvider {
     private _securityManager: SecurityManager;
     private _pathSafetyUtils: PathSafetyUtils;
     
@@ -1597,7 +1597,7 @@ export class PDFPreviewProvider {
      * @param pdfPath PDF file path (for additional context)
      * @returns Estimated page count
      */
-    private <span class="fstat-no" title="function not covered" >_estimatePageCount(</span>pdfBuffer: Buffer, pdfPath: string): number {
+    private <span class="fstat-no" title="function not covered" >_estimatePageCount(</span>pdfBuffer: Buffer, _pdfPath: string): number {
         // In a full implementation, we would use a PDF parsing library
         // For now, make a rough estimate based on buffer size
         // This is not accurate but serves as a placeholder
@@ -1626,7 +1626,7 @@ export class PDFPreviewProvider {
         pdfPath: string,
         pdfBuffer: Buffer,
         metadata?: PDFMetadata,
-        maxPages: number = <span class="branch-0 cbranch-no" title="branch not covered" >5,</span>
+        _maxPages: number = <span class="branch-0 cbranch-no" title="branch not covered" >5,</span>
         includeThumbnails: boolean = <span class="branch-0 cbranch-no" title="branch not covered" >true,</span>
         zoomLevel: number = <span class="branch-0 cbranch-no" title="branch not covered" >1.0</span>
     ): string {
@@ -1990,7 +1990,7 @@ export class PDFPreviewProvider {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-04T19:30:18.488Z
+                at 2025-06-06T09:31:49.551Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

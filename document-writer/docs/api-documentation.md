@@ -355,11 +355,11 @@ export class DocumentTreeProvider implements vscode.TreeDataProvider<TemplateTre
 
 ### DocumentWebviewProvider
 
-Provides webview-based document editing and preview.
+Provides webview-based document editing and preview with responsive design support.
 
 ```typescript
 /**
- * DocumentWebviewProvider provides webview-based document editing
+ * DocumentWebviewProvider provides webview-based document editing with responsive UI
  */
 export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
   /**
@@ -388,8 +388,36 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
    * @param content - The content to update with
    */
   public updateContent(content: string): void;
+
+  /**
+   * Updates the theme based on VS Code's active color theme
+   * Automatically called when VS Code theme changes
+   * 
+   * @param webview - The webview to update
+   * @private
+   */
+  private _updateTheme(webview: vscode.Webview): void;
 }
 ```
+
+#### Responsive Design Features
+
+The DocumentWebviewProvider automatically adapts to different panel sizes:
+
+- **Panel Size Detection**: Uses ResizeObserver to monitor panel width
+- **Breakpoints**: xs (≤350px), sm (≤600px), md (≤992px), lg (>992px)
+- **Collapsible Sections**: Sections can be collapsed to save space
+- **Split View**: Automatically adjusts based on available width
+- **Touch Support**: Detects touch-enabled devices and adjusts UI
+
+#### Theme Integration
+
+The webview automatically syncs with VS Code themes:
+- Dark theme support (vscode-dark)
+- Light theme support (vscode-light)
+- High contrast themes (vscode-high-contrast, vscode-high-contrast-light)
+
+All UI elements use VS Code's CSS variables for consistent theming.
 
 ### DocumentCreationWizard
 

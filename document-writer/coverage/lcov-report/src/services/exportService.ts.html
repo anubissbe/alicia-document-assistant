@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/135</span>
+                <span class='fraction'>0/141</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/134</span>
+                <span class='fraction'>0/140</span>
             </div>
         
             
@@ -851,13 +851,13 @@
 <a name='L786'></a><a href='#L786'>786</a>
 <a name='L787'></a><a href='#L787'>787</a>
 <a name='L788'></a><a href='#L788'>788</a>
-<a name='L789'></a><a href='#L789'>789</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L789'></a><a href='#L789'>789</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -881,7 +881,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1639,18 +1639,18 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as puppeteer from 'puppeteer';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import * as vscode from 'vscode';</span>
+<span class="cstat-no" title="statement not covered" >import * as fs from 'fs';</span>
+<span class="cstat-no" title="statement not covered" >import * as path from 'path';</span>
+<span class="cstat-no" title="statement not covered" >import * as puppeteer from 'puppeteer';</span>
 import { TemplateManagerService } from './templateManagerService';
 import { DocumentService } from './documentService';
-import { FormatConverter, HtmlExportOptions, MarkdownExportOptions, PdfExportOptions } from '../utils/formatConverter';
+<span class="cstat-no" title="statement not covered" >import { FormatConverter, HtmlExportOptions, MarkdownExportOptions, PdfExportOptions } from '../utils/formatConverter';</span>
 &nbsp;
 /**
  * Enum representing the different preview format types
  */
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >export </span>enum PreviewFormatType {</span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >export enum P</span>reviewFormatType {</span>
 <span class="cstat-no" title="statement not covered" >    HTML = 'html',</span>
 <span class="cstat-no" title="statement not covered" >    Markdown = 'markdown',</span>
 <span class="cstat-no" title="statement not covered" >    PDF = 'pdf'</span>
@@ -1669,7 +1669,7 @@ export interface PreviewOptions {
 /**
  * Service for exporting documents to different formats
  */
-export class ExportService {
+<span class="cstat-no" title="statement not covered" >export class E</span>xportService {
     private templateManager: TemplateManagerService;
     private documentService: DocumentService;
     private formatConverter: FormatConverter;
@@ -1705,14 +1705,14 @@ export class ExportService {
             
             // Generate PDF using Puppeteer
             const pdfOptions: PdfExportOptions = <span class="cstat-no" title="statement not covered" >{</span>
-                format: 'A4',
+                pageSize: 'A4',
                 margins: {
-                    top: '1cm',
-                    right: '1cm',
-                    bottom: '1cm',
-                    left: '1cm'
+                    top: 25.4,    // 1cm in mm
+                    right: 25.4,
+                    bottom: 25.4,
+                    left: 25.4
                 },
-                printBackground: true
+                preserveStyles: true
             };
             
             const pdf = <span class="cstat-no" title="statement not covered" >await this.generatePdfFromHtml(tempHtmlPath, outputPath);</span>
@@ -2074,7 +2074,7 @@ export class ExportService {
         document: any, 
         title: string, 
         viewColumn: vscode.ViewColumn,
-        showInNewPanel?: boolean
+        _showInNewPanel?: boolean
     ): Promise&lt;vscode.WebviewPanel&gt; {
         // Generate HTML content
         const htmlContent = <span class="cstat-no" title="statement not covered" >await this.generateHtml(document);</span>
@@ -2111,7 +2111,7 @@ export class ExportService {
         document: any, 
         title: string, 
         viewColumn: vscode.ViewColumn,
-        showInNewPanel?: boolean
+        _showInNewPanel?: boolean
     ): Promise&lt;vscode.WebviewPanel&gt; {
         // Generate Markdown content
         const markdownContent = <span class="cstat-no" title="statement not covered" >this.generateMarkdown(document);</span>
@@ -2276,7 +2276,7 @@ export class ExportService {
         document: any, 
         title: string, 
         viewColumn: vscode.ViewColumn,
-        showInNewPanel?: boolean
+        _showInNewPanel?: boolean
     ): Promise&lt;vscode.WebviewPanel&gt; {
         // Create temporary directory if it doesn't exist
         const tempDir = <span class="cstat-no" title="statement not covered" >path.join(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '', '.document-writer');</span>
@@ -2434,7 +2434,7 @@ export class ExportService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-04T19:30:18.488Z
+                at 2025-06-06T09:31:49.551Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

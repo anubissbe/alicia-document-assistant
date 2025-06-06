@@ -1,7 +1,11 @@
-/* Responsive styles for document preview */
+/* Responsive styles for Document Writer VS Code Extension */
 
 :root {
     --responsive-font-size-adjustment: 1;
+    --panel-min-width: 300px;
+    --sidebar-breakpoint: 1200px;
+    --mobile-breakpoint: 768px;
+    --small-mobile-breakpoint: 480px;
 }
 
 /* Base responsive container */
@@ -11,6 +15,69 @@
     height: calc(100vh - 40px); /* Adjust for toolbar height */
     width: 100%;
     overflow: hidden;
+}
+
+/* Document Editor Responsive Styles */
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    min-width: 240px; /* VS Code panel minimum */
+}
+
+/* Split view mode */
+body.split-view .editor-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 0;
+}
+
+body.split-view .editor-header {
+    grid-column: 1 / -1;
+}
+
+body.split-view #editor-area,
+body.split-view #preview-area {
+    overflow: auto;
+}
+
+/* Collapsible sections */
+.collapsible-section {
+    border: 1px solid var(--vscode-panel-border);
+    margin-bottom: 8px;
+}
+
+.collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: var(--vscode-sideBar-background);
+    cursor: pointer;
+    user-select: none;
+}
+
+.collapsible-header:hover {
+    background-color: var(--vscode-list-hoverBackground);
+}
+
+.collapsible-icon {
+    transition: transform 0.2s;
+}
+
+.collapsible-section.collapsed .collapsible-icon {
+    transform: rotate(-90deg);
+}
+
+.collapsible-content {
+    padding: 12px;
+    display: block;
+}
+
+.collapsible-section.collapsed .collapsible-content {
+    display: none;
 }
 
 /* Content area */
@@ -91,6 +158,116 @@
 
 .add-button:hover {
     background-color: var(--vscode-button-hoverBackground);
+}
+
+/* VS Code Panel Size Adaptation */
+/* Narrow panels (sidebar) */
+@media (max-width: 350px) {
+    .editor-header {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .document-title {
+        width: 100%;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    
+    .editor-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .action-button {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+    
+    /* Hide split view in narrow panels */
+    body.split-view .editor-container {
+        grid-template-columns: 1fr;
+    }
+    
+    body.split-view #preview-area {
+        display: none;
+    }
+    
+    /* Stack export options vertically */
+    #export-options {
+        right: auto;
+        left: 0;
+        width: 100%;
+    }
+    
+    #export-options a {
+        display: block;
+        padding: 8px 12px;
+    }
+}
+
+/* Medium panels */
+@media (min-width: 351px) and (max-width: 600px) {
+    .editor-header {
+        padding: 8px;
+    }
+    
+    .document-title {
+        font-size: 1rem;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Vertical split for medium panels */
+    body.split-view .editor-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr 1fr;
+    }
+    
+    body.split-view #editor-area {
+        border-bottom: 1px solid var(--vscode-panel-border);
+    }
+}
+
+/* Wide panels */
+@media (min-width: 601px) {
+    /* Default styles work well */
+}
+
+/* Touch support for VS Code on tablets */
+@media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets */
+    .action-button {
+        min-width: 44px;
+        min-height: 36px;
+        padding: 8px 12px;
+    }
+    
+    .dropdown-content a {
+        padding: 12px 16px;
+    }
+    
+    /* Improve textarea on touch devices */
+    #document-content {
+        font-size: 16px; /* Prevent zoom on iOS */
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    /* Better scrolling */
+    #editor-area,
+    #preview-area,
+    .preview-content {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* Larger resize handles for split view */
+    body.split-view .editor-container {
+        gap: 8px;
+    }
 }
 
 /* Responsive breakpoints */
@@ -205,5 +382,166 @@ body.annotations-visible .preview-content {
     
     .toolbar-button {
         border: 1px solid CanvasText;
+    }
+}
+
+/* Document Assistant Responsive Styles */
+.assistant-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Narrow panels for assistant */
+@media (max-width: 350px) {
+    .chat-container {
+        padding: 8px;
+    }
+    
+    .message {
+        max-width: 95%;
+        font-size: 0.85rem;
+    }
+    
+    .suggestions-container {
+        padding: 4px 8px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .suggestion-button {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    
+    .input-container {
+        padding: 8px;
+    }
+    
+    .message-input {
+        font-size: 14px;
+        min-height: 32px;
+    }
+}
+
+/* Document Wizard Responsive Styles */
+.wizard-container {
+    min-width: 240px;
+}
+
+/* Narrow panels for wizard */
+@media (max-width: 400px) {
+    .wizard-container {
+        padding: 0.5rem;
+    }
+    
+    .wizard-header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .wizard-header .description {
+        font-size: 0.85rem;
+    }
+    
+    .progress-container {
+        margin: 1rem 0;
+    }
+    
+    .document-type-card,
+    .template-card {
+        padding: 0.75rem;
+    }
+    
+    .document-type-card h3,
+    .template-card h3 {
+        font-size: 0.9rem;
+    }
+    
+    .document-type-card p,
+    .template-card p {
+        font-size: 0.8rem;
+    }
+    
+    .button-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .primary-button,
+    .secondary-button {
+        width: 100%;
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Form adjustments */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        font-size: 0.85rem;
+    }
+    
+    .form-group input[type="text"],
+    .form-group textarea,
+    .form-group select {
+        font-size: 14px;
+        padding: 0.4rem;
+    }
+}
+
+/* Template Manager Responsive */
+@media (max-width: 400px) {
+    .template-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .template-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .template-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .action-button svg,
+    .collapsible-icon svg {
+        transform: scale(0.95);
+    }
+}
+
+/* Flexible font sizing based on panel width */
+@container (max-width: 400px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+@container (min-width: 401px) and (max-width: 600px) {
+    html {
+        font-size: 15px;
+    }
+}
+
+@container (min-width: 601px) {
+    html {
+        font-size: 16px;
     }
 }

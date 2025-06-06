@@ -87,6 +87,12 @@
         
         // Initialize undo history with current content
         saveToHistory(currentState.content || '');
+        
+        // Initialize responsive features
+        initializeResponsiveFeatures();
+        
+        // Set up collapsible sections if they exist
+        initializeCollapsibleSections();
     }
     
     /**
@@ -627,6 +633,11 @@
                 // Extension is requesting to toggle split view
                 toggleSplitView();
                 break;
+                
+            case 'updateTheme':
+                // Update the body class with the new theme
+                document.body.className = message.theme;
+                break;
         }
     });
     
@@ -698,6 +709,107 @@
         const previewTimestamp = previewContent.querySelector('.preview-timestamp');
         if (previewTimestamp) {
             previewTimestamp.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+    }
+    
+    /**
+     * Initialize responsive features
+     */
+    function initializeResponsiveFeatures() {
+        // Detect panel size and add appropriate class
+        const detectPanelSize = () => {
+            const width = document.body.clientWidth;
+            let breakpoint = 'lg';
+            
+            if (width <= 350) {
+                breakpoint = 'xs';
+            } else if (width <= 600) {
+                breakpoint = 'sm';
+            } else if (width <= 992) {
+                breakpoint = 'md';
+            }
+            
+            document.body.setAttribute('data-breakpoint', breakpoint);
+            
+            // Auto-disable split view in narrow panels
+            if (breakpoint === 'xs' && currentState.splitView) {
+                disableSplitView();
+                currentState.splitView = false;
+                updateState();
+            }
+        };
+        
+        // Initial detection
+        detectPanelSize();
+        
+        // Listen for resize events
+        const resizeObserver = new ResizeObserver(() => {
+            detectPanelSize();
+        });
+        
+        resizeObserver.observe(document.body);
+        
+        // Touch support detection
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            document.body.classList.add('touch-enabled');
+        }
+    }
+    
+    /**
+     * Initialize collapsible sections
+     */
+    function initializeCollapsibleSections() {
+        // Create collapsible sections for better space usage
+        const sections = document.querySelectorAll('.collapsible-section');
+        
+        sections.forEach(section => {
+            const header = section.querySelector('.collapsible-header');
+            const content = section.querySelector('.collapsible-content');
+            
+            if (header && content) {
+                header.addEventListener('click', () => {
+                    section.classList.toggle('collapsed');
+                    
+                    // Save collapsed state
+                    const sectionId = section.getAttribute('data-section-id');
+                    if (sectionId) {
+                        const collapsedSections = currentState.collapsedSections || {};
+                        collapsedSections[sectionId] = section.classList.contains('collapsed');
+                        currentState.collapsedSections = collapsedSections;
+                        updateState();
+                    }
+                });
+                
+                // Restore collapsed state
+                const sectionId = section.getAttribute('data-section-id');
+                if (sectionId && currentState.collapsedSections && currentState.collapsedSections[sectionId]) {
+                    section.classList.add('collapsed');
+                }
+            }
+        });
+    }
+    
+    /**
+     * Handle panel size changes for responsive layout
+     */
+    function handlePanelResize() {
+        const width = document.body.clientWidth;
+        
+        // Adjust split view based on panel width
+        if (width < 600 && currentState.splitView) {
+            // Convert to vertical split on narrow panels
+            document.body.classList.add('vertical-split');
+        } else {
+            document.body.classList.remove('vertical-split');
+        }
+        
+        // Adjust font sizes for readability
+        if (width < 350) {
+            document.body.style.setProperty('--responsive-font-size-adjustment', '0.85');
+        } else if (width < 500) {
+            document.body.style.setProperty('--responsive-font-size-adjustment', '0.9');
+        } else {
+            document.body.style.setProperty('--responsive-font-size-adjustment', '1');
         }
     }
 })();

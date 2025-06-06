@@ -28,6 +28,12 @@
           "name": "Document Explorer",
           "icon": "$(file-text)",
           "contextualTitle": "Document Explorer"
+        },
+        {
+          "id": "documentWriter.versionHistory",
+          "name": "Version History",
+          "icon": "$(history)",
+          "contextualTitle": "Document Version History"
         }
       ]
     },
@@ -74,6 +80,26 @@
           "command": "document-writer.openDocument",
           "when": "view == documentWriter.documentExplorer && viewItem == document",
           "group": "1_open"
+        },
+        {
+          "command": "documentWriter.loadVersion",
+          "when": "view == documentWriter.versionHistory && viewItem == version",
+          "group": "1_actions"
+        },
+        {
+          "command": "documentWriter.compareVersions",
+          "when": "view == documentWriter.versionHistory && viewItem == version",
+          "group": "1_actions"
+        },
+        {
+          "command": "documentWriter.renameVersion",
+          "when": "view == documentWriter.versionHistory && viewItem == version",
+          "group": "2_manage"
+        },
+        {
+          "command": "documentWriter.deleteVersion",
+          "when": "view == documentWriter.versionHistory && viewItem == version",
+          "group": "2_manage"
         }
       ]
     },
@@ -206,6 +232,229 @@
         "command": "document-writer.deleteCategory",
         "title": "Delete Category",
         "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.showWizard",
+        "title": "Show Document Creation Wizard",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.exportDocument",
+        "title": "Export Current Document",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.analyzeDocument",
+        "title": "Analyze Document",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.generateChart",
+        "title": "Generate Chart",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.openTemplateManager",
+        "title": "Open Template Manager",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.showAssistant",
+        "title": "Show Document Assistant",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.previewDocument",
+        "title": "Preview Document",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.showQuickActions",
+        "title": "Show Quick Actions",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.showAiStatus",
+        "title": "Show AI Connection Status",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.showDetailedStats",
+        "title": "Show Document Statistics",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.exportProject",
+        "title": "Export Project",
+        "category": "Document Writer",
+        "icon": "$(export)"
+      },
+      {
+        "command": "documentWriter.importProject",
+        "title": "Import Project",
+        "category": "Document Writer",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "documentWriter.createProjectTemplate",
+        "title": "Create Project from Template",
+        "category": "Document Writer",
+        "icon": "$(file-directory-create)"
+      },
+      {
+        "command": "documentWriter.shareDocument",
+        "title": "Share Document",
+        "category": "Document Writer",
+        "icon": "$(link)"
+      },
+      {
+        "command": "documentWriter.viewSharedDocuments",
+        "title": "View Shared Documents",
+        "category": "Document Writer",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "documentWriter.openSharedDocument",
+        "title": "Open Shared Document",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.saveVersion",
+        "title": "Save Version",
+        "category": "Document Writer",
+        "icon": "$(save)"
+      },
+      {
+        "command": "documentWriter.showVersionHistory",
+        "title": "Show Version History",
+        "category": "Document Writer",
+        "icon": "$(history)"
+      },
+      {
+        "command": "documentWriter.loadVersion",
+        "title": "Load Version",
+        "category": "Document Writer"
+      },
+      {
+        "command": "documentWriter.compareVersions",
+        "title": "Compare with Current",
+        "category": "Document Writer",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "documentWriter.deleteVersion",
+        "title": "Delete Version",
+        "category": "Document Writer",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "documentWriter.renameVersion",
+        "title": "Rename Version",
+        "category": "Document Writer",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "documentWriter.printPreview",
+        "title": "Print Preview",
+        "category": "Document Writer",
+        "icon": "$(file-media)"
+      },
+      {
+        "command": "documentWriter.printSettings",
+        "title": "Print Settings",
+        "category": "Document Writer",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "documentWriter.quickPrint",
+        "title": "Quick Print",
+        "category": "Document Writer",
+        "icon": "$(file-binary)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "document-writer.saveDocument",
+        "key": "ctrl+s",
+        "mac": "cmd+s",
+        "when": "activeWebviewPanelId == 'documentWriter.documentEditor'"
+      },
+      {
+        "command": "document-writer.generateDocument",
+        "key": "ctrl+g",
+        "mac": "cmd+g",
+        "when": "activeWebviewPanelId == 'documentWriter.documentEditor'"
+      },
+      {
+        "command": "documentWriter.showWizard",
+        "key": "ctrl+shift+n",
+        "mac": "cmd+shift+n"
+      },
+      {
+        "command": "documentWriter.showQuickActions",
+        "key": "ctrl+shift+p",
+        "mac": "cmd+shift+p",
+        "when": "activeWebviewPanelId == 'documentWriter.documentEditor'"
+      },
+      {
+        "command": "documentWriter.exportDocument",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s",
+        "when": "activeWebviewPanelId == 'documentWriter.documentEditor'"
+      },
+      {
+        "command": "documentWriter.showAssistant",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      },
+      {
+        "command": "documentWriter.previewDocument",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "activeWebviewPanelId == 'documentWriter.documentEditor'"
+      },
+      {
+        "command": "documentWriter.showDetailedStats",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i",
+        "when": "activeWebviewPanelId == 'documentWriter.documentEditor'"
+      },
+      {
+        "command": "documentWriter.exportProject",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e"
+      },
+      {
+        "command": "documentWriter.importProject",
+        "key": "ctrl+shift+o",
+        "mac": "cmd+shift+o"
+      },
+      {
+        "command": "documentWriter.shareDocument",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s"
+      },
+      {
+        "command": "documentWriter.saveVersion",
+        "key": "ctrl+alt+v",
+        "mac": "cmd+alt+v"
+      },
+      {
+        "command": "documentWriter.showVersionHistory",
+        "key": "ctrl+h",
+        "mac": "cmd+h"
+      },
+      {
+        "command": "documentWriter.printPreview",
+        "key": "ctrl+p",
+        "mac": "cmd+p",
+        "when": "activeWebviewPanelId == 'documentWriter.documentEditor' || editorTextFocus"
+      },
+      {
+        "command": "documentWriter.quickPrint",
+        "key": "ctrl+shift+p",
+        "mac": "cmd+shift+p",
+        "when": "activeWebviewPanelId == 'documentWriter.documentEditor' || editorTextFocus"
       }
     ],
     "configuration": {

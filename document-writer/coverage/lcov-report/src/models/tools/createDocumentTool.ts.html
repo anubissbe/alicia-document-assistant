@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/27</span>
+                <span class='fraction'>0/31</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/27</span>
+                <span class='fraction'>0/31</span>
             </div>
         
             
@@ -250,18 +250,19 @@
 <a name='L185'></a><a href='#L185'>185</a>
 <a name='L186'></a><a href='#L186'>186</a>
 <a name='L187'></a><a href='#L187'>187</a>
-<a name='L188'></a><a href='#L188'>188</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -395,6 +396,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -438,17 +440,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as vscode from 'vscode';
-import * as path from 'path';
-import { BaseMCPTool, MCPToolResponse } from '../mcpTool';
+<span class="cstat-no" title="statement not covered" >import * as path from 'path';</span>
+<span class="cstat-no" title="statement not covered" >import { BaseMCPTool, MCPToolResponse } from '../mcpTool';</span>
 import { DocumentService } from '../../services/documentService';
 import { TemplateEngine, ValidationResult } from '../../core/templateEngine';
 import { DocumentTemplate } from '../documentTemplate';
-import { DocumentFormat } from '../documentFormat';
+<span class="cstat-no" title="statement not covered" >import { DocumentFormat } from '../documentFormat';</span>
 &nbsp;
 /**
  * Tool to create documents from templates
  */
-export class CreateDocumentTool extends BaseMCPTool {
+<span class="cstat-no" title="statement not covered" >export class C</span>reateDocumentTool extends BaseMCPTool {
     /**
      * Constructor
      * @param documentService Document service instance
@@ -567,25 +569,26 @@ export class CreateDocumentTool extends BaseMCPTool {
                 id: args.templateType,
                 name: args.templateType,
                 description: `Template for ${args.templateType}`,
-                templatePath: templatePath,
+                path: templatePath,
+                type: args.templateType,
                 format: this.getFormatFromPath(templatePath),
+                dateCreated: new Date(),
+                dateModified: new Date(),
                 metadata: {
                     author: 'Document Writer',
                     version: '1.0',
                     tags: [args.templateType],
                     category: 'generated'
-                },
-                sections: [],
-                createdAt: new Date(),
-                updatedAt: new Date()
+                }
             };
 &nbsp;
             // Generate the document
-            const outputFilePath = <span class="cstat-no" title="statement not covered" >await this.documentService.generateDocument(</span>
-                template,
-                documentData,
-                args.outputPath
-            );
+            const outputFilePath = <span class="cstat-no" title="statement not covered" >await this.documentService.generateDocument({</span>
+                title: template.name,
+                type: template.format.toLowerCase(),
+                content: JSON.stringify(documentData, null, 2),
+                outputPath: args.outputPath
+            });
 &nbsp;
             // Return the result
 <span class="cstat-no" title="statement not covered" >            return {</span>
@@ -631,7 +634,7 @@ export class CreateDocumentTool extends BaseMCPTool {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-04T19:30:18.488Z
+                at 2025-06-06T09:31:49.551Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
