@@ -1,186 +1,195 @@
-# Alicia - Your Personal Document Assistant
+# Alicia - Your Personal Document Assistant (Web App)
 
-👩‍💼 Meet Alicia, your intelligent personal document assistant. Available as both a VS Code extension and a standalone web application, Alicia transforms the way you create professional documents. With advanced AI capabilities powered by LM Studio and seamless integration with Cline AI assistant through the Model Context Protocol (MCP), Alicia makes document creation effortless and enjoyable.
+<div align="center">
+  <img src="Alicia-logo.png" alt="Alicia Logo" width="200"/>
+  
+  👩‍💼 **Meet Alicia - Your Intelligent Document Creation Assistant**
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![Node.js](https://img.shields.io/badge/Node.js-14%2B-green)](https://nodejs.org/)
+  [![LM Studio](https://img.shields.io/badge/LM%20Studio-Compatible-blue)](https://lmstudio.ai/)
+</div>
 
-<img src="Alicia-logo.png" alt="Alicia Logo" width="200" height="200" align="right">
+## 🌟 Overview
 
-## 🚀 Alicia Web Application
+Alicia is a powerful web-based document creation assistant that combines advanced AI capabilities with an intuitive interface. Create professional documents, technical documentation, academic papers, and more with the help of your personal AI assistant.
 
-Alicia is available as a beautiful, intuitive web application that runs right in your browser - no installation required!
+## ✨ Key Features
 
-### What Alicia Can Do For You
+### 🤖 AI-Powered Intelligence
+- **Smart Content Generation**: Alicia uses LM Studio to understand your requirements and generate tailored content
+- **Context-Aware Writing**: Upload reference documents for Alicia to analyze and learn from
+- **Intelligent Outlines**: Get AI-generated document structures optimized for your needs
 
-- 🤖 **AI-Powered Intelligence** - Alicia connects to LM Studio to understand your needs and generate perfect content
-- 🎨 **Smart Visual Creation** - Automatically generates charts, diagrams, and infographics to enhance your documents
-- 🔍 **Research Assistant** - Alicia searches the web and analyzes sources to enrich your content
-- 📄 **Multiple Export Formats** - Export to DOCX, PDF, HTML, and Markdown with perfect formatting
-- 📎 **Document Understanding** - Upload existing documents for Alicia to read, analyze, and reference
-- 🌐 **URL Intelligence** - Share websites and articles for Alicia to incorporate into your work
-- 💬 **Interactive Refinement** - Chat with Alicia to perfect every detail of your document
-- ✨ **Real-time Preview** - Watch your document come to life as Alicia works her magic
+### 🎨 Visual Content Creation
+- **Automatic Image Generation**: Creates contextual images using Stable Diffusion
+- **Smart Charts & Diagrams**: Visualize data automatically
+- **Scaling**: 3 images per 5 pages of content
 
-### Getting Started with Alicia
+### 🔍 Research Integration
+- **Web Search**: Built-in research capabilities
+- **URL Analysis**: Add websites as reference sources
+- **Content Summarization**: Get concise summaries of research materials
 
-1. Navigate to the `web-app` directory
-2. Install dependencies: `npm install`
-3. Start Alicia's research server: `npm run mcp-server`
-4. In a new terminal, start web server: `python -m http.server 8000`
-5. Open your browser and meet Alicia at `http://localhost:8000`
-6. Ensure LM Studio is running on port 1234 for Alicia's AI capabilities
+### 📄 Professional Output
+- **Multiple Formats**: Export to DOCX, PDF, HTML, and Markdown
+- **Templates**: Pre-built templates for various document types
+- **Print-Ready**: Customizable print settings with live preview
 
-## Alicia VS Code Extension
+### 💡 Modern Features
+- **Dark Mode**: Automatic theme detection
+- **Mobile Responsive**: Works on all devices
+- **Auto-Save**: Never lose your work
+- **Version History**: Track changes over time
+- **Document Sharing**: Generate shareable links
+- **Keyboard Shortcuts**: Speed up your workflow
 
-- **Document Generation Engine** - Create professional documents using templates and dynamic content
-- **AI Integration** - Leverage Cline AI assistant for intelligent content generation and document analysis
-- **Chart Generation** - Include dynamic charts and visualizations in your documents
-- **Template Management** - Organize and use document templates with metadata
-- **Multi-Format Support** - Generate documents in multiple formats
-
-## Installation
-
-1. Install Visual Studio Code 1.85.0 or higher
-2. Search for "Alicia Document Assistant" in the VS Code Extensions marketplace
-3. Click Install to add Alicia to VS Code
-4. Reload VS Code to activate Alicia
-
-## Usage
-
-### Creating a Document
-
-1. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-2. Type "Document Writer: Create New Document"
-3. Follow the wizard to select a document type and enter basic information
-4. The extension will generate a document based on your inputs
-
-### Using AI Assistance
-
-1. Open the Command Palette
-2. Type "Document Writer: Ask Cline to Create Document"
-3. Describe the document you want to create
-4. Cline will analyze your requirements and suggest appropriate templates and content
-
-### Managing Templates
-
-1. Click on the Document Writer icon in the Activity Bar
-2. Browse the available templates in the Document Templates view
-3. Right-click on a template to use it or view its properties
-
-## Project Structure
-
-```plaintext
-document-writer/
-├── src/                           # Source code
-│   ├── extension.ts               # Main extension entry point
-│   ├── core/                      # Core document processing
-│   │   ├── templateEngine.ts      # Template processing
-│   │   ├── chartGenerator.ts      # Chart generation
-│   │   └── aiDocumentGenerator.ts # AI document generation
-│   ├── integrations/              # External integrations
-│   │   └── clineIntegration.ts    # Cline MCP integration
-│   ├── models/                    # Data models
-│   ├── services/                  # Services
-│   │   ├── documentService.ts     # Document management
-│   │   └── templateManagerService.ts # Template management
-│   ├── providers/                 # VS Code providers
-│   ├── webview/                   # Webview interfaces
-│   └── utils/                     # Utility functions
-├── resources/                     # Resources
-│   └── templates/                 # Document templates
-└── test/                          # Test files
-```
-
-## Development
+## 🚀 Quick Start
 
 ### Prerequisites
+- Node.js 14+ 
+- [LM Studio](https://lmstudio.ai/) with a loaded model
+- Modern web browser (Chrome, Firefox, Edge, Safari)
 
-- Node.js 16.x or higher
-- npm 8.x or higher
-- Visual Studio Code
+### Installation
 
-### Setup
-
-1. Clone the repository
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/anubissbe/document-writer.git
+   git clone https://github.com/anubissbe/alicia-document-assistant.git
+   cd alicia-document-assistant
    ```
 
-2. Install dependencies
+2. **Install dependencies:**
    ```bash
-   cd document-writer
+   cd web-app
    npm install
    ```
 
-3. Build the extension
+3. **Start the application:**
    ```bash
-   npm run compile
+   npm start
    ```
+   This starts both the web server and MCP research server.
 
-4. Launch the extension in debug mode
-   - Press F5 in VS Code to launch a new window with the extension loaded
+4. **Open Alicia:**
+   Navigate to `http://localhost:3000` in your browser.
 
-### Testing
+### Setting Up AI
 
-Run the tests with:
+1. **Install [LM Studio](https://lmstudio.ai/)**
+2. **Download a model** (see recommendations below)
+3. **Start the server** on port 1234
+4. **Alicia connects automatically**
 
-```bash
-npm test
+## 📚 Recommended AI Models
+
+For best results with long documents:
+
+### Top Picks
+- **Mistral-7B-Instruct-v0.3-Q8_0** - Best balance
+- **Nous-Hermes-2-Mistral-7B-DPO** - Detailed content
+- **OpenHermes-2.5-Mistral-7B** - Comprehensive docs
+
+### LM Studio Settings
+- Temperature: 0.7-0.8
+- Max Tokens: 8192+
+- Context Length: 8192+
+- Top P: 0.9
+- Repeat Penalty: 1.1
+
+## 📖 How to Use Alicia
+
+### Document Creation Process
+
+1. **Choose Document Type**
+   - Business documents
+   - Technical documentation
+   - Academic papers
+   - Reports & letters
+   - Custom documents
+
+2. **Provide Details**
+   - Title and description
+   - Author information
+   - Target length
+
+3. **Add Context (Optional)**
+   - Upload reference documents
+   - Add research URLs
+   - Let Alicia search the web
+
+4. **Define Structure**
+   - Use AI-generated outlines
+   - Create custom sections
+   - Specify requirements
+
+5. **Generate & Refine**
+   - Watch Alicia create your document
+   - Chat to make adjustments
+   - Preview in real-time
+
+6. **Export & Share**
+   - Download in your preferred format
+   - Share via link
+   - Print with custom settings
+
+## ⌨️ Keyboard Shortcuts
+
+Press `Ctrl+/` to see all shortcuts. Common ones:
+
+- `Ctrl+S` - Save document
+- `Ctrl+E` - Export document
+- `Ctrl+I` - Import document
+- `Ctrl+H` - Version history
+- `Ctrl+P` - Print preview
+- `Ctrl+Enter` - Generate document
+
+## 🛠️ Configuration
+
+### Optional: Image Generation
+
+1. Install [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
+2. Start with `--api --listen`
+3. Configure in Alicia's settings (⚙️)
+
+### Settings
+
+Access settings with the ⚙️ button:
+- Document preferences
+- AI model selection
+- Image generation toggle
+- Theme preferences
+
+## 🏗️ Project Structure
+
+```
+web-app/
+├── index.html              # Main application
+├── styles.css              # Core styling
+├── app.js                  # Application logic
+├── ai-client.js            # LM Studio integration
+├── mcp-server.js           # Research server
+├── document-generator.js   # Document creation
+├── image-generator.js      # SD integration
+└── [other modules]         # Supporting features
 ```
 
-## Dependencies
-
-- docxtemplater - Word document generation
-- pizzip - ZIP file handling for DOCX
-- chart.js and canvas - Chart generation
-- handlebars - Template engine
-- puppeteer - PDF generation (planned)
-
-## Implementation Progress
-
-The project is being implemented in phases:
-
-1. ✅ **Phase 1: Foundation Setup** - Project configuration, extension structure, document engine, template management, basic DOCX generation
-2. ✅ **Phase 2: AI Integration** - Cline MCP integration, template engine, chart generation, AI document generation, MCP tools
-3. ✅ **Phase 3: User Interface Development** - Webview interfaces, document creation wizard, chat-based assistant, tree view provider
-4. ✅ **Phase 3.5: Web Application** - Standalone browser-based version with full AI integration
-5. ✅ **Phase 4: Advanced Features** - Multi-format support (DOCX, PDF, HTML, Markdown), enhanced AI capabilities, feedback chat system
-6. 🚧 **Phase 5: Polish and Release** - Documentation, example templates, publishing preparation
-
-## License
-
-[MIT](LICENSE)
-
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## 📄 License
 
-## Recent Updates
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### Web Application (New!)
-- ✅ Complete browser-based document creation interface
-- ✅ LM Studio integration for AI-powered generation
-- ✅ MCP server for internet search capabilities
-- ✅ File upload support (DOCX, PDF, TXT)
-- ✅ URL research and content extraction
-- ✅ AI feedback chat for document refinement
-- ✅ Export to DOCX, PDF, HTML, and Markdown
+## 🙏 Acknowledgments
 
-### VS Code Extension
-- ✅ Fixed Document Creation Wizard issues
-- ✅ Resolved template loading problems
-- ✅ Fixed JavaScript/CSS mismatches in webviews
-- ✅ Improved error handling and user feedback
+- LM Studio for local AI capabilities
+- The open-source community for inspiration
+- All contributors and users
 
-## Todo
+---
 
-- Polish VS Code extension UI based on web app improvements
-- Add more document templates for common use cases
-- Implement real-time collaboration features
-- Add support for more file formats (ODT, RTF)
-- Finalize documentation and example templates
-- Prepare the extension for release on VS Code marketplace
+<div align="center">
+  Made with ❤️ by Alicia - Your Personal Document Assistant
+</div>
