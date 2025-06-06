@@ -2,9 +2,8 @@
  * Main Application Logic for Document Writer
  */
 
-// Debug mode detection
-const DEBUG_MODE = localStorage.getItem('debugMode') === 'true' || 
-                   window.location.search.includes('debug=true');
+// Debug mode detection - using safe access from init.js
+const DEBUG_MODE = window.DEBUG_MODE;
 
 if (DEBUG_MODE) {
     console.log('%c[DEBUG MODE ENABLED]', 'color: #ff6b6b; font-weight: bold; font-size: 14px');
@@ -35,19 +34,22 @@ if (DEBUG_MODE) {
     };
 }
 
-// Debug logging helper
-function debugLog(category, message, data = null) {
-    if (!DEBUG_MODE) return;
-    
-    const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-    console.log(`%c[${timestamp}] [${category}]`, 'color: #95afc0; font-weight: bold', message);
-    if (data) {
-        console.log(data);
-    }
-}
+// Debug logging helper is now provided by init.js
+const debugLog = window.debugLog;
 
 class DocumentWriterApp {
     constructor() {
+        // Clear any stored images from previous sessions
+        if (window.imageStorage && typeof window.imageStorage.clear === 'function') {
+            window.imageStorage.clear();
+        }
+        
+        // Clear any stored content from previous sessions to avoid 404 errors
+        this.clearStoredContent();
+        
+        // Store event listeners for cleanup
+        this.eventListeners = [];
+        
         this.currentStepIndex = 0;
         this.steps = [
             {
@@ -109,12 +111,44 @@ class DocumentWriterApp {
         this.updateProgress();
         this.setupEventListeners();
         
+        // Start auto-save
+        if (window.autoSave) {
+            window.autoSave.start();
+        }
+        
         // Check AI connection status periodically
-        setInterval(() => {
+        this.connectionCheckInterval = setInterval(() => {
             if (window.aiClient) {
                 window.aiClient.checkConnection();
             }
         }, 30000); // Check every 30 seconds
+    }
+
+    /**
+     * Cleanup resources
+     */
+    cleanup() {
+        if (this.connectionCheckInterval) {
+            clearInterval(this.connectionCheckInterval);
+        }
+        if (window.autoSave) {
+            window.autoSave.stop();
+        }
+    }
+
+    /**
+     * Clear any stored content from previous sessions
+     */
+    clearStoredContent() {
+        // Clear localStorage items that might contain old image URLs
+        const keysToCheck = ['documentContent', 'wizardData', 'generatedContent'];
+        keysToCheck.forEach(key => {
+            const stored = localStorage.getItem(key);
+            if (stored && stored.includes('/image/img-')) {
+                console.log(`[APP] Clearing stored ${key} with old image references`);
+                localStorage.removeItem(key);
+            }
+        });
     }
 
     /**
@@ -211,9 +245,6 @@ class DocumentWriterApp {
                 break;
             case 'addImage':
                 this.showImageDialog();
-                break;
-            case 'regenerateWithImages':
-                this.regenerateDocumentWithImages();
                 break;
         }
     }
@@ -462,6 +493,13 @@ class DocumentWriterApp {
                                 Generate content for empty sections only
                             </label>
                         </div>
+                        <div class="info-message" style="margin-top: 1rem; padding: 0.75rem; background: var(--hover-background); border-radius: 4px; border: 1px solid var(--border-color);">
+                            <p style="margin: 0; font-size: 0.9rem;">
+                                📊 Based on your ${window.settingsManager?.getSetting('minPages') || 3}-page requirement, 
+                                Alicia will include <strong>${Math.max(2, Math.floor(((window.settingsManager?.getSetting('minPages') || 3) / 5) * 3))}</strong> 
+                                relevant images throughout the document (3 images per 5 pages).
+                            </p>
+                        </div>
                     </div>
                     
                     <button class="generate-button" data-action="generateDocument">
@@ -535,9 +573,6 @@ class DocumentWriterApp {
                     <div class="content-actions">
                         <button class="secondary-button" data-action="addImage">
                             🖼️ Add Image/Chart
-                        </button>
-                        <button class="secondary-button" data-action="regenerateWithImages">
-                            🎨 Auto-Add Visuals
                         </button>
                     </div>
                     <div class="content-preview" id="final-content-preview" style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); padding: 1rem; background: var(--input-background); margin-top: 1rem;">
@@ -648,10 +683,17 @@ class DocumentWriterApp {
         this.wizardData.documentType = type;
         this.steps[0].completed = true;
         
-        // Auto-populate sections based on document type
-        if (this.wizardData.sections.length === 0) {
-            const defaultSections = window.documentGenerator.getDefaultSections(type);
-            this.wizardData.sections = defaultSections.map(title => ({ title, content: '' }));
+        // Show template selection dialog
+        if (window.documentTemplates && type !== 'custom') {
+            setTimeout(() => {
+                window.documentTemplates.showTemplateDialog(type);
+            }, 300);
+        } else {
+            // Auto-populate sections based on document type
+            if (this.wizardData.sections.length === 0) {
+                const defaultSections = window.documentGenerator.getDefaultSections(type);
+                this.wizardData.sections = defaultSections.map(title => ({ title, content: '' }));
+            }
         }
         
         this.updateStepsNavigation();
@@ -659,6 +701,11 @@ class DocumentWriterApp {
         this.updateProgress();
         
         showToast(`Selected ${type} document type`, 'success');
+        
+        // Mark for auto-save
+        if (window.autoSave) {
+            window.autoSave.markDirty();
+        }
     }
 
     /**
@@ -675,6 +722,11 @@ class DocumentWriterApp {
         this.updateStepsNavigation();
         this.updateNavigationButtons();
         this.updateProgress();
+        
+        // Mark for auto-save
+        if (window.autoSave) {
+            window.autoSave.markDirty();
+        }
     }
 
     /**
@@ -758,10 +810,30 @@ class DocumentWriterApp {
             return;
         }
 
+        let progress;
         try {
+            // Show progress indicator
+            if (window.progressIndicator) {
+                progress = window.progressIndicator.showProgress('document-generation', {
+                    title: 'Generating Document',
+                    message: 'Alicia is creating your document with AI...',
+                    showPercentage: false
+                });
+                progress.setIndeterminate();
+            }
+            
             const content = await window.documentGenerator.generateDocument(this.wizardData, 'markdown');
             this.wizardData.generatedContent = content;
             this.steps[3].completed = true;
+            
+            // Log generated content stats
+            const imageCount = (content.match(/!\[([^\]]*)\]\(([^)]+)\)/g) || []).length;
+            const wordCount = content.split(' ').length;
+            console.log(`[DOCUMENT] Generated document:`, {
+                words: wordCount,
+                estimatedPages: Math.ceil(wordCount / 300),
+                images: imageCount
+            });
             
             this.updateStepsNavigation();
             this.updateWizardContent();
@@ -769,8 +841,18 @@ class DocumentWriterApp {
             
             showToast('Document generated successfully!', 'success');
             
+            // Mark for auto-save
+            if (window.autoSave) {
+                window.autoSave.markDirty();
+            }
+            
         } catch (error) {
             showToast('Error generating document: ' + error.message, 'error');
+        } finally {
+            // Hide progress indicator
+            if (progress) {
+                progress.hide();
+            }
         }
     }
 
@@ -1086,9 +1168,16 @@ Document context:
             showLoading('Processing your feedback...');
             
             // Generate revised content based on feedback
-            const prompt = `You are helping to refine a document. Here is the current document:
+            const currentContent = this.tempGeneratedContent || this.wizardData.generatedContent;
+            
+            // Limit content length to prevent token issues
+            const contentPreview = currentContent.length > 3000 
+                ? currentContent.substring(0, 3000) + '\n\n[... document continues ...]'
+                : currentContent;
+            
+            const prompt = `You are Alicia, a personal document assistant helping to refine a document. Here is the current document:
 
-${this.tempGeneratedContent || this.wizardData.generatedContent}
+${contentPreview}
 
 The user has provided the following feedback:
 "${feedback}"
@@ -1261,7 +1350,30 @@ Please revise the document according to this feedback. Maintain the overall stru
     updateDocumentPreview(content) {
         const previewElement = document.getElementById('final-content-preview');
         if (previewElement) {
-            previewElement.innerHTML = window.documentGenerator.markdownToHTML(content);
+            // Log to check if content has images
+            const imageMatches = content.match(/!\[([^\]]*)\]\(([^)]+)\)/g) || [];
+            const imageCount = imageMatches.length;
+            console.log(`[PREVIEW] Updating with ${imageCount} images`);
+            if (imageCount > 0) {
+                console.log('[PREVIEW] Images found in markdown:');
+                imageMatches.forEach((img, index) => {
+                    const isDataUrl = img.includes('data:image');
+                    console.log(`  ${index + 1}. ${img.substring(0, 100)}... (isDataUrl: ${isDataUrl})`);
+                });
+            }
+            
+            const htmlContent = window.documentGenerator.markdownToHTML(content);
+            
+            // Log HTML images
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const htmlImages = tempDiv.querySelectorAll('img');
+            console.log(`[PREVIEW] ${htmlImages.length} images in generated HTML`);
+            htmlImages.forEach((img, index) => {
+                console.log(`  ${index + 1}. src: ${img.src?.substring(0, 100)}...`);
+            });
+            
+            previewElement.innerHTML = htmlContent;
             previewElement.scrollTop = 0;
             
             // Add highlight effect
@@ -1435,8 +1547,12 @@ Please revise the document according to this feedback. Maintain the overall stru
                         suggestion.type
                     );
                     
+                    // For preview, use data URL directly
+                    // We'll store images only when exporting
+                    const imageUrl = imageData.url;
+                    
                     // Find appropriate place to insert image
-                    const imageMarkdown = `\n\n![${imageData.alt}](${imageData.url})\n*${suggestion.caption || imageData.caption}*\n\n`;
+                    const imageMarkdown = `\n\n![${imageData.alt}](${imageUrl})\n*${suggestion.caption || imageData.caption}*\n\n`;
                     
                     // Simple insertion strategy: add after the section mentioned in placement
                     if (suggestion.placement) {
@@ -1484,49 +1600,96 @@ Please revise the document according to this feedback. Maintain the overall stru
  * Navigation functions
  */
 function nextStep() {
-    if (app.currentStepIndex < app.steps.length - 1 && app.isCurrentStepValid()) {
-        app.currentStepIndex++;
-        app.updateStepsNavigation();
-        app.updateWizardContent();
+    if (window.app && window.app.currentStepIndex < window.app.steps.length - 1 && window.app.isCurrentStepValid()) {
+        window.app.currentStepIndex++;
+        window.app.updateStepsNavigation();
+        window.app.updateWizardContent();
     }
 }
 
 function previousStep() {
-    if (app.currentStepIndex > 0) {
-        app.currentStepIndex--;
-        app.updateStepsNavigation();
-        app.updateWizardContent();
+    if (window.app && window.app.currentStepIndex > 0) {
+        window.app.currentStepIndex--;
+        window.app.updateStepsNavigation();
+        window.app.updateWizardContent();
     }
 }
 
 /**
- * Utility functions
+ * Utility functions - now provided by init.js
  */
-function showLoading(message = 'Loading...') {
-    const overlay = document.getElementById('loading-overlay');
-    const text = document.getElementById('loading-text');
-    text.textContent = message;
-    overlay.style.display = 'flex';
-}
-
-function hideLoading() {
-    document.getElementById('loading-overlay').style.display = 'none';
-}
-
-function showToast(message, type = 'info') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    
-    container.appendChild(toast);
-    
-    setTimeout(() => {
-        container.removeChild(toast);
-    }, 5000);
-}
+const showLoading = window.showLoading;
+const hideLoading = window.hideLoading;
+const showToast = window.showToast;
 
 // Initialize the application when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new DocumentWriterApp();
+    
+    // Add navigation button event listeners
+    document.getElementById('prev-btn').addEventListener('click', previousStep);
+    document.getElementById('next-btn').addEventListener('click', nextStep);
+    
+    // Add help button listener
+    const helpBtn = document.getElementById('help-button');
+    if (helpBtn) {
+        helpBtn.addEventListener('click', () => {
+            if (window.keyboardShortcuts) {
+                window.keyboardShortcuts.showHelp();
+            }
+        });
+    }
+    
+    // Add new feature button listeners
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            if (window.shareDocument) {
+                window.shareDocument.showShareDialog();
+            }
+        });
+    }
+    
+    const versionBtn = document.getElementById('version-btn');
+    if (versionBtn) {
+        versionBtn.addEventListener('click', () => {
+            if (window.versionHistory) {
+                window.versionHistory.showVersionHistory();
+            }
+        });
+    }
+    
+    const exportBtn = document.getElementById('export-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            if (window.exportImport) {
+                window.exportImport.exportDocument();
+            }
+        });
+    }
+    
+    const printBtn = document.getElementById('print-btn');
+    if (printBtn) {
+        printBtn.addEventListener('click', () => {
+            if (window.printPreview) {
+                window.printPreview.showPrintSettings();
+            }
+        });
+    }
+    
+    const statsBtn = document.getElementById('stats-btn');
+    if (statsBtn) {
+        statsBtn.addEventListener('click', () => {
+            if (window.documentStats) {
+                window.documentStats.showDetailedStats();
+            }
+        });
+    }
+    
+    // Handle page unload
+    window.addEventListener('beforeunload', () => {
+        if (window.app) {
+            window.app.cleanup();
+        }
+    });
 });

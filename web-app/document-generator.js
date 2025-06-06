@@ -23,7 +23,7 @@ class DocumentGenerator {
         const { documentType, documentTitle, documentData, sections } = wizardData;
         
         try {
-            showLoading('Generating document with AI...');
+            showLoading('Generating document with AI and images...');
             
             // Prepare document details for AI
             const documentDetails = {
@@ -83,15 +83,8 @@ class DocumentGenerator {
         const { title, type, author, date } = documentDetails;
         const formattedDate = date ? new Date(date).toLocaleDateString() : new Date().toLocaleDateString();
         
-        // For export, we need to restore data URLs
-        let exportContent = content;
-        if (window.imageStorage) {
-            exportContent = window.imageStorage.restoreDataUrls(content);
-        }
-        
-        // Convert markdown content to HTML (basic conversion)
-        // Skip processing since we already restored data URLs
-        const htmlContent = this.markdownToHTML(exportContent, true);
+        // For HTML export, content already has data URLs, so just convert directly
+        const htmlContent = this.markdownToHTML(content);
         
         return `<!DOCTYPE html>
 <html lang="en">
@@ -219,10 +212,7 @@ class DocumentGenerator {
         const { title, type, author, date } = documentDetails;
         const formattedDate = date ? new Date(date).toLocaleDateString() : new Date().toLocaleDateString();
         
-        // For markdown export, restore data URLs
-        if (window.imageStorage) {
-            content = window.imageStorage.restoreDataUrls(content);
-        }
+        // Content already has data URLs, no need to restore
         
         return `# ${title}
 
@@ -242,12 +232,12 @@ ${content}
      * Basic markdown to HTML conversion with image support
      */
     markdownToHTML(markdown, skipProcessing = false) {
-        // First, process any data URLs in the markdown to store them
-        // Skip this if we're already processing for export
-        if (window.imageStorage && !skipProcessing) {
-            markdown = window.imageStorage.processContent(markdown);
+        // Sanitize input first
+        if (window.sanitizer && typeof window.sanitizer.sanitize === 'function') {
+            markdown = window.sanitizer.sanitize(markdown);
         }
         
+        // Don't process images here - they should already be stored
         let html = markdown
             // Headers
             .replace(/^### (.*$)/gm, '<h3>$1</h3>')
@@ -272,21 +262,23 @@ ${content}
             .replace(/<p>(<ul>.*<\/ul>)<\/p>/g, '$1')
             .replace(/<p>(<pre>.*<\/pre>)<\/p>/g, '$1');
             
-        // Handle images
+        // Handle images - they should already have data URLs
         html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
-            // Check if this is a stored image path
-            if (window.imageStorage && src.startsWith('/stored-images/')) {
-                const imageData = window.imageStorage.getImage(src);
-                if (imageData) {
-                    src = imageData.dataUrl;
-                }
-            }
+            // Sanitize alt text
+            const safeAlt = alt.replace(/[<>]/g, '');
+            // Only allow data URLs and safe http(s) URLs
+            const safeUrl = src.match(/^(data:|https?:\/\/)/) ? src : '';
             
             return `<figure class="document-image">
-                <img src="${src}" alt="${alt}" style="max-width: 100%; height: auto;">
-                ${alt ? `<figcaption>${alt}</figcaption>` : ''}
+                <img src="${safeUrl}" alt="${safeAlt}" style="max-width: 100%; height: auto;">
+                ${safeAlt ? `<figcaption>${safeAlt}</figcaption>` : ''}
             </figure>`;
         });
+        
+        // Final sanitization of the HTML output
+        if (window.sanitizer && typeof window.sanitizer.sanitize === 'function') {
+            html = window.sanitizer.sanitize(html);
+        }
         
         return html;
     }

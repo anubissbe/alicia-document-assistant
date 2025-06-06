@@ -8,6 +8,11 @@ class ImageStorage {
         
         // Counter for unique image IDs
         this.imageCounter = 0;
+        
+        // Memory limits
+        this.maxImages = 50; // Limit to prevent memory issues
+        this.totalSize = 0;
+        this.maxTotalSize = 100 * 1024 * 1024; // 100MB total limit
     }
     
     /**
@@ -17,6 +22,24 @@ class ImageStorage {
      * @returns {string} Reference path to use in documents
      */
     storeImage(dataUrl, description = '') {
+        // Check memory limits
+        const imageSize = dataUrl.length;
+        
+        // If we're at image limit, remove oldest
+        if (this.images.size >= this.maxImages) {
+            const oldestKey = this.images.keys().next().value;
+            const oldestImage = this.images.get(oldestKey);
+            this.totalSize -= oldestImage.dataUrl.length;
+            this.images.delete(oldestKey);
+            console.log(`[IMAGE STORAGE] Removed oldest image due to limit: ${oldestKey}`);
+        }
+        
+        // Check total size limit
+        if (this.totalSize + imageSize > this.maxTotalSize) {
+            console.error('[IMAGE STORAGE] Cannot store image: total size limit exceeded');
+            throw new Error('Image storage limit exceeded. Please clear some images.');
+        }
+        
         // Generate unique ID
         const imageId = `img-${Date.now()}-${this.imageCounter++}`;
         const imagePath = `/stored-images/${imageId}.png`;
@@ -28,7 +51,8 @@ class ImageStorage {
             timestamp: new Date().toISOString()
         });
         
-        console.log(`[IMAGE STORAGE] Stored image: ${imagePath}`);
+        this.totalSize += imageSize;
+        console.log(`[IMAGE STORAGE] Stored image: ${imagePath} (${(imageSize / 1024).toFixed(2)}KB)`);
         
         return imagePath;
     }
@@ -90,6 +114,7 @@ class ImageStorage {
     clear() {
         this.images.clear();
         this.imageCounter = 0;
+        this.totalSize = 0;
         console.log('[IMAGE STORAGE] Cleared all stored images');
     }
 }

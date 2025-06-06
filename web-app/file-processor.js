@@ -17,6 +17,12 @@ class FileProcessor {
      * Process uploaded file and extract text content
      */
     async processFile(file) {
+        // Add file size limit (25MB)
+        const maxSize = 25 * 1024 * 1024; // 25MB
+        if (file.size > maxSize) {
+            throw new Error(`File size exceeds limit of 25MB. File size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+        }
+        
         const fileType = this.supportedFormats[file.type];
         
         if (!fileType) {

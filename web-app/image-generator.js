@@ -3,12 +3,16 @@
 
 class ImageGenerator {
     constructor() {
+        // Get settings from settings manager or use defaults
+        const sdEndpoint = window.settingsManager?.getSetting('sdEndpoint') || 'http://192.168.1.25:8000';
+        const sdEnabled = window.settingsManager?.getSetting('sdEnabled') ?? true;
+        
         // Configuration - set USE_STABLE_DIFFUSION to false to disable SD completely
-        this.USE_STABLE_DIFFUSION = true; // Set to false to only use fallback images
+        this.USE_STABLE_DIFFUSION = sdEnabled; // Set to false to only use fallback images
         
         // Local Stable Diffusion API
         this.stableDiffusionAPI = {
-            baseUrl: 'http://192.168.1.25:8000',
+            baseUrl: sdEndpoint,
             enabled: this.USE_STABLE_DIFFUSION,
             // Different possible endpoints for various Stable Diffusion implementations
             endpoints: {
@@ -197,18 +201,24 @@ class ImageGenerator {
             
             switch (type) {
                 case 'photo':
-                    enhancedPrompt = `professional photograph of ${prompt}, high quality, detailed, sharp focus`;
+                    // Remove "A photo" from the beginning if present to avoid confusion
+                    const cleanPrompt = prompt.replace(/^(a photo|photo)\s+(of|showing|illustrating)\s+/i, '');
+                    
+                    // Make the prompt more specific to business/professional context
+                    enhancedPrompt = `professional business photograph showing ${cleanPrompt}, corporate professional setting, modern office environment, business context, high quality photography`;
+                    negativePrompt = 'cat, cats, kitten, kittens, feline, animal, pet, dog, puppy, bird, cartoon, anime, blurry, bad quality, distorted, ugly, meme, comic, childish, unprofessional';
                     break;
                 case 'diagram':
-                    enhancedPrompt = `clean technical diagram of ${prompt}, white background, simple lines, professional`;
-                    negativePrompt += ', complex, cluttered, photorealistic';
+                    enhancedPrompt = `clean technical diagram of ${prompt}, white background, simple lines, professional, business diagram`;
+                    negativePrompt = 'cat, animal, pet, complex, cluttered, photorealistic, cartoon';
                     break;
                 case 'infographic':
-                    enhancedPrompt = `modern infographic design showing ${prompt}, clean layout, professional colors`;
-                    negativePrompt += ', photorealistic, complex background';
+                    enhancedPrompt = `modern infographic design showing ${prompt}, clean layout, professional colors, business style`;
+                    negativePrompt = 'cat, animal, pet, photorealistic, complex background, cartoon';
                     break;
                 default:
-                    enhancedPrompt = `professional illustration of ${prompt}, high quality`;
+                    enhancedPrompt = `professional business illustration of ${prompt}, high quality, corporate style`;
+                    negativePrompt = 'cat, animal, pet, cartoon, anime, unprofessional';
             }
             
             // Try different request formats based on the endpoint
@@ -262,16 +272,52 @@ class ImageGenerator {
             
             let data;
             let responseText;
-            try {
-                responseText = await response.text();
-                if (window.DEBUG_MODE || typeof debugLog !== 'undefined') {
-                    console.log('[STABLE DIFFUSION] Raw response:', responseText.substring(0, 200) + '...');
+            
+            // Check if response is JSON or binary image data
+            const contentType = response.headers.get('content-type');
+            console.log('[STABLE DIFFUSION] Response content-type:', contentType);
+            
+            if (contentType && contentType.includes('image/')) {
+                // Response is binary image data
+                try {
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+                    
+                    return new Promise((resolve, reject) => {
+                        reader.onloadend = () => {
+                            const base64data = reader.result.split(',')[1];
+                            console.log('[STABLE DIFFUSION] Converted binary image to base64');
+                            
+                            const duration = Date.now() - startTime;
+                            console.log(`[STABLE DIFFUSION] ✓ Image generated successfully in ${duration}ms`);
+                            
+                            resolve({
+                                url: `data:image/png;base64,${base64data}`,
+                                alt: prompt,
+                                caption: `AI Generated: ${prompt}`,
+                                type: type,
+                                isDataUrl: true
+                            });
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+                } catch (error) {
+                    throw new Error('Failed to process binary image response');
                 }
-                data = JSON.parse(responseText);
-            } catch (parseError) {
-                console.error('[STABLE DIFFUSION] Parse error:', parseError);
-                console.error('[STABLE DIFFUSION] Response text:', responseText);
-                throw new Error('Invalid JSON response from Stable Diffusion API');
+            } else {
+                // Try to parse as JSON
+                try {
+                    responseText = await response.text();
+                    if (window.DEBUG_MODE || typeof debugLog !== 'undefined') {
+                        console.log('[STABLE DIFFUSION] Raw response:', responseText.substring(0, 200) + '...');
+                    }
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('[STABLE DIFFUSION] Parse error:', parseError);
+                    console.error('[STABLE DIFFUSION] Response text:', responseText);
+                    throw new Error('Invalid response from Stable Diffusion API');
+                }
             }
             
             const duration = Date.now() - startTime;
@@ -376,6 +422,12 @@ class ImageGenerator {
             const canvas = document.createElement('canvas');
             canvas.width = 800;
             canvas.height = 600;
+            
+            // Check if Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                throw new Error('Chart.js library is not available. Please ensure it is loaded.');
+            }
             
             // Generate the chart
             const ctx = canvas.getContext('2d');

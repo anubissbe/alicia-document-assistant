@@ -5,12 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alicia - Your Personal Document Assistant</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
     <div class="app-container">
         <header class="app-header">
             <h1>👩‍💼 Alicia</h1>
             <p>Your Personal Document Assistant</p>
+            <button class="settings-button" id="settings-button" title="Settings">⚙️</button>
+            <button class="help-button" id="help-button" title="Help (Ctrl+/)" style="position: absolute; right: 60px; top: 20px; background: transparent; border: none; font-size: 24px; cursor: pointer;">❓</button>
+            <div class="header-menu" style="position: absolute; right: 100px; top: 20px; display: flex; gap: 10px;">
+                <button class="icon-button" id="share-btn" title="Share (Ctrl+Shift+S)" style="background: transparent; border: none; font-size: 20px; cursor: pointer;">🔗</button>
+                <button class="icon-button" id="version-btn" title="Version History (Ctrl+H)" style="background: transparent; border: none; font-size: 20px; cursor: pointer;">📚</button>
+                <button class="icon-button" id="export-btn" title="Export (Ctrl+E)" style="background: transparent; border: none; font-size: 20px; cursor: pointer;">📥</button>
+                <button class="icon-button" id="print-btn" title="Print (Ctrl+P)" style="background: transparent; border: none; font-size: 20px; cursor: pointer;">🖨️</button>
+                <button class="icon-button" id="stats-btn" title="Statistics (Ctrl+Shift+I)" style="background: transparent; border: none; font-size: 20px; cursor: pointer;">📊</button>
+            </div>
             <div class="ai-status" id="ai-status">
                 <span class="status-indicator" id="status-indicator"></span>
                 <span id="status-text">Connecting to LM Studio...</span>
@@ -43,10 +54,10 @@
                 </div>
                 
                 <div class="wizard-navigation">
-                    <button class="secondary-button" id="prev-btn" onclick="previousStep()" disabled>
+                    <button class="secondary-button" id="prev-btn" disabled>
                         ← Previous
                     </button>
-                    <button class="primary-button" id="next-btn" onclick="nextStep()">
+                    <button class="primary-button" id="next-btn">
                         Next →
                     </button>
                 </div>
@@ -65,7 +76,75 @@
     <!-- Toast notifications -->
     <div class="toast-container" id="toast-container"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal" style="display: none;">
+        <div class="modal-content settings-modal">
+            <h2>⚙️ Alicia Settings</h2>
+            
+            <div class="settings-section">
+                <h3>Image Generation</h3>
+                <div class="form-group">
+                    <label for="sd-endpoint">Stable Diffusion API Endpoint</label>
+                    <input type="text" id="sd-endpoint" class="form-input" placeholder="http://192.168.1.25:8000">
+                    <small>Enter the URL for your Stable Diffusion API</small>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sd-enabled"> Enable Stable Diffusion
+                    </label>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Document Generation</h3>
+                <div class="form-group">
+                    <label for="min-pages">Minimum Document Length (pages)</label>
+                    <input type="number" id="min-pages" class="form-input" min="1" max="50" value="3">
+                    <small>Alicia will ensure documents are at least this many pages</small>
+                </div>
+                <div class="form-group">
+                    <label for="doc-detail-level">Document Detail Level</label>
+                    <select id="doc-detail-level" class="form-input">
+                        <option value="concise">Concise - Brief and to the point</option>
+                        <option value="standard" selected>Standard - Balanced detail</option>
+                        <option value="detailed">Detailed - Comprehensive coverage</option>
+                        <option value="extensive">Extensive - Maximum detail</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>AI Model</h3>
+                <div class="form-group">
+                    <label for="lm-studio-url">LM Studio URL</label>
+                    <input type="text" id="lm-studio-url" class="form-input" placeholder="http://127.0.0.1:1234/v1" value="http://127.0.0.1:1234/v1">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">AI Model</label>
+                    <input type="text" id="ai-model" class="form-input" placeholder="nousresearch.nous-hermes-2-mistral-7b-dpo">
+                    <small>Leave empty to use default model</small>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="secondary-button" id="cancel-settings-btn">Cancel</button>
+                <button class="primary-button" id="save-settings-btn">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" 
+            integrity="sha384-NXOpxOt3P6M1u2iBjXMr4pCLrx06GpCTQfVb0JGgJMFO7iIFx3voEZxf2T0dfIsH" 
+            crossorigin="anonymous"></script>
+    <script src="init.js"></script>
+    <script src="error-handler.js"></script>
+    <script src="dom-utils.js"></script>
+    <script src="sanitizer.js"></script>
+    <script src="settings-manager.js"></script>
+    <script src="auto-save.js"></script>
+    <script src="progress-indicator.js"></script>
+    <script src="keyboard-shortcuts.js"></script>
+    <script src="document-templates.js"></script>
     <script src="ai-client.js"></script>
     <script src="mcp-client.js"></script>
     <script src="image-storage.js"></script>
@@ -73,6 +152,12 @@
     <script src="file-processor.js"></script>
     <script src="research-assistant.js"></script>
     <script src="document-generator.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="export-import.js"></script>
+    <script src="document-stats.js"></script>
+    <script src="share-document.js"></script>
+    <script src="version-history.js"></script>
+    <script src="print-preview.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

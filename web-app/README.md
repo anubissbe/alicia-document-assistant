@@ -14,8 +14,9 @@ Alicia is more than just a document writer - she's your personal assistant who u
 
 ## Features
 
+### Core Features
 - 🤖 **AI-Powered Intelligence**: Alicia uses advanced AI to understand your requirements and generate tailored content
-- 🎨 **Smart Visual Generation**: Automatically creates charts, diagrams, and infographics to enhance your documents
+- 🎨 **Smart Visual Generation**: Automatically creates contextual images, charts, and diagrams using Stable Diffusion
 - 🔍 **Research Assistant**: Alicia can search the web and analyze sources to enrich your content
 - 📄 **Multiple Export Formats**: Export to DOCX, PDF, HTML, and Markdown
 - 📎 **Document Analysis**: Upload existing documents for Alicia to read, understand, and reference
@@ -23,6 +24,19 @@ Alicia is more than just a document writer - she's your personal assistant who u
 - 💬 **Interactive Refinement**: Chat with Alicia to perfect your documents
 - 📊 **Smart Templates**: Pre-built templates optimized for different document types
 - ✨ **Real-time Preview**: See your document come to life as Alicia works
+
+### New Features (v2.0)
+- 🌙 **Dark Mode**: Easy on the eyes with automatic theme detection
+- 📱 **Mobile Responsive**: Works seamlessly on tablets and smartphones  
+- 💾 **Auto-Save**: Never lose your work with automatic saving every 30 seconds
+- 📊 **Document Statistics**: Real-time word count, page count, reading time
+- 🔗 **Share Documents**: Generate shareable links for easy collaboration
+- 📚 **Version History**: Track changes and restore previous versions
+- 🖨️ **Print Preview**: Customizable print settings with live preview
+- ⌨️ **Keyboard Shortcuts**: Speed up your workflow (press Ctrl+/ for help)
+- 🌍 **Export/Import Projects**: Save and load complete document projects
+- 🛡️ **Enhanced Security**: XSS protection and sanitized content
+- ⚡ **Performance Improvements**: Faster loading and better error handling
 
 ## Quick Start
 
@@ -39,26 +53,49 @@ Alicia is more than just a document writer - she's your personal assistant who u
    npm install
    ```
 
-2. **Start the MCP server:**
+2. **Start all services:**
    ```bash
-   npm run mcp-server
+   npm start
    ```
+   This will start both the web server and MCP research server.
 
-3. **Start a web server** (in a new terminal):
-   ```bash
-   npm run web-server
-   ```
-   Or use any static file server like Live Server in VS Code.
+   **Alternative methods:**
+   - Windows: `start-all.cmd` or `start-all.ps1`
+   - Unix/Linux/Mac: `./start-all.sh`
+   - Debug mode: `npm run start-debug`
 
-4. **Meet Alicia:**
-   Navigate to `http://localhost:8000` in your browser to start working with your personal document assistant.
+3. **Meet Alicia:**
+   Navigate to `http://localhost:3000` in your browser to start working with your personal document assistant.
 
 ### Setting Up Alicia's AI Brain
 
 1. Download and install [LM Studio](https://lmstudio.ai/)
-2. Load a language model (Alicia works best with: qwen2.5-coder-7b-instruct-128k)
+2. Load a language model (see recommended models below)
 3. Start the local server on port 1234
 4. Alicia will automatically connect and be ready to assist you
+
+#### Recommended AI Models for Long Documents
+
+For generating documents that meet minimum page requirements, we recommend:
+
+**Best for Long Documents (7+ pages):**
+- **Mistral-7B-Instruct-v0.3-Q8_0** - Best balance of quality and length
+- **Nous-Hermes-2-Mistral-7B-DPO** - Excellent for detailed content
+- **OpenHermes-2.5-Mistral-7B** - Good for comprehensive documents
+
+**Also Good:**
+- **Llama-3-8B-Instruct** - Reliable for structured documents
+- **Qwen2.5-7B-Instruct** - Great for technical content
+- **Zephyr-7B-Beta** - Good general purpose model
+
+**LM Studio Settings for Better Results:**
+- **Temperature:** 0.7-0.8 (higher for more creative content)
+- **Max Tokens:** 8192 or higher
+- **Context Length:** 8192 or higher
+- **Top P:** 0.9
+- **Repeat Penalty:** 1.1
+
+**Pro Tip:** Enable "Keep model loaded" in LM Studio for faster generation
 
 ## Working with Alicia
 
@@ -71,6 +108,26 @@ Alicia is more than just a document writer - she's your personal assistant who u
 5. **Define Sections**: Create custom sections or use AI-generated outlines
 6. **AI Generation**: Let AI generate your complete document
 7. **Review & Download**: Preview and download in your preferred format
+
+### Keyboard Shortcuts
+
+Press `Ctrl+/` anytime to see all available shortcuts. Here are the most useful ones:
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+/` | Show keyboard shortcuts help |
+| `Ctrl+S` | Save document |
+| `Ctrl+E` | Export document |
+| `Ctrl+I` | Import document |
+| `Ctrl+H` | Show version history |
+| `Ctrl+P` | Print settings & preview |
+| `Ctrl+Shift+S` | Share document |
+| `Ctrl+Shift+I` | Show document statistics |
+| `Alt+←` | Previous step |
+| `Alt+→` | Next step |
+| `Ctrl+Enter` | Generate document |
+| `Ctrl+1-8` | Navigate to specific steps |
+| `Esc` | Close any open dialog |
 
 ### How Alicia Helps You
 
@@ -123,6 +180,27 @@ No environment variables required - all configuration is handled in the JavaScri
 - **Communication Port**: Modify port in `mcp-server.js` and `mcp-client.js`
 - **Search Capabilities**: Update search endpoints in `mcp-server.js`
 
+### Image Generation Setup (Optional)
+
+Alicia can create contextual images for your documents using Stable Diffusion:
+
+1. **Install Stable Diffusion** (e.g., AUTOMATIC1111's WebUI)
+2. **Start with API enabled**: `--api --listen`
+3. **Configure in Alicia's settings**:
+   - Click ⚙️ Settings
+   - Enter your SD endpoint (e.g., `http://192.168.1.25:8000`)
+   - Enable image generation
+   
+**Image Scaling**: Alicia automatically generates 3 images per 5 pages of content
+
+### Settings & Configuration
+
+Click the ⚙️ button to access:
+- **Document Settings**: Minimum pages, detail level
+- **AI Settings**: LM Studio URL and model selection
+- **Image Settings**: Stable Diffusion endpoint and toggle
+- **Theme**: Automatic dark mode detection
+
 ## Troubleshooting
 
 ### If Alicia Can't Connect
@@ -140,20 +218,67 @@ No environment variables required - all configuration is handled in the JavaScri
 - Check file size limits (default: 10MB)
 - Verify browser supports File API
 
+### Debug Mode
+To enable debug mode for detailed logging and troubleshooting:
+
+**PowerShell (Windows):**
+```powershell
+# Start servers with debug mode
+$env:DEBUG = "true"
+npm run mcp-server
+# In a new terminal:
+npm run web-server
+```
+
+**Command Prompt (Windows):**
+```cmd
+# Start servers with debug mode
+set DEBUG=true
+npm run mcp-server
+# In a new terminal:
+npm run web-server
+```
+
+**Alternative Method:**
+Add `?debug=true` to your URL: `http://localhost:8000/?debug=true`
+
+Debug mode provides:
+- Detailed API call logging
+- Request/response tracking
+- Image generation debugging
+- Performance metrics
+- Error details
+
 ## Development
 
 ### Project Structure
 ```
 web-app/
 ├── index.html              # Main application
-├── styles.css              # Styling
+├── styles.css              # Core styling
+├── dark-mode.css           # Dark theme styles
+├── responsive.css          # Mobile responsive styles
 ├── app.js                  # Main application logic
+├── init.js                 # Initialization and global setup
+├── error-handler.js        # Global error handling
+├── dom-utils.js            # Safe DOM manipulation utilities
 ├── ai-client.js            # LM Studio integration
+├── image-generator.js      # Stable Diffusion integration
 ├── mcp-client.js           # MCP WebSocket client
 ├── mcp-server.js           # MCP search server
 ├── file-processor.js       # File upload handling
 ├── research-assistant.js   # Research and URL management
 ├── document-generator.js   # Document generation logic
+├── sanitizer.js            # HTML/content sanitization
+├── settings-manager.js     # Application settings
+├── auto-save.js            # Auto-save functionality
+├── keyboard-shortcuts.js   # Keyboard shortcut handler
+├── theme-manager.js        # Dark mode support
+├── export-import.js        # Project save/load
+├── document-stats.js       # Statistics tracking
+├── share-document.js       # Document sharing
+├── version-history.js      # Version control
+├── print-preview.js        # Print functionality
 └── package.json           # Node.js dependencies
 ```
 

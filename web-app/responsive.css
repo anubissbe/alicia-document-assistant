@@ -1,0 +1,431 @@
+/* Responsive Design for Document Writer */
+
+/* Tablet styles (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+    .app-header {
+        padding: 1rem;
+    }
+    
+    .app-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .app-header p {
+        font-size: 0.9rem;
+    }
+    
+    .wizard-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .document-type-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .steps-navigation {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .step-nav-item {
+        min-width: 120px;
+    }
+    
+    .modal-content {
+        margin: 1rem;
+        max-width: calc(100% - 2rem);
+        max-height: calc(100vh - 2rem);
+    }
+}
+
+/* Mobile styles (max-width: 768px) */
+@media screen and (max-width: 768px) {
+    /* Header adjustments */
+    .app-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+        position: relative;
+        padding-top: 3rem;
+    }
+    
+    .app-header h1 {
+        font-size: 1.25rem;
+        margin: 0;
+    }
+    
+    .app-header p {
+        font-size: 0.8rem;
+        margin: 0;
+    }
+    
+    /* Position buttons in top corners */
+    .settings-button,
+    .help-button,
+    .theme-toggle {
+        position: absolute !important;
+        top: 0.5rem !important;
+    }
+    
+    .settings-button {
+        right: 0.5rem !important;
+    }
+    
+    .help-button {
+        right: 3rem !important;
+    }
+    
+    .theme-toggle {
+        right: 5.5rem !important;
+    }
+    
+    /* Status indicators */
+    .ai-status,
+    .mcp-status,
+    .sd-status {
+        font-size: 0.75rem;
+    }
+    
+    /* Wizard container */
+    .wizard-container {
+        margin: 0.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    /* Progress bar */
+    .wizard-progress {
+        margin-bottom: 1rem;
+    }
+    
+    .progress-text {
+        font-size: 0.8rem;
+    }
+    
+    /* Steps navigation */
+    .steps-navigation {
+        flex-direction: column;
+        margin-bottom: 1rem;
+    }
+    
+    .step-nav-item {
+        width: 100%;
+        padding: 0.75rem;
+        justify-content: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .step-nav-number {
+        width: 24px;
+        height: 24px;
+        font-size: 0.875rem;
+    }
+    
+    .step-nav-title {
+        font-size: 0.875rem;
+    }
+    
+    /* Document type grid */
+    .document-type-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .document-type-card {
+        padding: 1rem;
+    }
+    
+    .card-icon {
+        font-size: 2rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .card-description {
+        font-size: 0.8rem;
+    }
+    
+    /* Forms */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        font-size: 0.875rem;
+    }
+    
+    .form-input {
+        font-size: 0.875rem;
+        padding: 0.625rem;
+    }
+    
+    /* Buttons */
+    .primary-button,
+    .secondary-button {
+        font-size: 0.875rem;
+        padding: 0.625rem 1rem;
+    }
+    
+    .button-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .button-container button {
+        width: 100%;
+    }
+    
+    /* Navigation buttons */
+    .wizard-navigation {
+        gap: 0.5rem;
+    }
+    
+    .wizard-navigation button {
+        flex: 1;
+        font-size: 0.875rem;
+    }
+    
+    /* Sections */
+    .section-item {
+        padding: 0.75rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .section-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .section-title-input {
+        font-size: 0.875rem;
+    }
+    
+    .section-content-input {
+        font-size: 0.875rem;
+        min-height: 80px;
+    }
+    
+    /* File upload */
+    .file-item {
+        padding: 0.75rem;
+    }
+    
+    .file-name {
+        font-size: 0.875rem;
+    }
+    
+    .file-meta {
+        font-size: 0.75rem;
+    }
+    
+    .file-summary {
+        font-size: 0.8rem;
+    }
+    
+    /* Research */
+    .research-item {
+        padding: 0.75rem;
+    }
+    
+    .url-title {
+        font-size: 0.875rem;
+    }
+    
+    .url-link {
+        font-size: 0.75rem;
+    }
+    
+    .url-summary {
+        font-size: 0.8rem;
+    }
+    
+    /* Chat */
+    .feedback-chat {
+        padding: 1rem;
+    }
+    
+    .chat-history {
+        max-height: 200px;
+        font-size: 0.875rem;
+    }
+    
+    .chat-message {
+        padding: 0.5rem;
+    }
+    
+    #feedback-input {
+        font-size: 0.875rem;
+        rows: 2;
+    }
+    
+    /* Modal */
+    .modal-content {
+        padding: 1.5rem;
+        margin: 0.5rem;
+        max-width: calc(100vw - 1rem);
+        max-height: calc(100vh - 1rem);
+        overflow-y: auto;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.25rem;
+    }
+    
+    .modal-content h3 {
+        font-size: 1rem;
+    }
+    
+    /* Loading overlay */
+    .loading-content {
+        padding: 1.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Toast */
+    .toast {
+        font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+        max-width: calc(100vw - 2rem);
+    }
+    
+    /* Document stats */
+    .document-stats {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        font-size: 0.75rem !important;
+        padding: 8px 12px !important;
+    }
+    
+    .document-stats > div {
+        flex-wrap: wrap;
+        gap: 8px !important;
+    }
+    
+    .document-stats > div > div {
+        flex: 1;
+        min-width: 80px;
+        text-align: center;
+    }
+    
+    /* Hide less important elements on small screens */
+    @media screen and (max-width: 480px) {
+        .mcp-status,
+        .sd-status {
+            display: none;
+        }
+        
+        .document-stats {
+            display: none !important;
+        }
+    }
+}
+
+/* Landscape mobile adjustments */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .app-header {
+        padding: 0.5rem 1rem;
+    }
+    
+    .wizard-container {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .steps-navigation {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+    
+    .step-nav-item {
+        min-width: 150px;
+        width: auto;
+    }
+    
+    .modal-content {
+        max-height: calc(100vh - 1rem);
+    }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets */
+    button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .form-input,
+    .form-group select {
+        min-height: 44px;
+    }
+    
+    .document-type-card {
+        min-height: 80px;
+    }
+    
+    /* Add more spacing for touch */
+    .button-container {
+        gap: 12px;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Improve touch scrolling */
+    .modal-content,
+    .chat-history,
+    .wizard-content {
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto;
+    }
+}
+
+/* Print styles */
+@media print {
+    .app-header,
+    .wizard-navigation,
+    .steps-navigation,
+    .wizard-progress,
+    .button-container,
+    .modal-overlay,
+    .toast-container,
+    .loading-overlay,
+    .document-stats,
+    .settings-button,
+    .help-button,
+    .theme-toggle {
+        display: none !important;
+    }
+    
+    .wizard-container {
+        box-shadow: none;
+        border: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .wizard-content {
+        padding: 0;
+    }
+    
+    /* Ensure content fits on page */
+    .content-preview {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+}

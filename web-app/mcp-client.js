@@ -4,10 +4,14 @@
 class MCPClient {
     constructor() {
         this.isConnected = false;
-        this.serverUrl = 'ws://localhost:3000'; // MCP server websocket
+        // Use secure WebSocket if available, fallback to non-secure for localhost
+        this.serverUrl = window.location.protocol === 'https:' ? 'wss://localhost:3000' : 'ws://localhost:3000';
         this.websocket = null;
         this.requestId = 0;
         this.pendingRequests = new Map();
+        this.reconnectAttempts = 0;
+        this.baseReconnectDelay = 1000; // Start with 1 second
+        this.maxReconnectDelay = 30000; // Max 30 seconds
         this.connect();
     }
 
@@ -21,19 +25,48 @@ class MCPClient {
             this.websocket.onopen = () => {
                 console.log('Connected to MCP server');
                 this.isConnected = true;
+                this.reconnectAttempts = 0; // Reset on successful connection
                 this.updateConnectionStatus('connected');
             };
 
             this.websocket.onmessage = (event) => {
-                this.handleMessage(JSON.parse(event.data));
+                try {
+                    const data = JSON.parse(event.data);
+                    this.handleMessage(data);
+                } catch (error) {
+                    console.error('Failed to parse MCP server message:', error);
+                    console.error('Raw message:', event.data);
+                    if (window.showToast) {
+                        window.showToast('Research server sent invalid response', 'error');
+                    }
+                }
             };
 
             this.websocket.onclose = () => {
                 console.log('Disconnected from MCP server');
                 this.isConnected = false;
                 this.updateConnectionStatus('disconnected');
-                // Attempt to reconnect after 5 seconds
-                setTimeout(() => this.connect(), 5000);
+                
+                // Implement exponential backoff for reconnection
+                if (this.reconnectAttempts < 5) {
+                    const delay = Math.min(
+                        this.baseReconnectDelay * Math.pow(2, this.reconnectAttempts),
+                        this.maxReconnectDelay
+                    );
+                    this.reconnectAttempts++;
+                    console.log(`Reconnecting in ${delay/1000} seconds... (attempt ${this.reconnectAttempts})`);
+                    
+                    if (this.reconnectAttempts === 5 && window.showToast) {
+                        window.showToast('Research server unavailable. Continuing without research features.', 'warning');
+                    }
+                    
+                    setTimeout(() => this.connect(), delay);
+                } else {
+                    console.log('Max reconnection attempts reached. Research features disabled.');
+                    if (window.showToast) {
+                        window.showToast('Research server connection failed. You can continue without research features.', 'warning');
+                    }
+                }
             };
 
             this.websocket.onerror = (error) => {

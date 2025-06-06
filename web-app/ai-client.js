@@ -78,6 +78,8 @@ class AIClient {
             });
 
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`LM Studio error response: ${errorText}`);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -167,13 +169,79 @@ ${sections.map((section, index) => `${index + 1}. ${section.title}${section.cont
 `;
         }
 
-        prompt += `Format the response as a complete document with proper markdown formatting. Include headers, bullet points, and other formatting as appropriate.
+        // Calculate max tokens based on minimum pages
+        const minPages = window.settingsManager?.getSetting('minPages') || 3;
+        // Increase tokens significantly for longer documents
+        // Approximate: 1 page = 300 words = 400 tokens, so for safety use 2000 tokens per page
+        // Cap at 32000 tokens to avoid API limits
+        const maxTokens = Math.min(32000, Math.max(4000, minPages * 2000));
+        
+        // Calculate number of images based on document length (3 images per 5 pages)
+        const imageCount = Math.max(2, Math.floor((minPages / 5) * 3));
 
-If appropriate for the document type, you may include 1-3 image placeholders in the format: [IMAGE: description of image] where visual content would significantly enhance understanding. Only suggest images if they truly add value to the document.`;
+        // Add length requirements from settings
+        if (window.settingsManager) {
+            const lengthInstructions = window.settingsManager.getDocumentGenerationInstructions();
+            console.log('[AI CLIENT] Length instructions:', lengthInstructions);
+            prompt += lengthInstructions;
+        } else {
+            console.error('[AI CLIENT] Settings manager not available!');
+        }
 
+        prompt += `
+
+CRITICAL REQUIREMENTS - YOU MUST FOLLOW THESE EXACTLY:
+================================================================
+
+1. LENGTH REQUIREMENT: 
+   - The document MUST be AT LEAST ${minPages} pages (${minPages * 300} words MINIMUM)
+   - Write extensively and in detail for EVERY section
+   - Each main section should be 400-600 words minimum
+   - Include multiple paragraphs for each point
+   - Add examples, explanations, and elaborations
+
+2. IMAGE REQUIREMENT:
+   - You MUST include EXACTLY ${imageCount} images in the document
+   - Space them evenly throughout the document (approximately every ${Math.floor(minPages / imageCount)} pages)
+   - Use this EXACT format: [IMAGE: detailed description]
+   - DO NOT forget to add images!
+
+REQUIRED IMAGES (distribute these evenly throughout the document):`;
+
+        // Generate dynamic image suggestions based on document type
+        const imageSuggestions = this.generateImageSuggestions(documentType, imageCount);
+        imageSuggestions.forEach((suggestion, index) => {
+            prompt += `\n${index + 1}. [IMAGE: ${suggestion}]`;
+        });
+
+        prompt += `
+
+3. STRUCTURE REQUIREMENT:
+   - Include an executive summary (300+ words)
+   - Have at least ${Math.max(6, Math.floor(minPages * 0.8))} main sections
+   - Each section must have 2-3 subsections
+   - Include a comprehensive conclusion (300+ words)
+
+FINAL CHECK: Before finishing, ensure:
+✓ Document is AT LEAST ${minPages * 300} words
+✓ Exactly ${imageCount} [IMAGE: ...] placeholders are included
+✓ Images are distributed evenly throughout the document
+✓ Each section is detailed and comprehensive
+
+START GENERATING THE COMPREHENSIVE DOCUMENT NOW:`;
+        
+        console.log(`[AI CLIENT] Generating document with requirements:
+- Minimum pages: ${minPages}
+- Required images: ${imageCount} (3 per 5 pages)
+- Detail level: ${window.settingsManager?.getSetting('docDetailLevel')}
+- Max tokens: ${maxTokens}`);
+        
+        // Log first part of prompt to verify it includes length requirements
+        console.log('[AI CLIENT] Prompt preview:', prompt.substring(0, 500) + '...');
+        
         const content = await this.generateText(prompt, {
             temperature: 0.7,
-            maxTokens: 3000
+            maxTokens: maxTokens
         });
 
         // If we have the image generator, process image placeholders
@@ -208,9 +276,22 @@ If appropriate for the document type, you may include 1-3 image placeholders in 
             matches = matches.slice(0, 5);
         }
         
+        console.log(`[AI CLIENT] Processing ${matches.length} image placeholders`);
+        
+        // Update loading message if we have images to generate
+        if (matches.length > 0 && typeof showLoading !== 'undefined') {
+            showLoading(`Generating document with ${matches.length} images... This may take a moment`);
+        }
+        
         // Process each match
-        for (const matchData of matches) {
+        for (let i = 0; i < matches.length; i++) {
+            const matchData = matches[i];
             const description = matchData.description;
+            
+            // Update loading progress
+            if (typeof showLoading !== 'undefined') {
+                showLoading(`Generating image ${i + 1} of ${matches.length}: ${description.substring(0, 50)}...`);
+            }
             
             try {
                 // Determine image type from description
@@ -245,12 +326,23 @@ If appropriate for the document type, you may include 1-3 image placeholders in 
                 // Generate the image
                 const imageData = await imageGenerator.generateImage(description, imageType);
                 
+                // For preview, use data URL directly
+                const imageUrl = imageData.url;
+                
+                // Log successful generation
+                console.log(`[AI CLIENT] Image ${i + 1} generated successfully:`, {
+                    type: imageType,
+                    hasUrl: !!imageUrl,
+                    isDataUrl: imageUrl?.startsWith('data:'),
+                    alt: imageData.alt
+                });
+                
                 // Replace placeholder with actual image markdown
-                const imageMarkdown = `\n\n![${imageData.alt}](${imageData.url})\n*${imageData.caption}*\n\n`;
+                const imageMarkdown = `\n\n![${imageData.alt}](${imageUrl})\n*${imageData.caption}*\n\n`;
                 enhancedContent = enhancedContent.replace(matchData.fullMatch, imageMarkdown);
                 
             } catch (error) {
-                console.error('Error generating image:', error);
+                console.error(`Error generating image ${i + 1}:`, error);
                 // Keep the placeholder if image generation fails
             }
         }
@@ -341,6 +433,69 @@ Format the outline using markdown with proper heading levels (##, ###, etc.) and
             temperature: 0.6,
             maxTokens: 1500
         });
+    }
+
+    /**
+     * Generate image suggestions based on document type
+     */
+    generateImageSuggestions(documentType, count) {
+        const suggestions = {
+            business: [
+                'detailed organizational chart showing company structure and reporting lines',
+                'bar chart comparing quarterly revenue, costs, and profit margins with specific values',
+                'flowchart diagram illustrating the complete business process workflow',
+                'professional team meeting in modern conference room discussing strategy',
+                'infographic showing key performance indicators and business metrics',
+                'timeline visualization of project milestones and deliverables'
+            ],
+            technical: [
+                'comprehensive system architecture diagram showing all components and data flow',
+                'flowchart of the technical implementation process with decision points',
+                'bar chart comparing performance metrics before and after implementation',
+                'detailed network topology diagram showing infrastructure layout',
+                'sequence diagram illustrating API calls and system interactions',
+                'dashboard visualization of system monitoring and analytics'
+            ],
+            academic: [
+                'detailed research methodology flowchart showing all phases',
+                'bar chart or graph showing research findings and statistical data',
+                'conceptual framework diagram illustrating theoretical relationships',
+                'timeline of literature review spanning key developments in the field',
+                'data visualization comparing different research approaches',
+                'infographic summarizing key research contributions'
+            ],
+            report: [
+                'executive summary dashboard with key metrics and KPIs',
+                'bar chart comparing data across different categories or time periods',
+                'process flow diagram showing the analysis methodology',
+                'pie chart showing distribution of resources or outcomes',
+                'trend line graph showing changes over time',
+                'infographic highlighting main findings and recommendations'
+            ],
+            letter: [
+                'professional letterhead design with company branding',
+                'simple diagram illustrating the main points discussed',
+                'timeline showing proposed schedule or deadlines'
+            ],
+            custom: [
+                'overview diagram showing the main components or concepts',
+                'data visualization chart with relevant metrics',
+                'process flow illustrating key workflows or procedures',
+                'comparison chart showing different options or alternatives',
+                'timeline or roadmap visualization',
+                'summary infographic of key points'
+            ]
+        };
+
+        const typeImages = suggestions[documentType] || suggestions.custom;
+        
+        // Return the requested number of images, cycling through if necessary
+        const result = [];
+        for (let i = 0; i < count; i++) {
+            result.push(typeImages[i % typeImages.length]);
+        }
+        
+        return result;
     }
 
     /**
