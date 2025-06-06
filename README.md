@@ -160,18 +160,36 @@ Access settings with the ⚙️ button:
 - Image generation toggle
 - Theme preferences
 
+## 📚 Documentation
+
+Comprehensive documentation is available in the `docs/` folder:
+
+- **[API Documentation](docs/api.md)** - Complete API reference for developers
+- **[Architecture Guide](docs/architecture.md)** - System design and components
+- **[Features Documentation](docs/features.md)** - Detailed feature descriptions
+- **[How-To Guide](docs/howto.md)** - Step-by-step tutorials
+- **[Security Documentation](docs/security.md)** - Security best practices and guidelines
+
 ## 🏗️ Project Structure
 
 ```
-web-app/
-├── index.html              # Main application
-├── styles.css              # Core styling
-├── app.js                  # Application logic
-├── ai-client.js            # LM Studio integration
-├── mcp-server.js           # Research server
-├── document-generator.js   # Document creation
-├── image-generator.js      # SD integration
-└── [other modules]         # Supporting features
+document-writer/
+├── docs/                   # Documentation
+│   ├── api.md             # API reference
+│   ├── architecture.md    # System architecture
+│   ├── features.md        # Feature documentation
+│   ├── howto.md          # How-to guides
+│   └── security.md       # Security documentation
+├── web-app/               # Main web application
+│   ├── index.html        # Main application
+│   ├── styles.css        # Core styling
+│   ├── app.js            # Application logic
+│   ├── ai-client.js      # LM Studio integration
+│   ├── mcp-server.js     # Research server
+│   └── [other modules]   # Supporting features
+├── README.md             # This file
+├── todo.md               # Development roadmap
+└── LICENSE               # MIT License
 ```
 
 ## 🤝 Contributing
