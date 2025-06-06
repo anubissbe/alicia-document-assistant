@@ -1,8 +1,10 @@
 {
   "name": "document-writer",
-  "displayName": "Document Writer with AI",
+  "displayName": "Alicia - Your Personal Document Assistant",
   "description": "Create professional documents with AI assistance and Cline integration",
   "version": "0.0.1",
+  "publisher": "document-writer",
+  "icon": "resources/icons/Alicia-logo.png",
   "engines": {
     "vscode": "^1.100.0"
   },

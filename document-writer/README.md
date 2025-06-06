@@ -1,6 +1,8 @@
-# Document Writer
+# Alicia - Your Personal Document Assistant
 
-Document Writer is a powerful VS Code extension that helps you create, edit, and manage professional documents directly within your development environment. It combines the convenience of Markdown editing with the power of AI assistance and professional document generation.
+<img src="resources/icons/Alicia-logo.png" alt="Alicia Logo" width="128" height="128" align="right">
+
+Alicia is a powerful VS Code extension that helps you create, edit, and manage professional documents directly within your development environment. Named after your personal AI document assistant, Alicia combines the convenience of Markdown editing with the power of AI assistance and professional document generation.
 
 ## Features
 
@@ -19,7 +21,7 @@ Document Writer is a powerful VS Code extension that helps you create, edit, and
 - **Performance Optimization**: Caching, lazy loading, and memory management
 - **Auto-save Integration**: Automatic document saving with VS Code's file system API
 
-![Document Writer Preview](https://via.placeholder.com/800x450.png?text=Document+Writer+Preview)
+![Alicia Document Assistant Preview](https://via.placeholder.com/800x450.png?text=Alicia+Document+Assistant+Preview)
 
 ## Getting Started
 
@@ -27,11 +29,11 @@ Document Writer is a powerful VS Code extension that helps you create, edit, and
 
 1. Install the extension from the VS Code marketplace
 2. Open VS Code
-3. Access Document Writer through the activity bar or command palette
+3. Access Alicia through the activity bar or command palette
 
 ### Quick Start
 
-1. Click on the Document Writer icon in the activity bar
+1. Click on the Alicia icon in the activity bar
 2. Select "New Document" from the sidebar
 3. Choose a template or start with a blank document
 4. Use the document editor to create your content
@@ -69,7 +71,7 @@ Document Writer supports multiple document formats:
 
 ## User Interface
 
-Document Writer features a modern, responsive interface that adapts to your workflow:
+Alicia features a modern, responsive interface that adapts to your workflow:
 
 ### Theme Integration
 - Automatically matches your VS Code theme (light, dark, high contrast)
@@ -105,7 +107,7 @@ Document Writer features a modern, responsive interface that adapts to your work
 
 ## Professional Template Library
 
-Document Writer includes 13 professionally designed templates:
+Alicia includes 13 professionally designed templates:
 
 ### Business Templates
 - **Meeting Agenda**: Structured agendas with time allocations and action items

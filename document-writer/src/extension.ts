@@ -27,13 +27,13 @@ import { webviewOptimizer } from './utils/webviewOptimizer';
 
 export function activate(context: vscode.ExtensionContext) {
     try {
-        console.log('Document Writer extension is activating...');
-        vscode.window.showInformationMessage('Document Writer extension activated successfully!');
+        console.log('Alicia - Your Personal Document Assistant is activating...');
+        vscode.window.showInformationMessage('Welcome to Alicia - Your Personal Document Assistant!');
         
         // Register a simple test command first
         context.subscriptions.push(
             vscode.commands.registerCommand('document-writer.test', () => {
-                vscode.window.showInformationMessage('Document Writer test command works!');
+                vscode.window.showInformationMessage('Alicia test command works!');
             })
         );
         
@@ -457,10 +457,10 @@ export function activate(context: vscode.ExtensionContext) {
     // Command to open the document editor webview
     vscode.commands.executeCommand('document-writer.openEditor');
     
-    console.log('Document Writer extension activated successfully!');
+    console.log('Alicia - Your Personal Document Assistant activated successfully!');
     } catch (error) {
-        console.error('Document Writer extension failed to activate:', error);
-        vscode.window.showErrorMessage(`Document Writer extension failed to activate: ${error}`);
+        console.error('Alicia extension failed to activate:', error);
+        vscode.window.showErrorMessage(`Alicia extension failed to activate: ${error}`);
         throw error;
     }
 }
