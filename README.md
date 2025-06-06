@@ -2,7 +2,7 @@
 
 👩‍💼 Meet Alicia, your intelligent personal document assistant. Available as both a VS Code extension and a standalone web application, Alicia transforms the way you create professional documents. With advanced AI capabilities powered by LM Studio and seamless integration with Cline AI assistant through the Model Context Protocol (MCP), Alicia makes document creation effortless and enjoyable.
 
-![Alicia Logo](document-writer/resources/icon.svg)
+<img src="Alicia-logo.png" alt="Alicia Logo" width="200" height="200" align="right">
 
 ## 🚀 Alicia Web Application
 

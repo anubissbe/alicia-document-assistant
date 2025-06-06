@@ -1,6 +1,6 @@
 # Alicia - Your Personal Document Assistant
 
-<img src="resources/icons/Alicia-logo.png" alt="Alicia Logo" width="128" height="128" align="right">
+<img src="./resources/icons/Alicia-logo.png" alt="Alicia Logo" width="128" height="128" align="right">
 
 Alicia is a powerful VS Code extension that helps you create, edit, and manage professional documents directly within your development environment. Named after your personal AI document assistant, Alicia combines the convenience of Markdown editing with the power of AI assistance and professional document generation.
 
