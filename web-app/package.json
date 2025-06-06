@@ -1,0 +1,37 @@
+{
+  "name": "alicia-document-assistant",
+  "version": "1.0.0",
+  "description": "Alicia - Your Personal Document Assistant Web App",
+  "main": "index.html",
+  "scripts": {
+    "start": "npm run mcp-server & npm run web-server",
+    "mcp-server": "node mcp-server.js",
+    "web-server": "http-server . -p 3000 -c-1",
+    "dev": "npm run start",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "test": "echo \"No tests specified\" && exit 0",
+    "serve": "http-server . -p 3000"
+  },
+  "keywords": [
+    "document",
+    "assistant",
+    "ai",
+    "lm-studio",
+    "mcp",
+    "web-app"
+  ],
+  "author": "anubissbe",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.18.0",
+    "node-fetch": "^3.3.2",
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

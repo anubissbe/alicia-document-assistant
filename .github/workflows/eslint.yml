@@ -30,19 +30,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install ESLint
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
         run: |
-          npm install eslint@8.10.0
-          npm install @microsoft/eslint-formatter-sarif@3.1.0
+          cd web-app
+          npm install
+          npm install --save-dev eslint@8.10.0
+          npm install --save-dev @microsoft/eslint-formatter-sarif@3.1.0
 
       - name: Run ESLint
         env:
           SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
-        run: npx eslint .
-          --config .eslintrc.js
-          --ext .js,.jsx,.ts,.tsx
+        run: cd web-app && npx eslint .
+          --ext .js
           --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results.sarif
+          --output-file ../eslint-results.sarif
         continue-on-error: true
 
       - name: Upload analysis results to GitHub
