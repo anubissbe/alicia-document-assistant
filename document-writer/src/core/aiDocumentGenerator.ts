@@ -404,6 +404,84 @@ export class AIDocumentGenerator {
                     description: 'Second party address'
                 }
             ]
+        },
+        {
+            name: 'Architecture Decision Record',
+            description: 'A structured document for recording significant architectural decisions, their context, alternatives, and consequences',
+            keywords: ['adr', 'architecture', 'decision', 'design', 'technical', 'solution', 'alternatives', 'consequences'],
+            recommendedSections: [
+                'ADR Header',
+                'Context',
+                'Decision',
+                'Decision Matrix',
+                'Consequences',
+                'Implementation Notes',
+                'Related Decisions',
+                'Review Information',
+                'References'
+            ],
+            recommendedVariables: [
+                {
+                    name: 'adrNumber',
+                    type: 'string',
+                    required: true,
+                    description: 'ADR sequence number'
+                },
+                {
+                    name: 'title',
+                    type: 'string',
+                    required: true,
+                    description: 'Architecture decision title'
+                },
+                {
+                    name: 'author',
+                    type: 'string',
+                    required: true,
+                    description: 'Decision author or responsible team'
+                },
+                {
+                    name: 'date',
+                    type: 'date',
+                    required: true,
+                    description: 'Decision date'
+                },
+                {
+                    name: 'status',
+                    type: 'string',
+                    required: true,
+                    description: 'Decision status (Proposed, Accepted, Implemented, etc.)'
+                },
+                {
+                    name: 'context',
+                    type: 'string',
+                    required: true,
+                    description: 'Technical and business context for the decision'
+                },
+                {
+                    name: 'decision',
+                    type: 'string',
+                    required: true,
+                    description: 'The chosen solution and rationale'
+                },
+                {
+                    name: 'alternatives',
+                    type: 'string',
+                    required: true,
+                    description: 'Alternative options that were considered'
+                },
+                {
+                    name: 'positiveConsequences',
+                    type: 'string',
+                    required: true,
+                    description: 'Positive outcomes from this decision'
+                },
+                {
+                    name: 'negativeConsequences',
+                    type: 'string',
+                    required: true,
+                    description: 'Negative consequences and trade-offs'
+                }
+            ]
         }
     ];
 
@@ -454,7 +532,16 @@ export class AIDocumentGenerator {
         'Limitation of Liability': 'Defines the extent of liability for each party.',
         'Governing Law': 'Specifies which laws govern the interpretation of the contract.',
         'Dispute Resolution': 'Outlines the process for resolving disputes between parties.',
-        'Signatures': 'Provides space for parties to sign the agreement.'
+        'Signatures': 'Provides space for parties to sign the agreement.',
+        'ADR Header': 'Contains essential ADR metadata including number, title, status, author, date, and stakeholders.',
+        'Context': 'Provides technical and business background, constraints, and forces that influenced the decision.',
+        'Decision': 'States the chosen solution and the rationale behind selecting this option.',
+        'Decision Matrix': 'Structured comparison of alternatives with pros, cons, and evaluation scores.',
+        'Consequences': 'Documents positive, negative, and neutral outcomes resulting from this decision.',
+        'Implementation Notes': 'Provides guidance on implementing the decision including timeline and considerations.',
+        'Related Decisions': 'Links to other ADRs and architectural decisions that influence or are influenced by this decision.',
+        'Review Information': 'Specifies review criteria and dates for re-evaluating this decision.',
+        'References': 'Lists supporting documentation, research, and external resources.'
     };
 
     constructor(
@@ -515,6 +602,10 @@ export class AIDocumentGenerator {
                 score += 5;
             } else if (docType.name === 'Legal Contract' && 
                 (lowercaseContent.includes('hereby agrees') || lowercaseContent.includes('terms and conditions'))) {
+                score += 5;
+            } else if (docType.name === 'Architecture Decision Record' && 
+                (lowercaseContent.includes('adr') || lowercaseContent.includes('architecture decision') || 
+                 lowercaseContent.includes('decision record') || lowercaseContent.includes('alternatives considered'))) {
                 score += 5;
             }
             
@@ -884,6 +975,42 @@ export class AIDocumentGenerator {
             'Requirements': {
                 'Technical Specification': 'The system must meet the following requirements: 1) [requirement 1], 2) [requirement 2], and 3) [requirement 3]. These requirements are prioritized based on [criteria].',
                 default: 'The requirements for this project include functional and non-functional specifications that must be met for successful implementation.'
+            },
+            'ADR Header': {
+                'Architecture Decision Record': 'ADR Number: [ADR-XXX] | Title: [Decision Title] | Status: [Proposed/Accepted/Implemented] | Author: [Decision Author] | Date: [Decision Date]',
+                default: 'Document header information including identification, status, and metadata.'
+            },
+            'Context': {
+                'Architecture Decision Record': 'This decision addresses [problem statement] in the context of [system/project name]. Current constraints include [technical constraints], [business constraints], and [organizational constraints]. Key forces driving this decision are [performance requirements], [scalability needs], [maintainability concerns], and [team expertise].',
+                default: 'Background information and context surrounding this topic.'
+            },
+            'Decision': {
+                'Architecture Decision Record': 'We have decided to [chosen solution] because [primary rationale]. This approach was selected over alternatives due to [key differentiating factors] and aligns with our [architectural principles/goals].',
+                default: 'The primary decision or conclusion reached.'
+            },
+            'Decision Matrix': {
+                'Architecture Decision Record': 'The following alternatives were evaluated: 1) [Option 1] - Pros: [benefits], Cons: [drawbacks], Score: [X/10], 2) [Option 2] - Pros: [benefits], Cons: [drawbacks], Score: [Y/10], 3) [Option 3] - Pros: [benefits], Cons: [drawbacks], Score: [Z/10].',
+                default: 'Comparison matrix of available options and their evaluation.'
+            },
+            'Consequences': {
+                'Architecture Decision Record': 'Positive: [improved performance], [better maintainability], [reduced complexity]. Negative: [increased learning curve], [additional tooling requirements], [potential migration effort]. Neutral: [no significant impact on existing systems].',
+                default: 'Expected outcomes and implications of this decision.'
+            },
+            'Implementation Notes': {
+                'Architecture Decision Record': 'Implementation should begin with [first step], followed by [subsequent steps]. Key considerations include [technical requirements], [timeline constraints], and [resource allocation]. Expected completion: [timeframe].',
+                default: 'Guidance and considerations for implementing this decision.'
+            },
+            'Related Decisions': {
+                'Architecture Decision Record': 'This decision is related to [ADR-XXX: Related Decision 1] and may influence [ADR-YYY: Future Decision]. Dependencies include [prerequisite decisions] and impacts [downstream decisions].',
+                default: 'Connections to other decisions and dependencies.'
+            },
+            'Review Information': {
+                'Architecture Decision Record': 'This decision should be reviewed when [triggering conditions] occur, such as [performance issues], [technology changes], or [business requirement changes]. Next review date: [date].',
+                default: 'Information about when and how this should be reviewed.'
+            },
+            'References': {
+                'Architecture Decision Record': 'Supporting documentation: [link 1], [link 2]. Research sources: [article/paper references]. Benchmarks and analysis: [performance data], [comparison studies].',
+                default: 'Supporting documentation and reference materials.'
             }
         };
         
@@ -1064,6 +1191,25 @@ export class AIDocumentGenerator {
             case 'user manual':
                 if (!content.toLowerCase().includes('step')) {
                     suggestions.push('User manuals typically include step-by-step instructions.');
+                }
+                break;
+                
+            case 'adr':
+            case 'architecture decision record':
+                if (!content.toLowerCase().includes('context') && !content.toLowerCase().includes('background')) {
+                    suggestions.push('ADRs should include detailed context and background information.');
+                }
+                if (!content.toLowerCase().includes('alternative') && !content.toLowerCase().includes('option')) {
+                    suggestions.push('Consider documenting alternative solutions that were evaluated.');
+                }
+                if (!content.toLowerCase().includes('consequence') && !content.toLowerCase().includes('impact')) {
+                    suggestions.push('ADRs should document both positive and negative consequences of the decision.');
+                }
+                if (!content.toLowerCase().includes('rationale') && !content.toLowerCase().includes('reason')) {
+                    suggestions.push('Include clear rationale for why this decision was made.');
+                }
+                if (!content.toLowerCase().includes('status')) {
+                    suggestions.push('Specify the current status of the decision (Proposed, Accepted, Implemented, etc.).');
                 }
                 break;
         }

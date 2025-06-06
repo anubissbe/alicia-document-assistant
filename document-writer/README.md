@@ -4,7 +4,7 @@ Document Writer is a powerful VS Code extension that helps you create, edit, and
 
 ## Features
 
-- **Template-based Document Creation**: Choose from a variety of professional templates for business, technical, and academic documents
+- **Professional Template Library**: 13+ professional templates covering business, technical, academic, and personal documents
 - **AI-powered Content Generation**: Get intelligent suggestions and content generation powered by Cline integration
 - **Interactive Document Assistant**: Chat-based assistant that helps with document creation and editing tasks
 - **Document Creation Wizard**: Step-by-step guided document creation process
@@ -13,6 +13,11 @@ Document Writer is a powerful VS Code extension that helps you create, edit, and
 - **Advanced Document Analysis**: Get insights and improvement suggestions for your documents
 - **Template Management**: Create, customize, and manage document templates
 - **Document Preview**: Real-time preview of your documents in different formats
+- **Dark Mode Support**: Seamlessly integrates with VS Code themes (light, dark, high contrast)
+- **Responsive Design**: Adapts to different panel sizes for optimal usability
+- **Enhanced Security**: Input validation, HTML sanitization, and secure API communications
+- **Performance Optimization**: Caching, lazy loading, and memory management
+- **Auto-save Integration**: Automatic document saving with VS Code's file system API
 
 ![Document Writer Preview](https://via.placeholder.com/800x450.png?text=Document+Writer+Preview)
 
@@ -62,6 +67,67 @@ Document Writer supports multiple document formats:
 - **PDF**: High-quality printable documents with full layout control
 - **HTML**: Web-friendly format with customizable stylesheets
 
+## User Interface
+
+Document Writer features a modern, responsive interface that adapts to your workflow:
+
+### Theme Integration
+- Automatically matches your VS Code theme (light, dark, high contrast)
+- All UI elements use VS Code's design language for consistency
+- Charts and visualizations adapt to maintain readability in all themes
+
+### Responsive Design
+- **Narrow panels (240-350px)**: Compact layout ideal for sidebar usage
+- **Medium panels (351-600px)**: Balanced layout with essential features
+- **Wide panels (600px+)**: Full feature set with split editor/preview views
+- **Collapsible sections**: Click section headers to save space
+- **Adaptive split view**: Automatically adjusts based on available width
+
+### Keyboard Shortcuts
+
+**Document Management**
+- `Ctrl+Shift+P` → `Document Writer: Create Document`: Open document creation wizard
+- `Ctrl+Shift+P` → `Document Writer: Open Template Manager`: Access template management
+- `Ctrl+Shift+P` → `Document Writer: Show Assistant`: Open AI document assistant
+- `Ctrl+Shift+P` → `Document Writer: Export Document`: Quick export dialog
+
+**Editor Shortcuts**
+- `Ctrl/Cmd+S`: Save document
+- `Ctrl/Cmd+Z`: Undo
+- `Ctrl/Cmd+Shift+Z` or `Ctrl/Cmd+Y`: Redo
+- `Alt+P`: Toggle split view
+- `Ctrl/Cmd+P`: Toggle preview
+
+**Quick Actions**
+- `Ctrl+Shift+P` → `Document Writer: Generate Chart`: Create data visualizations
+- `Ctrl+Shift+P` → `Document Writer: Preview Document`: Open document preview
+- `Ctrl+Shift+P` → `Document Writer: Start MCP Server`: Initialize AI integration
+
+## Professional Template Library
+
+Document Writer includes 13 professionally designed templates:
+
+### Business Templates
+- **Meeting Agenda**: Structured agendas with time allocations and action items
+- **Executive Summary**: Key findings, recommendations, and impact analysis
+- **Project Charter**: Scope definition, stakeholders, and success criteria
+- **Business Case**: Problem statement, solution overview, and ROI analysis
+
+### Technical Templates
+- **Architecture Decision Record (ADR)**: Context, decision matrix, and consequences
+- **API Specification**: OpenAPI format with endpoint documentation and examples
+- **Database Design Document**: Schema diagrams, table descriptions, and relationships
+- **Security Assessment**: Risk analysis, mitigation strategies, and compliance checklist
+
+### Academic Templates
+- **Dissertation Chapter**: Literature review, methodology, and results format
+- **Grant Proposal**: Research objectives, budget section, and timeline
+- **Conference Paper**: Abstract format, IEEE/ACM styles, and references
+
+### Personal Templates
+- **Personal Development Plan**: Goal setting, skill assessment, and action items
+- **Blog Post**: SEO metadata, content structure, and call-to-action
+
 ## Current Development Status
 
 The extension is currently in active development:
@@ -72,9 +138,16 @@ The extension is currently in active development:
 - ✅ Multi-Format Support (100% complete)
 - ✅ Enhanced AI Capabilities (100% complete)
 - ✅ Security Enhancements (100% complete)
+- ✅ UI/UX Polish (100% complete)
+- ✅ Feature Parity with Web App (100% complete)
+- ✅ Enhanced Security Implementation (100% complete)
+- ✅ Performance Optimization (100% complete)
+- ✅ Business Templates (100% complete)
+- ✅ Technical Templates (100% complete)
+- ✅ Academic Templates (100% complete)
+- ✅ Personal Templates (100% complete)
 - 🔄 Testing and Optimization (50% complete)
-- 🔄 Documentation (43% complete)
-- 🔄 Example Templates (43% complete)
+- 🔄 Documentation (In progress)
 - 🔄 Publishing Preparation (Not started)
 
 ## Documentation
@@ -128,6 +201,14 @@ Document Writer contributes the following settings:
 - Added chart generation
 - Enhanced preview capabilities
 - Improved template management
+
+### 0.4.0
+
+- Added comprehensive template library (13 professional templates)
+- Enhanced security with input validation and HTML sanitization
+- Performance optimization with caching and lazy loading
+- Web app feature parity with auto-save, document statistics, and sharing
+- Improved responsive design and dark mode support
 
 ---
 

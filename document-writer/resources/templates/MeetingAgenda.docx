@@ -1,0 +1,89 @@
+# Meeting Agenda Template
+
+## Meeting Information
+**Meeting Title:** {{meetingTitle}}
+**Date:** {{meetingDate}}
+**Time:** {{meetingTime}}
+**Duration:** {{estimatedDuration}}
+**Location:** {{meetingLocation}}
+**Meeting Type:** {{meetingType}}
+
+**Meeting Facilitator:** {{facilitator}}
+**Note Taker:** {{noteTaker}}
+
+## Attendees
+
+### Required Attendees
+{{#each requiredAttendees}}
+- {{name}} - {{role}} - {{email}}
+{{/each}}
+
+### Optional Attendees
+{{#each optionalAttendees}}
+- {{name}} - {{role}} - {{email}}
+{{/each}}
+
+## Meeting Objectives
+{{#each objectives}}
+- {{.}}
+{{/each}}
+
+## Agenda Items
+
+{{#each agendaItems}}
+### {{time}} - {{title}} ({{duration}} min)
+**Owner:** {{owner}}
+**Type:** {{type}}
+
+**Description:** {{description}}
+
+**Pre-meeting preparation:**
+{{#each preparation}}
+- {{.}}
+{{/each}}
+
+**Expected outcomes:**
+{{#each outcomes}}
+- {{.}}
+{{/each}}
+
+---
+{{/each}}
+
+## Action Items Template
+| Action Item | Owner | Due Date | Priority | Status |
+|-------------|-------|----------|----------|--------|
+| | | | | |
+| | | | | |
+| | | | | |
+
+## Decision Log Template
+| Decision | Context | Owner | Date | Impact |
+|----------|---------|-------|------|--------|
+| | | | | |
+| | | | | |
+
+## Next Steps
+- **Next Meeting:** {{nextMeetingDate}}
+- **Follow-up Actions:** {{followUpActions}}
+- **Distribution List:** {{distributionList}}
+
+## Meeting Notes Section
+*[This section will be filled during the meeting]*
+
+### Key Discussion Points
+
+### Decisions Made
+
+### Action Items Assigned
+
+### Issues Raised
+
+### Parking Lot Items
+*[Items to be addressed in future meetings]*
+
+---
+
+**Meeting End Time:** ___________
+**Next Meeting Date:** ___________
+**Meeting Summary:** ___________

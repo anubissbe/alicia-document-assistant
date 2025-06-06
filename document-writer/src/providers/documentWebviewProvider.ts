@@ -5,6 +5,12 @@ import { DocumentService } from '../services/documentService';
 import { FormatProcessor } from '../core/formatProcessor';
 import { DocumentFormat } from '../models/documentFormat';
 import { PreviewEnhancer } from '../utils/previewEnhancer';
+import { SecurityManager } from '../utils/securityManager';
+import { inputValidator } from '../utils/inputValidator';
+import { webviewOptimizer } from '../utils/webviewOptimizer';
+import { lazyLoader } from '../utils/lazyLoader';
+import { cacheManager } from '../utils/cacheManager';
+import { memoryManager } from '../utils/memoryManager';
 
 /**
  * Get a nonce to use in HTML to avoid script injection attacks
@@ -54,6 +60,9 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
     private _documentService: DocumentService;
     private _formatProcessor: FormatProcessor;
     private _previewEnhancer: PreviewEnhancer;
+    private _securityManager: SecurityManager;
+    private _cache: any;
+    private _optimizedMessageSender?: any;
     private _state: DocumentEditorState = {
         isModified: false,
         viewMode: 'edit'
@@ -62,6 +71,7 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
     // Static storage for persisting state across extension restarts
     private static readonly _stateStorage = new Map<string, WebviewPersistentState>();
     private _storageKey: string = 'default';
+    private _autoSaveManager?: any; // Will be set via setter
     
     /**
      * Constructor
@@ -78,6 +88,16 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
         this._documentService = documentService;
         this._formatProcessor = formatProcessor;
         this._previewEnhancer = PreviewEnhancer.getInstance();
+        this._securityManager = new SecurityManager();
+        
+        // Initialize performance optimizations
+        this._cache = cacheManager.getCache('document-webview', {
+            maxSize: 100,
+            defaultTtl: 1800000 // 30 minutes
+        });
+        
+        // Register lazy loadable resources
+        this._setupLazyLoading();
         
         // Generate a unique storage key for this instance
         this._storageKey = `documentEditor_${Date.now()}`;
@@ -114,6 +134,33 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             this._exportDocument(format);
         });
     }
+
+    /**
+     * Get the active document from the current state
+     * @returns The active document object or undefined
+     */
+    public getActiveDocument(): any {
+        if (!this._state.documentPath) {
+            return undefined;
+        }
+
+        return {
+            path: this._state.documentPath,
+            content: this._state.documentContent || '',
+            title: this._state.documentTitle || 'Untitled',
+            type: this._state.documentType || 'document',
+            isModified: this._state.isModified,
+            lastEdited: this._state.lastEdited
+        };
+    }
+
+    /**
+     * Set the auto-save manager
+     * @param autoSaveManager The auto-save manager instance
+     */
+    public setAutoSaveManager(autoSaveManager: any): void {
+        this._autoSaveManager = autoSaveManager;
+    }
     
     /**
      * Resolve the webview view
@@ -139,9 +186,19 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
         // Try to restore persistent state
         this._tryRestorePersistentState();
         
-        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+        // Set up optimized message sending
+        this._optimizedMessageSender = webviewOptimizer.optimizeMessageSending(webviewView.webview);
+        
+        webviewView.webview.html = this._getOptimizedHtmlForWebview(webviewView.webview);
         
         this._setWebviewMessageListener(webviewView.webview);
+        
+        // Listen for theme changes
+        vscode.window.onDidChangeActiveColorTheme(() => {
+            if (webviewView.visible) {
+                this._updateTheme(webviewView.webview);
+            }
+        });
         
         // Update webview when it becomes visible
         webviewView.onDidChangeVisibility(() => {
@@ -187,6 +244,11 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             vscode.Uri.joinPath(this._extensionUri, 'media', 'documentEditor.css')
         );
         
+        // Dark theme CSS
+        const darkStyleUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'media', 'documentEditor-dark.css')
+        );
+        
         // Get responsive styles and preview enhancer script
         const responsiveStyleUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, 'media', 'responsive.css')
@@ -199,17 +261,36 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
         // Use a nonce to whitelist which scripts can be run
         const nonce = getNonce();
         
+        // Detect VS Code theme
+        const theme = vscode.window.activeColorTheme.kind;
+        let themeClass = '';
+        switch (theme) {
+            case vscode.ColorThemeKind.Dark:
+                themeClass = 'vscode-dark';
+                break;
+            case vscode.ColorThemeKind.Light:
+                themeClass = 'vscode-light';
+                break;
+            case vscode.ColorThemeKind.HighContrast:
+                themeClass = 'vscode-high-contrast';
+                break;
+            case vscode.ColorThemeKind.HighContrastLight:
+                themeClass = 'vscode-high-contrast-light';
+                break;
+        }
+        
         return `<!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} https: data:;">
+            <meta http-equiv="Content-Security-Policy" content="${this._securityManager.generateWebviewCSP(nonce)}">
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
             <link href="${styleUri}" rel="stylesheet">
+            <link href="${darkStyleUri}" rel="stylesheet">
             <link href="${responsiveStyleUri}" rel="stylesheet">
             <title>Document Editor</title>
         </head>
-        <body>
+        <body class="${themeClass}">
             <div class="editor-container">
                 <div class="editor-header">
                     <div class="document-title" id="document-title">${this._state.documentTitle || 'Untitled Document'}</div>
@@ -288,12 +369,42 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
     private _setWebviewMessageListener(webview: vscode.Webview): void {
         webview.onDidReceiveMessage(
             async (message) => {
+                // Validate incoming message
+                if (!this._validateWebviewMessage(message)) {
+                    console.warn('Invalid message received from webview:', message);
+                    return;
+                }
+
                 switch (message.command) {
                     case 'contentChanged':
+                        // Sanitize and validate content
+                        const sanitizedContent = this._securityManager.sanitizeInput(message.content || '');
+                        const contentValidation = inputValidator.validateDocumentContent(sanitizedContent);
+                        
+                        if (!contentValidation.valid) {
+                            vscode.window.showErrorMessage(`Content validation failed: ${contentValidation.errors[0]}`);
+                            return;
+                        }
+                        
                         // Update the content in state
-                        this._state.documentContent = message.content;
+                        this._state.documentContent = sanitizedContent;
                         this._state.isModified = true;
                         this._state.lastEdited = Date.now();
+                        
+                        // Trigger auto-save if enabled and document has a path
+                        if (this._autoSaveManager && this._state.documentPath) {
+                            this._autoSaveManager.markDirty({
+                                documentPath: this._state.documentPath,
+                                content: this._state.documentContent || '',
+                                timestamp: new Date(),
+                                isDirty: true,
+                                metadata: {
+                                    title: this._state.documentTitle,
+                                    type: this._state.documentType,
+                                    format: this._state.previewFormat
+                                }
+                            });
+                        }
                         break;
                         
                     case 'saveDocument':
@@ -309,8 +420,35 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
                         break;
                         
                     case 'updateTitle':
-                        this._state.documentTitle = message.title;
+                        // Sanitize and validate title
+                        const sanitizedTitle = this._securityManager.sanitizeInput(message.title || '');
+                        const titleValidation = inputValidator.validateValue(sanitizedTitle, [
+                            inputValidator.Rules.required(),
+                            inputValidator.Rules.documentTitle()
+                        ]);
+                        
+                        if (!titleValidation.valid) {
+                            vscode.window.showErrorMessage(`Title validation failed: ${titleValidation.errors[0]}`);
+                            return;
+                        }
+                        
+                        this._state.documentTitle = sanitizedTitle;
                         this._state.isModified = true;
+                        
+                        // Trigger auto-save if enabled and document has a path
+                        if (this._autoSaveManager && this._state.documentPath) {
+                            this._autoSaveManager.markDirty({
+                                documentPath: this._state.documentPath,
+                                content: this._state.documentContent || '',
+                                timestamp: new Date(),
+                                isDirty: true,
+                                metadata: {
+                                    title: this._state.documentTitle,
+                                    type: this._state.documentType,
+                                    format: this._state.previewFormat
+                                }
+                            });
+                        }
                         break;
                         
                     case 'changePreviewFormat':
@@ -634,6 +772,11 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
                 path: this._state.documentPath,
                 title: this._state.documentTitle
             });
+            
+            // Notify auto-save manager that document was saved
+            if (this._autoSaveManager && this._state.documentPath) {
+                this._autoSaveManager.documentSaved(this._state.documentPath);
+            }
             
             // Update last edited timestamp
             this._state.lastEdited = Date.now();
@@ -978,6 +1121,232 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
     public hasUnsavedChanges(): boolean {
         return this._state.isModified;
     }
+
+    /**
+     * Validates incoming webview messages for security
+     * @param message The message to validate
+     * @returns True if the message is valid and safe
+     */
+    private _validateWebviewMessage(message: any): boolean {
+        // Check if message is an object
+        if (!message || typeof message !== 'object') {
+            return false;
+        }
+
+        // Check if command exists and is a string
+        if (!message.command || typeof message.command !== 'string') {
+            return false;
+        }
+
+        // Check command against allowlist
+        const allowedCommands = [
+            'contentChanged',
+            'saveDocument',
+            'togglePreview',
+            'exportDocument',
+            'updateTitle',
+            'changePreviewFormat',
+            'refreshPreview',
+            'persistState',
+            'stateRestored'
+        ];
+
+        if (!allowedCommands.includes(message.command)) {
+            return false;
+        }
+
+        // Validate command-specific parameters
+        switch (message.command) {
+            case 'contentChanged':
+                if (typeof message.content !== 'string') {
+                    return false;
+                }
+                break;
+
+            case 'updateTitle':
+                if (typeof message.title !== 'string') {
+                    return false;
+                }
+                break;
+
+            case 'exportDocument':
+            case 'changePreviewFormat':
+            case 'refreshPreview':
+                if (typeof message.format !== 'string') {
+                    return false;
+                }
+                // Validate format against allowed formats
+                const allowedFormats = ['pdf', 'docx', 'html', 'markdown', 'text'];
+                if (!allowedFormats.includes(message.format.toLowerCase())) {
+                    return false;
+                }
+                break;
+
+            case 'persistState':
+            case 'stateRestored':
+                if (message.state && typeof message.state !== 'object') {
+                    return false;
+                }
+                break;
+        }
+
+        return true;
+    }
+
+    /**
+     * Setup lazy loading for resources
+     */
+    private _setupLazyLoading(): void {
+        // Register common resources for lazy loading
+        const resources = [
+            'media/documentEditor.css',
+            'media/documentEditor-dark.css',
+            'media/responsive.css',
+            'media/documentEditor.js',
+            'media/previewEnhancer.js'
+        ];
+
+        for (const resourcePath of resources) {
+            lazyLoader.register({
+                id: resourcePath,
+                loader: async () => {
+                    const uri = vscode.Uri.joinPath(this._extensionUri, resourcePath);
+                    const content = await vscode.workspace.fs.readFile(uri);
+                    return content.toString();
+                },
+                priority: resourcePath.includes('.css') ? 'high' : 'medium'
+            });
+        }
+
+        // Preload high priority resources
+        lazyLoader.preload(resources.filter(r => r.includes('.css')));
+    }
+
+    /**
+     * Get optimized HTML for webview with performance enhancements
+     */
+    private _getOptimizedHtmlForWebview(webview: vscode.Webview): string {
+        const nonce = getNonce();
+        
+        // Check cache first
+        const cacheKey = `html-${this._state.viewMode}-${this._state.documentTitle || 'untitled'}`;
+        const cached = this._cache.get(cacheKey);
+        if (cached) {
+            return cached.replace(/nonce-[^"]+/g, `nonce-${nonce}`); // Update nonce for security
+        }
+
+        // Get resource URIs
+        const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'documentEditor.css'));
+        const darkStyleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'documentEditor-dark.css'));
+        const responsiveStyleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'responsive.css'));
+        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'documentEditor.js'));
+        const previewEnhancerUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'previewEnhancer.js'));
+
+        // Generate optimized HTML using the webview optimizer
+        const optimizedHtml = webviewOptimizer.createOptimizedHTML({
+            title: 'Document Editor',
+            nonce,
+            cspSource: webview.cspSource,
+            styleUris: [styleUri, darkStyleUri, responsiveStyleUri],
+            scriptUris: [scriptUri, previewEnhancerUri],
+            bodyContent: this._generateBodyContent(),
+            enableLazyLoading: true
+        });
+
+        // Cache the result (without nonce for reuse)
+        const cacheableHtml = optimizedHtml.replace(/nonce-[^"]+/g, 'nonce-PLACEHOLDER');
+        this._cache.set(cacheKey, cacheableHtml, 300000); // 5 minutes
+
+        return optimizedHtml;
+    }
+
+    /**
+     * Generate the body content for the webview
+     */
+    private _generateBodyContent(): string {
+        // Determine theme class
+        let themeClass = 'vscode-light';
+        switch (vscode.window.activeColorTheme.kind) {
+            case vscode.ColorThemeKind.Dark:
+                themeClass = 'vscode-dark';
+                break;
+            case vscode.ColorThemeKind.Light:
+                themeClass = 'vscode-light';
+                break;
+            case vscode.ColorThemeKind.HighContrast:
+                themeClass = 'vscode-high-contrast';
+                break;
+            case vscode.ColorThemeKind.HighContrastLight:
+                themeClass = 'vscode-high-contrast-light';
+                break;
+        }
+
+        return `
+        <div class="editor-container ${themeClass} optimized-container">
+            <div class="editor-header">
+                <div class="document-title" id="document-title">${this._escapeHtml(this._state.documentTitle || 'Untitled Document')}</div>
+                <div class="editor-actions">
+                    <button id="btn-save" class="action-button hardware-accelerated" title="Save Document">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                    </button>
+                    <button id="btn-toggle-preview" class="action-button hardware-accelerated" title="Toggle Preview">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                    <div class="dropdown">
+                        <button id="btn-export" class="action-button hardware-accelerated" title="Export Document">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </button>
+                        <div class="dropdown-content" id="export-options">
+                            <a href="#" data-format="pdf">PDF</a>
+                            <a href="#" data-format="docx">Word (DOCX)</a>
+                            <a href="#" data-format="html">HTML</a>
+                            <a href="#" data-format="markdown">Markdown</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="editor-area" class="${this._state.viewMode === 'edit' ? '' : 'hidden'}">
+                <textarea id="document-content" class="optimized-container">${this._escapeHtml(this._state.documentContent || '')}</textarea>
+            </div>
+            
+            <div id="preview-area" class="${this._state.viewMode === 'preview' ? '' : 'hidden'}">
+                <div class="preview-header">
+                    <div class="preview-format-selector">
+                        <label for="preview-format">Preview Format:</label>
+                        <select id="preview-format">
+                            <option value="html" selected>HTML</option>
+                            <option value="pdf">PDF</option>
+                            <option value="docx">Word</option>
+                            <option value="markdown">Markdown</option>
+                        </select>
+                    </div>
+                    <div class="preview-actions">
+                        <button id="btn-refresh-preview" class="action-button hardware-accelerated" title="Refresh Preview">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 4v6h-6"></path>
+                                <path d="M1 20v-6h6"></path>
+                                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10"></path>
+                                <path d="M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="preview-content" class="optimized-container"></div>
+            </div>
+        </div>`;
+    }
     
     /**
      * Escape HTML special characters to prevent XSS
@@ -1016,6 +1385,35 @@ export class DocumentWebviewProvider implements vscode.WebviewViewProvider {
             default:
                 return DocumentFormat.MARKDOWN; // Default to markdown
         }
+    }
+    
+    /**
+     * Update the theme class on the webview body
+     * @param webview The webview to update
+     */
+    private _updateTheme(webview: vscode.Webview): void {
+        const theme = vscode.window.activeColorTheme.kind;
+        let themeClass = '';
+        switch (theme) {
+            case vscode.ColorThemeKind.Dark:
+                themeClass = 'vscode-dark';
+                break;
+            case vscode.ColorThemeKind.Light:
+                themeClass = 'vscode-light';
+                break;
+            case vscode.ColorThemeKind.HighContrast:
+                themeClass = 'vscode-high-contrast';
+                break;
+            case vscode.ColorThemeKind.HighContrastLight:
+                themeClass = 'vscode-high-contrast-light';
+                break;
+        }
+        
+        // Send message to webview to update theme
+        webview.postMessage({
+            command: 'updateTheme',
+            theme: themeClass
+        });
     }
     
     /**

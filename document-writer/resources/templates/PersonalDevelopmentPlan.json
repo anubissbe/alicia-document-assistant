@@ -1,0 +1,369 @@
+{
+    "type": "PersonalDevelopmentPlan",
+    "name": "Personal Development Plan Template",
+    "description": "Comprehensive personal development plan template for professional and personal growth planning",
+    "category": "Professional Development",
+    "author": "Document Writer Extension",
+    "version": "1.0.0",
+    "tags": ["personal", "development", "career", "planning", "goals", "skills", "growth", "professional"],
+    "variables": [
+        {
+            "name": "fullName",
+            "type": "string",
+            "required": true,
+            "description": "Full name of the individual",
+            "placeholder": "e.g., John Smith"
+        },
+        {
+            "name": "currentRole",
+            "type": "string",
+            "required": true,
+            "description": "Current job title or role",
+            "placeholder": "e.g., Software Developer, Project Manager"
+        },
+        {
+            "name": "department",
+            "type": "string",
+            "required": true,
+            "description": "Department or team",
+            "placeholder": "e.g., Engineering, Marketing, Sales"
+        },
+        {
+            "name": "organization",
+            "type": "string",
+            "required": true,
+            "description": "Company or organization name",
+            "placeholder": "e.g., ACME Corporation"
+        },
+        {
+            "name": "dateCreated",
+            "type": "date",
+            "required": true,
+            "description": "Date the plan was created",
+            "placeholder": "Current date will be used if not specified"
+        },
+        {
+            "name": "reviewDate",
+            "type": "date",
+            "required": true,
+            "description": "Next review date for the plan",
+            "placeholder": "e.g., 6 months from creation date"
+        },
+        {
+            "name": "careerStage",
+            "type": "string",
+            "required": true,
+            "description": "Current career stage",
+            "placeholder": "e.g., Entry Level, Mid-Career, Senior Level, Executive"
+        },
+        {
+            "name": "yearsExperience",
+            "type": "number",
+            "required": true,
+            "description": "Years of professional experience",
+            "placeholder": "e.g., 5"
+        },
+        {
+            "name": "currentSkills",
+            "type": "string",
+            "required": true,
+            "description": "Current skills inventory",
+            "placeholder": "List technical and soft skills you currently possess"
+        },
+        {
+            "name": "strengthsAnalysis",
+            "type": "string",
+            "required": true,
+            "description": "Analysis of current strengths",
+            "placeholder": "Detailed assessment of your key strengths and what you excel at"
+        },
+        {
+            "name": "improvementAreas",
+            "type": "string",
+            "required": true,
+            "description": "Areas identified for improvement",
+            "placeholder": "Skills, behaviors, or knowledge areas that need development"
+        },
+        {
+            "name": "workingStyle",
+            "type": "string",
+            "required": true,
+            "description": "Personal working style and preferences",
+            "placeholder": "How you prefer to work, communicate, and approach tasks"
+        },
+        {
+            "name": "personalityAssessment",
+            "type": "string",
+            "required": false,
+            "description": "Results from personality assessments (e.g., MBTI, DISC)",
+            "placeholder": "e.g., ENFP, High D/I profile, etc."
+        },
+        {
+            "name": "shortTermGoals",
+            "type": "string",
+            "required": true,
+            "description": "Short-term goals (3-6 months)",
+            "placeholder": "Specific, measurable goals to achieve in the next 3-6 months"
+        },
+        {
+            "name": "mediumTermGoals",
+            "type": "string",
+            "required": true,
+            "description": "Medium-term goals (1-2 years)",
+            "placeholder": "Goals and milestones for the next 1-2 years"
+        },
+        {
+            "name": "longTermGoals",
+            "type": "string",
+            "required": true,
+            "description": "Long-term goals (3-5 years)",
+            "placeholder": "Vision and objectives for 3-5 years ahead"
+        },
+        {
+            "name": "smartGoalExample",
+            "type": "string",
+            "required": true,
+            "description": "Example of a SMART goal",
+            "placeholder": "Specific, Measurable, Achievable, Relevant, Time-bound goal example"
+        },
+        {
+            "name": "technicalSkillsTodevelop",
+            "type": "string",
+            "required": true,
+            "description": "Technical skills to develop",
+            "placeholder": "Programming languages, software, tools, certifications, etc."
+        },
+        {
+            "name": "softSkillsToEnhance",
+            "type": "string",
+            "required": true,
+            "description": "Soft skills to enhance",
+            "placeholder": "Communication, leadership, teamwork, time management, etc."
+        },
+        {
+            "name": "learningResourcesAndMethods",
+            "type": "string",
+            "required": true,
+            "description": "Learning resources and preferred methods",
+            "placeholder": "Online courses, books, workshops, mentoring, conferences, etc."
+        },
+        {
+            "name": "skillGapAnalysis",
+            "type": "string",
+            "required": true,
+            "description": "Analysis of skill gaps",
+            "placeholder": "Comparison between current skills and required skills for goals"
+        },
+        {
+            "name": "careerAspirations",
+            "type": "string",
+            "required": true,
+            "description": "Career aspirations and vision",
+            "placeholder": "Where you want your career to go, ideal roles and responsibilities"
+        },
+        {
+            "name": "potentialCareerPaths",
+            "type": "string",
+            "required": true,
+            "description": "Potential career paths to explore",
+            "placeholder": "Different career directions and opportunities you're considering"
+        },
+        {
+            "name": "requiredQualifications",
+            "type": "string",
+            "required": true,
+            "description": "Qualifications required for career goals",
+            "placeholder": "Degrees, certifications, experience, skills needed for target roles"
+        },
+        {
+            "name": "networkingOpportunities",
+            "type": "string",
+            "required": true,
+            "description": "Networking opportunities and strategies",
+            "placeholder": "Professional associations, events, online communities, etc."
+        },
+        {
+            "name": "actionItems",
+            "type": "string",
+            "required": true,
+            "description": "Specific action items and tasks",
+            "placeholder": "Concrete steps to take, with deadlines and priorities"
+        },
+        {
+            "name": "milestones",
+            "type": "string",
+            "required": true,
+            "description": "Key milestones and checkpoints",
+            "placeholder": "Important progress markers and achievement targets"
+        },
+        {
+            "name": "successMetrics",
+            "type": "string",
+            "required": true,
+            "description": "Success metrics and KPIs",
+            "placeholder": "How you'll measure progress and success"
+        },
+        {
+            "name": "progressTracking",
+            "type": "string",
+            "required": true,
+            "description": "Progress tracking methods",
+            "placeholder": "How you'll monitor and track your development progress"
+        },
+        {
+            "name": "reviewSchedule",
+            "type": "string",
+            "required": true,
+            "description": "Review and update schedule",
+            "placeholder": "When and how often you'll review and update this plan"
+        },
+        {
+            "name": "learningResources",
+            "type": "string",
+            "required": true,
+            "description": "Learning and development resources",
+            "placeholder": "Books, courses, tools, platforms for continuous learning"
+        },
+        {
+            "name": "supportNetwork",
+            "type": "string",
+            "required": true,
+            "description": "Support network and contacts",
+            "placeholder": "Mentors, colleagues, coaches who can support your development"
+        },
+        {
+            "name": "mentorshipPlans",
+            "type": "string",
+            "required": false,
+            "description": "Mentorship and coaching plans",
+            "placeholder": "Current or planned mentoring relationships"
+        },
+        {
+            "name": "reflectionNotes",
+            "type": "string",
+            "required": false,
+            "description": "Progress reflection and notes",
+            "placeholder": "Regular reflection on progress, challenges, and learnings"
+        },
+        {
+            "name": "challengesMet",
+            "type": "string",
+            "required": false,
+            "description": "Challenges met and overcome",
+            "placeholder": "Obstacles faced and how they were addressed"
+        },
+        {
+            "name": "lessonsLearned",
+            "type": "string",
+            "required": false,
+            "description": "Key lessons learned",
+            "placeholder": "Important insights and learnings from your development journey"
+        },
+        {
+            "name": "certificates",
+            "type": "string",
+            "required": false,
+            "description": "Certificates and credentials earned",
+            "placeholder": "Professional certifications, training completions, awards"
+        },
+        {
+            "name": "portfolioItems",
+            "type": "string",
+            "required": false,
+            "description": "Portfolio items and achievements",
+            "placeholder": "Projects, accomplishments, work samples that demonstrate growth"
+        },
+        {
+            "name": "budget",
+            "type": "number",
+            "required": false,
+            "description": "Development budget allocation",
+            "placeholder": "e.g., 2500 (annual budget for training and development)"
+        },
+        {
+            "name": "timeAllocation",
+            "type": "string",
+            "required": true,
+            "description": "Time allocation for development activities",
+            "placeholder": "How much time per week/month dedicated to development"
+        }
+    ],
+    "sections": [
+        {
+            "name": "Title Page",
+            "description": "Cover page with plan title, individual information, and dates"
+        },
+        {
+            "name": "Personal Information and Overview",
+            "description": "Basic information about the individual and their current situation"
+        },
+        {
+            "name": "Self-Assessment",
+            "description": "Comprehensive assessment of current skills, strengths, and areas for improvement"
+        },
+        {
+            "name": "Goal Setting",
+            "description": "Short-term, medium-term, and long-term goals using SMART framework"
+        },
+        {
+            "name": "Skill Development Plan",
+            "description": "Detailed plan for developing technical and soft skills"
+        },
+        {
+            "name": "Career Development",
+            "description": "Career aspirations, paths, and required qualifications"
+        },
+        {
+            "name": "Action Items and Milestones",
+            "description": "Specific tasks, deadlines, and progress tracking methods"
+        },
+        {
+            "name": "Learning and Development Resources",
+            "description": "Resources and methods for continuous learning and growth"
+        },
+        {
+            "name": "Support Network and Mentorship",
+            "description": "People and relationships that support development goals"
+        },
+        {
+            "name": "Progress Review and Reflection",
+            "description": "Framework for regular review and reflection on progress"
+        },
+        {
+            "name": "Appendices",
+            "description": "Supporting documents, certificates, and portfolio items"
+        }
+    ],
+    "formatting": {
+        "hasHeaders": true,
+        "hasTable": true,
+        "hasPageBreaks": true,
+        "fontSizes": {
+            "title": 24,
+            "sectionHeader": 18,
+            "subHeader": 14,
+            "body": 11
+        },
+        "styling": {
+            "headers": "bold with color accent",
+            "table": "professional with alternating row colors",
+            "spacing": "professional with consistent margins and line spacing"
+        }
+    },
+    "handlebarsHelpers": [
+        "formatDate",
+        "currency",
+        "conditional"
+    ],
+    "usageInstructions": [
+        "Fill in all required variables before generating the document",
+        "This template is designed for individual professional development planning",
+        "Regular review and updates are recommended (quarterly or bi-annually)",
+        "Use specific, measurable goals following the SMART framework",
+        "Include both technical and soft skill development objectives",
+        "Budget field should be entered as a number (without currency symbols)",
+        "The template includes comprehensive sections for holistic development planning",
+        "Consider sharing relevant sections with managers, mentors, or coaches",
+        "Use the action items section to create accountability and track progress"
+    ]
+}

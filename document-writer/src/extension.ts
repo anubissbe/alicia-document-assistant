@@ -15,6 +15,15 @@ import { EntityExtractor } from './core/entityExtractor';
 import { ContentSuggestionEngine } from './core/contentSuggestionEngine';
 import { FeedbackLearningEngine } from './core/feedbackLearningEngine';
 import { SentimentAnalyzer } from './core/sentimentAnalyzer';
+import { StatusBarManager } from './providers/statusBarManager';
+import { AutoSaveManager } from './providers/autoSaveManager';
+import { ProjectManager } from './providers/projectManager';
+import { DocumentShareProvider } from './providers/documentShareProvider';
+import { VersionHistoryProvider } from './providers/versionHistoryProvider';
+import { PrintPreviewProvider } from './providers/printPreviewProvider';
+import { cacheManager } from './utils/cacheManager';
+import { memoryManager } from './utils/memoryManager';
+import { webviewOptimizer } from './utils/webviewOptimizer';
 
 export function activate(context: vscode.ExtensionContext) {
     try {
@@ -41,12 +50,70 @@ export function activate(context: vscode.ExtensionContext) {
         const contentSuggestionEngine = new ContentSuggestionEngine();
         const feedbackLearningEngine = new FeedbackLearningEngine(context);
         const sentimentAnalyzer = new SentimentAnalyzer();
+        
+        // Initialize status bar manager
+        const statusBarManager = new StatusBarManager(context, clineIntegration, documentService);
+        context.subscriptions.push(statusBarManager);
+        
+        // Set status bar manager on document service
+        documentService.setStatusBarManager(statusBarManager);
+        
+        // Initialize auto-save manager
+        const autoSaveManager = new AutoSaveManager(context, documentService, statusBarManager);
+        context.subscriptions.push(autoSaveManager);
+        
+        // Initialize project manager
+        const projectManager = new ProjectManager(context, documentService, templateManager, statusBarManager);
+        context.subscriptions.push(projectManager);
+        
+        // Initialize document share provider
+        const documentShareProvider = new DocumentShareProvider(context, documentService, statusBarManager);
+        context.subscriptions.push(documentShareProvider);
+        
+        // Initialize version history provider
+        const versionHistoryProvider = new VersionHistoryProvider(context, documentService, statusBarManager);
+        context.subscriptions.push(versionHistoryProvider);
+        
+        // Initialize print preview provider
+        const printPreviewProvider = new PrintPreviewProvider(context, documentService, statusBarManager);
+        context.subscriptions.push(printPreviewProvider);
+        
+        // Initialize performance managers
+        console.log('Initializing performance optimization systems...');
+        
+        // Set context for cache manager
+        cacheManager['context'] = context;
+        
+        // Start memory monitoring in production mode
+        memoryManager.startMonitoring();
+        
+        // Monitor extension memory usage
+        memoryManager.registerCleanupStrategy({
+            name: 'Extension cache cleanup',
+            priority: 50,
+            condition: (stats) => stats.heapUsedPercentage > 80,
+            action: () => {
+                console.log('Running extension cache cleanup...');
+                cacheManager.cleanupAll();
+            }
+        });
+        
+        // Add dispose handlers for performance managers
+        context.subscriptions.push({
+            dispose: () => {
+                console.log('Disposing performance managers...');
+                memoryManager.dispose();
+                cacheManager.dispose();
+                webviewOptimizer.dispose();
+            }
+        });
     
     // Initialize wizard
     const documentCreationWizard = new DocumentCreationWizard(context.extensionUri, documentService, templateManager);
     
     // Register document webview provider
     const documentWebviewProvider = new DocumentWebviewProvider(context.extensionUri, documentService, formatProcessor);
+    documentWebviewProvider.setAutoSaveManager(autoSaveManager);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
             DocumentWebviewProvider.viewType,
@@ -297,6 +364,92 @@ export function activate(context: vscode.ExtensionContext) {
                 }
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to open document: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('documentWriter.startMcpServer', async () => {
+            try {
+                statusBarManager.showProgress('Starting MCP server...');
+                await clineIntegration.initialize();
+                statusBarManager.hideProgress();
+                statusBarManager.updateAiConnectionStatus();
+                vscode.window.showInformationMessage('MCP server started successfully!');
+            } catch (error) {
+                statusBarManager.hideProgress();
+                vscode.window.showErrorMessage(`Failed to start MCP server: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('documentWriter.showWizard', async () => {
+            await documentCreationWizard.showWizard();
+        }),
+
+        vscode.commands.registerCommand('documentWriter.exportDocument', async () => {
+            const quickPicks = [
+                { label: '$(file-pdf) PDF', description: 'Export as PDF document', format: 'pdf' },
+                { label: '$(file-code) HTML', description: 'Export as HTML file', format: 'html' },
+                { label: '$(markdown) Markdown', description: 'Export as Markdown file', format: 'markdown' },
+                { label: '$(file-text) Word', description: 'Export as Word document', format: 'docx' }
+            ];
+            
+            const selection = await vscode.window.showQuickPick(quickPicks, {
+                placeHolder: 'Select export format'
+            });
+            
+            if (selection) {
+                const activeDocument = documentWebviewProvider.getActiveDocument();
+                if (activeDocument) {
+                    switch (selection.format) {
+                        case 'pdf':
+                            vscode.commands.executeCommand('document-writer.exportToPdf', activeDocument);
+                            break;
+                        case 'html':
+                            vscode.commands.executeCommand('document-writer.exportToHtml', activeDocument);
+                            break;
+                        case 'markdown':
+                            vscode.commands.executeCommand('document-writer.exportToMarkdown', activeDocument);
+                            break;
+                        case 'docx':
+                            vscode.commands.executeCommand('document-writer.generateDocument', activeDocument);
+                            break;
+                    }
+                } else {
+                    vscode.window.showWarningMessage('No active document to export');
+                }
+            }
+        }),
+
+        vscode.commands.registerCommand('documentWriter.generateChart', async () => {
+            // TODO: Implement chart generation interface
+            vscode.window.showInformationMessage('Chart generation interface coming soon!');
+        }),
+
+        vscode.commands.registerCommand('documentWriter.openTemplateManager', async () => {
+            // Open template manager webview
+            const panel = vscode.window.createWebviewPanel(
+                'templateManager',
+                'Template Manager',
+                vscode.ViewColumn.One,
+                {
+                    enableScripts: true,
+                    retainContextWhenHidden: true
+                }
+            );
+            
+            // TODO: Load template manager HTML content
+            panel.webview.html = '<h1>Template Manager</h1><p>Coming soon...</p>';
+        }),
+
+        vscode.commands.registerCommand('documentWriter.showAssistant', async () => {
+            documentAssistant.open();
+        }),
+
+        vscode.commands.registerCommand('documentWriter.previewDocument', async () => {
+            const activeDocument = documentWebviewProvider.getActiveDocument();
+            if (activeDocument) {
+                vscode.commands.executeCommand('document-writer.previewDocument', activeDocument);
+            } else {
+                vscode.window.showWarningMessage('No active document to preview');
             }
         })
     );

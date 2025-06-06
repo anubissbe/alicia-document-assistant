@@ -1,0 +1,300 @@
+{
+    "type": "BusinessCase",
+    "name": "Business Case Template",
+    "description": "Comprehensive business case template for project proposals and investment decisions",
+    "category": "Business",
+    "author": "Document Writer Extension",
+    "version": "1.0.0",
+    "tags": ["business", "case", "roi", "financial", "analysis", "project", "proposal"],
+    "variables": [
+        {
+            "name": "title",
+            "type": "string",
+            "required": true,
+            "description": "Title of the business case",
+            "placeholder": "e.g., Implementation of Customer Management System"
+        },
+        {
+            "name": "author", 
+            "type": "string",
+            "required": true,
+            "description": "Author of the business case",
+            "placeholder": "e.g., John Smith, Project Manager"
+        },
+        {
+            "name": "date",
+            "type": "date", 
+            "required": true,
+            "description": "Date the business case was created",
+            "placeholder": "Current date will be used if not specified"
+        },
+        {
+            "name": "company",
+            "type": "string",
+            "required": true,
+            "description": "Company name",
+            "placeholder": "e.g., ACME Corporation"
+        },
+        {
+            "name": "department",
+            "type": "string",
+            "required": true,
+            "description": "Department requesting the project",
+            "placeholder": "e.g., Information Technology"
+        },
+        {
+            "name": "executiveSummary",
+            "type": "string",
+            "required": true,
+            "description": "Brief executive summary of the business case",
+            "placeholder": "2-3 paragraph summary highlighting the key points, investment required, and expected benefits"
+        },
+        {
+            "name": "currentSituation",
+            "type": "string",
+            "required": true,
+            "description": "Description of the current business situation",
+            "placeholder": "Detailed description of the current state, processes, and systems"
+        },
+        {
+            "name": "problemDescription",
+            "type": "string",
+            "required": true,
+            "description": "Clear description of the problem being addressed",
+            "placeholder": "Specific issues, pain points, and challenges that need to be resolved"
+        },
+        {
+            "name": "impactOfInaction",
+            "type": "string",
+            "required": true,
+            "description": "Consequences of not implementing the solution",
+            "placeholder": "Risks, costs, and negative impacts if no action is taken"
+        },
+        {
+            "name": "stakeholdersAffected",
+            "type": "string",
+            "required": true,
+            "description": "List of stakeholders impacted by the problem and solution",
+            "placeholder": "Departments, teams, customers, or external parties affected"
+        },
+        {
+            "name": "proposedSolution",
+            "type": "string",
+            "required": true,
+            "description": "Detailed description of the proposed solution",
+            "placeholder": "Comprehensive overview of the recommended approach and solution"
+        },
+        {
+            "name": "keyFeatures",
+            "type": "string",
+            "required": true,
+            "description": "Key features and capabilities of the solution",
+            "placeholder": "Bullet points or list of main features and functionalities"
+        },
+        {
+            "name": "benefits",
+            "type": "string",
+            "required": true,
+            "description": "Expected benefits from implementing the solution",
+            "placeholder": "Quantifiable and qualitative benefits, improvements, and value"
+        },
+        {
+            "name": "alternatives",
+            "type": "string",
+            "required": true,
+            "description": "Alternative solutions considered",
+            "placeholder": "Other options evaluated and reasons for not selecting them"
+        },
+        {
+            "name": "totalInvestment",
+            "type": "number",
+            "required": true,
+            "description": "Total upfront investment required",
+            "placeholder": "e.g., 150000 (will be formatted as currency)"
+        },
+        {
+            "name": "annualCost",
+            "type": "number",
+            "required": true,
+            "description": "Annual operating costs",
+            "placeholder": "e.g., 25000 (will be formatted as currency)"
+        },
+        {
+            "name": "projectedSavings",
+            "type": "number",
+            "required": true,
+            "description": "Projected annual cost savings",
+            "placeholder": "e.g., 75000 (will be formatted as currency)"
+        },
+        {
+            "name": "roi",
+            "type": "number",
+            "required": true,
+            "description": "Expected return on investment as decimal",
+            "placeholder": "e.g., 0.45 (will be formatted as 45%)"
+        },
+        {
+            "name": "paybackPeriod",
+            "type": "string",
+            "required": true,
+            "description": "Time to recover the initial investment",
+            "placeholder": "e.g., 18 months, 2.5 years"
+        },
+        {
+            "name": "npv",
+            "type": "number",
+            "required": true,
+            "description": "Net Present Value of the investment",
+            "placeholder": "e.g., 125000 (will be formatted as currency)"
+        },
+        {
+            "name": "risks",
+            "type": "string",
+            "required": true,
+            "description": "Identified risks and their potential impact",
+            "placeholder": "List of risks with probability and impact assessment"
+        },
+        {
+            "name": "mitigation",
+            "type": "string",
+            "required": true,
+            "description": "Risk mitigation strategies and contingency plans",
+            "placeholder": "Specific actions to minimize or eliminate identified risks"
+        },
+        {
+            "name": "duration",
+            "type": "string",
+            "required": true,
+            "description": "Total project duration",
+            "placeholder": "e.g., 6 months, 1 year"
+        },
+        {
+            "name": "phases",
+            "type": "string",
+            "required": true,
+            "description": "Implementation phases and their scope",
+            "placeholder": "Detailed breakdown of project phases with timelines"
+        },
+        {
+            "name": "milestones",
+            "type": "string",
+            "required": true,
+            "description": "Key project milestones and deliverables",
+            "placeholder": "Critical checkpoints and deliverables with target dates"
+        },
+        {
+            "name": "humanResources",
+            "type": "string",
+            "required": true,
+            "description": "Human resource requirements",
+            "placeholder": "Staff, skills, roles, and time commitments needed"
+        },
+        {
+            "name": "technology",
+            "type": "string",
+            "required": true,
+            "description": "Technology and infrastructure requirements",
+            "placeholder": "Hardware, software, licenses, and technical resources"
+        },
+        {
+            "name": "budget",
+            "type": "number",
+            "required": true,
+            "description": "Total budget allocation required",
+            "placeholder": "e.g., 200000 (will be formatted as currency)"
+        },
+        {
+            "name": "kpis",
+            "type": "string",
+            "required": true,
+            "description": "Key Performance Indicators to measure success",
+            "placeholder": "Specific, measurable metrics to track project success"
+        },
+        {
+            "name": "measurementMethods",
+            "type": "string",
+            "required": true,
+            "description": "Methods for measuring and tracking success",
+            "placeholder": "How KPIs will be measured, frequency, and reporting methods"
+        },
+        {
+            "name": "appendices",
+            "type": "string",
+            "required": false,
+            "description": "Additional supporting documentation",
+            "placeholder": "References to additional documents, charts, technical specifications, etc."
+        }
+    ],
+    "sections": [
+        {
+            "name": "Title Page",
+            "description": "Cover page with project title, company, department, author, and date"
+        },
+        {
+            "name": "Executive Summary", 
+            "description": "High-level overview of the business case"
+        },
+        {
+            "name": "Problem Statement",
+            "description": "Current situation, problem description, impact, and stakeholders"
+        },
+        {
+            "name": "Solution Overview",
+            "description": "Proposed solution, features, benefits, and alternatives"
+        },
+        {
+            "name": "ROI Analysis",
+            "description": "Financial analysis with investment, costs, savings, and returns"
+        },
+        {
+            "name": "Risk Assessment",
+            "description": "Risk identification and mitigation strategies"
+        },
+        {
+            "name": "Implementation Timeline",
+            "description": "Project duration, phases, and key milestones"
+        },
+        {
+            "name": "Resource Requirements",
+            "description": "Human resources, technology, and budget needs"
+        },
+        {
+            "name": "Success Metrics",
+            "description": "KPIs and measurement methods for tracking success"
+        },
+        {
+            "name": "Appendices",
+            "description": "Supporting documentation and references"
+        }
+    ],
+    "formatting": {
+        "hasHeaders": true,
+        "hasTable": true,
+        "hasPageBreaks": true,
+        "fontSizes": {
+            "title": 32,
+            "sectionHeader": 28,
+            "subHeader": 22,
+            "body": 11
+        },
+        "styling": {
+            "headers": "bold",
+            "table": "bordered with header highlighting",
+            "spacing": "professional with consistent margins"
+        }
+    },
+    "handlebarsHelpers": [
+        "formatDate",
+        "currency",
+        "percentage"
+    ],
+    "usageInstructions": [
+        "Fill in all required variables before generating the document",
+        "Financial values should be entered as numbers (without currency symbols)",
+        "ROI should be entered as a decimal (e.g., 0.45 for 45%)",
+        "Dates will be automatically formatted using the formatDate helper",
+        "Use bullet points or numbered lists for multi-item fields",
+        "The template includes a professional financial analysis table",
+        "All sections are designed for comprehensive business case documentation"
+    ]
+}

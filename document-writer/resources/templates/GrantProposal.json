@@ -1,0 +1,521 @@
+{
+    "type": "GrantProposal",
+    "name": "Grant Proposal Template",
+    "description": "Comprehensive academic grant proposal template for NSF, NIH, and other funding agencies with professional formatting and detailed sections",
+    "category": "Academic",
+    "author": "Document Writer Extension",
+    "version": "1.0.0",
+    "tags": ["grant", "proposal", "research", "funding", "academic", "nsf", "nih", "scientific", "budget", "methodology"],
+    "variables": [
+        {
+            "name": "projectTitle",
+            "type": "string",
+            "required": true,
+            "description": "Title of the research project",
+            "placeholder": "e.g., Advanced Machine Learning Approaches for Climate Prediction"
+        },
+        {
+            "name": "fundingAgency",
+            "type": "string",
+            "required": true,
+            "description": "Name of the funding agency",
+            "placeholder": "e.g., National Science Foundation (NSF)"
+        },
+        {
+            "name": "fundingOpportunity",
+            "type": "string",
+            "required": true,
+            "description": "Specific funding opportunity or program",
+            "placeholder": "e.g., NSF-23-545: Computer and Information Science and Engineering"
+        },
+        {
+            "name": "principalInvestigator",
+            "type": "string",
+            "required": true,
+            "description": "Principal Investigator name and title",
+            "placeholder": "e.g., Dr. Jane Smith, Professor of Computer Science"
+        },
+        {
+            "name": "institution",
+            "type": "string",
+            "required": true,
+            "description": "Institution or university name",
+            "placeholder": "e.g., University of Technology"
+        },
+        {
+            "name": "department",
+            "type": "string",
+            "required": true,
+            "description": "Department or school name",
+            "placeholder": "e.g., Department of Computer Science"
+        },
+        {
+            "name": "requestedAmount",
+            "type": "string",
+            "required": true,
+            "description": "Total funding amount requested",
+            "placeholder": "e.g., $500,000"
+        },
+        {
+            "name": "projectPeriod",
+            "type": "string",
+            "required": true,
+            "description": "Duration of the project",
+            "placeholder": "e.g., 3 years (September 2024 - August 2027)"
+        },
+        {
+            "name": "submissionDate",
+            "type": "date",
+            "required": true,
+            "description": "Date of proposal submission",
+            "placeholder": "Current date will be used if not specified"
+        },
+        {
+            "name": "executiveSummary",
+            "type": "string",
+            "required": true,
+            "description": "Executive summary of the project (2-3 paragraphs)",
+            "placeholder": "Concise overview of the research project, its objectives, methodology, and expected impact. Should be compelling and accessible to both technical and non-technical reviewers."
+        },
+        {
+            "name": "projectSignificance",
+            "type": "string",
+            "required": true,
+            "description": "Significance and importance of the project",
+            "placeholder": "Explain why this research is important, timely, and needed. Address broader impacts and potential contributions to the field."
+        },
+        {
+            "name": "expectedImpact",
+            "type": "string",
+            "required": true,
+            "description": "Expected impact and outcomes of the research",
+            "placeholder": "Describe the anticipated scientific, technological, economic, or societal impacts of the research."
+        },
+        {
+            "name": "backgroundSignificance",
+            "type": "string",
+            "required": true,
+            "description": "Detailed background and significance section",
+            "placeholder": "Comprehensive background information, context, and significance of the research problem. Include current state of the field and knowledge gaps."
+        },
+        {
+            "name": "primaryObjective",
+            "type": "string",
+            "required": true,
+            "description": "Primary research objective",
+            "placeholder": "Main goal or objective of the research project. Should be specific, measurable, and achievable."
+        },
+        {
+            "name": "secondaryObjectives",
+            "type": "string",
+            "required": true,
+            "description": "Secondary research objectives",
+            "placeholder": "Supporting objectives that contribute to the primary goal. Use bullet points or numbered list format."
+        },
+        {
+            "name": "researchHypotheses",
+            "type": "string",
+            "required": true,
+            "description": "Research hypotheses to be tested",
+            "placeholder": "Specific, testable hypotheses that will guide the research. Should be falsifiable and clearly stated."
+        },
+        {
+            "name": "literatureReview",
+            "type": "string",
+            "required": true,
+            "description": "Literature review and related work",
+            "placeholder": "Comprehensive review of relevant literature, citing key studies and identifying research gaps. Demonstrate thorough knowledge of the field."
+        },
+        {
+            "name": "theoreticalFramework",
+            "type": "string",
+            "required": true,
+            "description": "Theoretical framework underlying the research",
+            "placeholder": "Theoretical foundations, models, or frameworks that inform the research approach and methodology."
+        },
+        {
+            "name": "studyDesign",
+            "type": "string",
+            "required": true,
+            "description": "Study design and research approach",
+            "placeholder": "Overall research design, methodology type (quantitative, qualitative, mixed-methods), and justification for the chosen approach."
+        },
+        {
+            "name": "dataCollection",
+            "type": "string",
+            "required": true,
+            "description": "Data collection procedures and methods",
+            "placeholder": "Detailed description of data collection methods, instruments, sampling procedures, and data sources."
+        },
+        {
+            "name": "analysisPlan",
+            "type": "string",
+            "required": true,
+            "description": "Data analysis plan and statistical methods",
+            "placeholder": "Statistical and analytical methods to be used, software tools, and analysis procedures. Include power analysis if applicable."
+        },
+        {
+            "name": "timelineMilestones",
+            "type": "string",
+            "required": true,
+            "description": "Project timeline with key milestones",
+            "placeholder": "Detailed timeline showing major phases, activities, milestones, and deliverables across the project period."
+        },
+        {
+            "name": "personnelYear1",
+            "type": "string",
+            "required": true,
+            "description": "Personnel costs for Year 1",
+            "placeholder": "e.g., $125,000"
+        },
+        {
+            "name": "personnelYear2",
+            "type": "string",
+            "required": true,
+            "description": "Personnel costs for Year 2",
+            "placeholder": "e.g., $130,000"
+        },
+        {
+            "name": "personnelYear3",
+            "type": "string",
+            "required": true,
+            "description": "Personnel costs for Year 3",
+            "placeholder": "e.g., $135,000"
+        },
+        {
+            "name": "totalPersonnel",
+            "type": "string",
+            "required": true,
+            "description": "Total personnel costs",
+            "placeholder": "e.g., $390,000"
+        },
+        {
+            "name": "equipmentYear1",
+            "type": "string",
+            "required": true,
+            "description": "Equipment costs for Year 1",
+            "placeholder": "e.g., $75,000"
+        },
+        {
+            "name": "equipmentYear2",
+            "type": "string",
+            "required": true,
+            "description": "Equipment costs for Year 2",
+            "placeholder": "e.g., $15,000"
+        },
+        {
+            "name": "equipmentYear3",
+            "type": "string",
+            "required": true,
+            "description": "Equipment costs for Year 3",
+            "placeholder": "e.g., $10,000"
+        },
+        {
+            "name": "totalEquipment",
+            "type": "string",
+            "required": true,
+            "description": "Total equipment costs",
+            "placeholder": "e.g., $100,000"
+        },
+        {
+            "name": "suppliesYear1",
+            "type": "string",
+            "required": true,
+            "description": "Supplies costs for Year 1",
+            "placeholder": "e.g., $8,000"
+        },
+        {
+            "name": "suppliesYear2",
+            "type": "string",
+            "required": true,
+            "description": "Supplies costs for Year 2",
+            "placeholder": "e.g., $8,500"
+        },
+        {
+            "name": "suppliesYear3",
+            "type": "string",
+            "required": true,
+            "description": "Supplies costs for Year 3",
+            "placeholder": "e.g., $9,000"
+        },
+        {
+            "name": "totalSupplies",
+            "type": "string",
+            "required": true,
+            "description": "Total supplies costs",
+            "placeholder": "e.g., $25,500"
+        },
+        {
+            "name": "travelYear1",
+            "type": "string",
+            "required": true,
+            "description": "Travel costs for Year 1",
+            "placeholder": "e.g., $12,000"
+        },
+        {
+            "name": "travelYear2",
+            "type": "string",
+            "required": true,
+            "description": "Travel costs for Year 2",
+            "placeholder": "e.g., $8,000"
+        },
+        {
+            "name": "travelYear3",
+            "type": "string",
+            "required": true,
+            "description": "Travel costs for Year 3",
+            "placeholder": "e.g., $10,000"
+        },
+        {
+            "name": "totalTravel",
+            "type": "string",
+            "required": true,
+            "description": "Total travel costs",
+            "placeholder": "e.g., $30,000"
+        },
+        {
+            "name": "indirectYear1",
+            "type": "string",
+            "required": true,
+            "description": "Indirect costs for Year 1",
+            "placeholder": "e.g., $55,000"
+        },
+        {
+            "name": "indirectYear2",
+            "type": "string",
+            "required": true,
+            "description": "Indirect costs for Year 2",
+            "placeholder": "e.g., $40,625"
+        },
+        {
+            "name": "indirectYear3",
+            "type": "string",
+            "required": true,
+            "description": "Indirect costs for Year 3",
+            "placeholder": "e.g., $41,000"
+        },
+        {
+            "name": "totalIndirect",
+            "type": "string",
+            "required": true,
+            "description": "Total indirect costs",
+            "placeholder": "e.g., $136,625"
+        },
+        {
+            "name": "totalYear1",
+            "type": "string",
+            "required": true,
+            "description": "Total budget for Year 1",
+            "placeholder": "e.g., $275,000"
+        },
+        {
+            "name": "totalYear2",
+            "type": "string",
+            "required": true,
+            "description": "Total budget for Year 2",
+            "placeholder": "e.g., $202,125"
+        },
+        {
+            "name": "totalYear3",
+            "type": "string",
+            "required": true,
+            "description": "Total budget for Year 3",
+            "placeholder": "e.g., $205,000"
+        },
+        {
+            "name": "grandTotal",
+            "type": "string",
+            "required": true,
+            "description": "Grand total budget for all years",
+            "placeholder": "e.g., $682,125"
+        },
+        {
+            "name": "budgetJustification",
+            "type": "string",
+            "required": true,
+            "description": "Detailed budget justification",
+            "placeholder": "Comprehensive justification for each budget category, explaining costs and their necessity for the project."
+        },
+        {
+            "name": "evaluationMethodology",
+            "type": "string",
+            "required": true,
+            "description": "Evaluation methodology and success metrics",
+            "placeholder": "Methods for evaluating project success, including metrics, benchmarks, and assessment procedures."
+        },
+        {
+            "name": "disseminationPlan",
+            "type": "string",
+            "required": true,
+            "description": "Plan for disseminating research results",
+            "placeholder": "Strategy for sharing results through publications, conferences, workshops, and other dissemination channels."
+        },
+        {
+            "name": "researchTeam",
+            "type": "string",
+            "required": true,
+            "description": "Research team qualifications and roles",
+            "placeholder": "Detailed information about team members, their qualifications, roles, and contributions to the project."
+        },
+        {
+            "name": "institutionalResources",
+            "type": "string",
+            "required": true,
+            "description": "Institutional resources and support",
+            "placeholder": "Description of institutional facilities, resources, support services, and commitments available for the project."
+        },
+        {
+            "name": "expectedOutcomes",
+            "type": "string",
+            "required": true,
+            "description": "Expected outcomes and deliverables",
+            "placeholder": "Specific outcomes, deliverables, and impacts expected from the research, including publications, patents, software, etc."
+        },
+        {
+            "name": "riskManagement",
+            "type": "string",
+            "required": true,
+            "description": "Risk management and contingency plans",
+            "placeholder": "Identification of potential risks and challenges with corresponding mitigation strategies and contingency plans."
+        },
+        {
+            "name": "references",
+            "type": "string",
+            "required": true,
+            "description": "References and citations",
+            "placeholder": "Complete bibliography of all sources cited in the proposal, formatted according to the funding agency's requirements."
+        },
+        {
+            "name": "principalInvestigatorCV",
+            "type": "string",
+            "required": false,
+            "description": "Principal Investigator curriculum vitae",
+            "placeholder": "Comprehensive CV of the Principal Investigator, including education, experience, publications, and relevant qualifications."
+        },
+        {
+            "name": "coInvestigatorCVs",
+            "type": "string",
+            "required": false,
+            "description": "Co-Investigator curriculum vitae",
+            "placeholder": "CVs of all co-investigators and key personnel involved in the project."
+        },
+        {
+            "name": "lettersOfSupport",
+            "type": "string",
+            "required": false,
+            "description": "Letters of support and collaboration",
+            "placeholder": "Letters of support from collaborators, institutions, industry partners, or other stakeholders."
+        },
+        {
+            "name": "additionalDocuments",
+            "type": "string",
+            "required": false,
+            "description": "Additional supporting documents",
+            "placeholder": "Any additional documents required by the funding agency, such as facilities descriptions, data management plans, etc."
+        }
+    ],
+    "sections": [
+        {
+            "name": "Title Page",
+            "description": "Professional cover page with project information, PI details, and funding request"
+        },
+        {
+            "name": "Executive Summary",
+            "description": "Concise overview of the project, significance, and expected impact"
+        },
+        {
+            "name": "Project Description",
+            "description": "Comprehensive description including background, objectives, literature review, and theoretical framework"
+        },
+        {
+            "name": "Research Methodology",
+            "description": "Detailed methodology including study design, data collection, analysis plan, and timeline"
+        },
+        {
+            "name": "Budget",
+            "description": "Complete budget breakdown with professional table format and detailed justification"
+        },
+        {
+            "name": "Evaluation and Dissemination Plan",
+            "description": "Plans for evaluating success and disseminating results"
+        },
+        {
+            "name": "Research Team and Qualifications",
+            "description": "Team member qualifications and their roles in the project"
+        },
+        {
+            "name": "Institutional Resources and Support",
+            "description": "Available institutional facilities and support for the project"
+        },
+        {
+            "name": "Expected Outcomes and Impact",
+            "description": "Anticipated outcomes, deliverables, and broader impacts"
+        },
+        {
+            "name": "Risk Management and Contingency Plans",
+            "description": "Risk identification and mitigation strategies"
+        },
+        {
+            "name": "References and Citations",
+            "description": "Complete bibliography of cited sources"
+        },
+        {
+            "name": "Appendices",
+            "description": "Supporting documents including CVs, letters of support, and additional materials"
+        }
+    ],
+    "formatting": {
+        "hasHeaders": true,
+        "hasTable": true,
+        "hasPageBreaks": true,
+        "fontSizes": {
+            "title": 32,
+            "sectionHeader": 24,
+            "subHeader": 22,
+            "body": 22,
+            "tableHeader": 22,
+            "tableContent": 20,
+            "appendix": 18
+        },
+        "styling": {
+            "font": "Times New Roman",
+            "lineSpacing": "1.15",
+            "margins": "1 inch all sides",
+            "headers": "bold with consistent hierarchy",
+            "table": "professional with shaded headers and borders",
+            "spacing": "academic formatting with proper section breaks"
+        }
+    },
+    "handlebarsHelpers": [
+        "formatDate",
+        "currency",
+        "toUpperCase",
+        "toLowerCase"
+    ],
+    "usageInstructions": [
+        "Complete all required variables before generating the document",
+        "Budget amounts should include currency symbols (e.g., $500,000)",
+        "Use academic writing style appropriate for grant proposals",
+        "Ensure literature review includes current and relevant citations",
+        "Follow specific funding agency guidelines for page limits and formatting",
+        "Include detailed budget justification for all requested funds",
+        "Provide comprehensive methodology that demonstrates feasibility",
+        "Address broader impacts and societal benefits of the research",
+        "Include contingency plans for potential challenges or setbacks",
+        "Ensure all team member qualifications align with project requirements",
+        "Letters of support should be from credible and relevant sources",
+        "Follow proper citation format required by the funding agency"
+    ],
+    "fundingAgencyGuidelines": {
+        "NSF": "Follows NSF proposal guidelines including broader impacts criteria",
+        "NIH": "Structured for NIH R01 and similar research grants",
+        "DOE": "Appropriate for Department of Energy research proposals",
+        "Generic": "Adaptable template suitable for various funding agencies"
+    },
+    "academicStandards": {
+        "formatting": "Professional academic formatting with proper headings and spacing",
+        "citations": "Academic citation style with comprehensive bibliography",
+        "writing": "Formal academic writing appropriate for research proposals",
+        "structure": "Standard grant proposal structure following best practices"
+    }
+}

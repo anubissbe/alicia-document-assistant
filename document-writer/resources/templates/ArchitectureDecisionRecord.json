@@ -1,0 +1,301 @@
+{
+    "type": "ArchitectureDecisionRecord",
+    "name": "Architecture Decision Record (ADR) Template",
+    "description": "Professional template for documenting architecture decisions, evaluating options, and tracking decision rationale in software engineering projects",
+    "category": "Technical",
+    "author": "Document Writer Extension",
+    "version": "1.0.0",
+    "tags": ["adr", "architecture", "decision", "technical", "software", "engineering", "documentation", "design"],
+    "variables": [
+        {
+            "name": "adrNumber",
+            "type": "string",
+            "required": true,
+            "description": "ADR sequence number (e.g., ADR-001, ADR-015)",
+            "placeholder": "e.g., ADR-001"
+        },
+        {
+            "name": "title",
+            "type": "string",
+            "required": true,
+            "description": "Clear, descriptive title of the architecture decision",
+            "placeholder": "e.g., Use Microservices Architecture for Order Processing System"
+        },
+        {
+            "name": "author",
+            "type": "string",
+            "required": true,
+            "description": "Decision author or team responsible",
+            "placeholder": "e.g., John Smith, Senior Architect"
+        },
+        {
+            "name": "date",
+            "type": "date",
+            "required": true,
+            "description": "Date when the decision was made",
+            "placeholder": "Decision date will be formatted automatically"
+        },
+        {
+            "name": "status",
+            "type": "string",
+            "required": true,
+            "description": "Current status of the decision",
+            "placeholder": "e.g., Proposed, Accepted, Implemented, Deprecated, Superseded"
+        },
+        {
+            "name": "reviewDate",
+            "type": "date",
+            "required": false,
+            "description": "Next review date for this decision",
+            "placeholder": "Date when this decision should be re-evaluated"
+        },
+        {
+            "name": "stakeholders",
+            "type": "string",
+            "required": true,
+            "description": "Key stakeholders involved in or affected by this decision",
+            "placeholder": "e.g., Development Team, DevOps Team, Product Owner, Security Team"
+        },
+        {
+            "name": "context",
+            "type": "string",
+            "required": true,
+            "description": "Technical and business context surrounding this decision",
+            "placeholder": "Background information, current situation, and factors influencing this decision"
+        },
+        {
+            "name": "constraints",
+            "type": "string",
+            "required": true,
+            "description": "Technical, business, or organizational constraints",
+            "placeholder": "Budget limitations, technology restrictions, time constraints, compliance requirements"
+        },
+        {
+            "name": "forces",
+            "type": "string",
+            "required": true,
+            "description": "Driving forces and trade-offs that shape this decision",
+            "placeholder": "Performance requirements, scalability needs, maintainability, team expertise, cost considerations"
+        },
+        {
+            "name": "decision",
+            "type": "string",
+            "required": true,
+            "description": "The chosen solution and rationale",
+            "placeholder": "Clear statement of what was decided and why this option was selected"
+        },
+        {
+            "name": "alternatives",
+            "type": "string",
+            "required": true,
+            "description": "Alternative options that were considered",
+            "placeholder": "Other solutions evaluated with brief description of each option"
+        },
+        {
+            "name": "option1Name",
+            "type": "string",
+            "required": true,
+            "description": "Name of first option in decision matrix",
+            "placeholder": "e.g., Monolithic Architecture"
+        },
+        {
+            "name": "option1Pros",
+            "type": "string",
+            "required": true,
+            "description": "Advantages of option 1",
+            "placeholder": "Benefits and positive aspects of this option"
+        },
+        {
+            "name": "option1Cons",
+            "type": "string",
+            "required": true,
+            "description": "Disadvantages of option 1",
+            "placeholder": "Drawbacks and limitations of this option"
+        },
+        {
+            "name": "option1Score",
+            "type": "number",
+            "required": true,
+            "description": "Evaluation score for option 1 (1-10 scale)",
+            "placeholder": "e.g., 6"
+        },
+        {
+            "name": "option2Name",
+            "type": "string",
+            "required": true,
+            "description": "Name of second option in decision matrix",
+            "placeholder": "e.g., Microservices Architecture"
+        },
+        {
+            "name": "option2Pros",
+            "type": "string",
+            "required": true,
+            "description": "Advantages of option 2",
+            "placeholder": "Benefits and positive aspects of this option"
+        },
+        {
+            "name": "option2Cons",
+            "type": "string",
+            "required": true,
+            "description": "Disadvantages of option 2",
+            "placeholder": "Drawbacks and limitations of this option"
+        },
+        {
+            "name": "option2Score",
+            "type": "number",
+            "required": true,
+            "description": "Evaluation score for option 2 (1-10 scale)",
+            "placeholder": "e.g., 8"
+        },
+        {
+            "name": "option3Name",
+            "type": "string",
+            "required": false,
+            "description": "Name of third option in decision matrix (optional)",
+            "placeholder": "e.g., Service-Oriented Architecture"
+        },
+        {
+            "name": "option3Pros",
+            "type": "string",
+            "required": false,
+            "description": "Advantages of option 3",
+            "placeholder": "Benefits and positive aspects of this option"
+        },
+        {
+            "name": "option3Cons",
+            "type": "string",
+            "required": false,
+            "description": "Disadvantages of option 3",
+            "placeholder": "Drawbacks and limitations of this option"
+        },
+        {
+            "name": "option3Score",
+            "type": "number",
+            "required": false,
+            "description": "Evaluation score for option 3 (1-10 scale)",
+            "placeholder": "e.g., 7"
+        },
+        {
+            "name": "positiveConsequences",
+            "type": "string",
+            "required": true,
+            "description": "Positive outcomes and benefits from this decision",
+            "placeholder": "Expected improvements, benefits, and positive impacts"
+        },
+        {
+            "name": "negativeConsequences",
+            "type": "string",
+            "required": true,
+            "description": "Negative outcomes and trade-offs from this decision",
+            "placeholder": "Risks, limitations, and potential negative impacts"
+        },
+        {
+            "name": "neutralConsequences",
+            "type": "string",
+            "required": false,
+            "description": "Neutral outcomes that don't significantly impact the system",
+            "placeholder": "Changes that are neither clearly positive nor negative"
+        },
+        {
+            "name": "implementationNotes",
+            "type": "string",
+            "required": true,
+            "description": "Implementation guidance and considerations",
+            "placeholder": "Key steps, technical requirements, timeline, and implementation considerations"
+        },
+        {
+            "name": "relatedDecisions",
+            "type": "string",
+            "required": false,
+            "description": "Related ADRs or decisions that influence or are influenced by this decision",
+            "placeholder": "e.g., ADR-003 Database Technology Selection, ADR-007 API Gateway Implementation"
+        },
+        {
+            "name": "reviewCriteria",
+            "type": "string",
+            "required": true,
+            "description": "Criteria for reviewing and potentially revising this decision",
+            "placeholder": "Metrics, conditions, or events that would trigger a review of this decision"
+        },
+        {
+            "name": "references",
+            "type": "string",
+            "required": false,
+            "description": "Supporting documentation, articles, or resources",
+            "placeholder": "Links to documentation, research papers, benchmarks, or other supporting materials"
+        }
+    ],
+    "sections": [
+        {
+            "name": "ADR Header",
+            "description": "ADR number, title, date, status, and basic metadata"
+        },
+        {
+            "name": "Context",
+            "description": "Technical background, business context, constraints, and driving forces"
+        },
+        {
+            "name": "Decision",
+            "description": "The chosen solution and rationale for the decision"
+        },
+        {
+            "name": "Decision Matrix",
+            "description": "Structured comparison of alternatives with pros, cons, and scoring"
+        },
+        {
+            "name": "Consequences",
+            "description": "Positive, negative, and neutral outcomes from this decision"
+        },
+        {
+            "name": "Implementation Notes",
+            "description": "Implementation guidance, timeline, and technical considerations"
+        },
+        {
+            "name": "Related Decisions",
+            "description": "Links to other ADRs and related architectural decisions"
+        },
+        {
+            "name": "Review Information",
+            "description": "Review date, criteria, and evaluation guidelines"
+        },
+        {
+            "name": "References",
+            "description": "Supporting documentation and external resources"
+        }
+    ],
+    "formatting": {
+        "hasHeaders": true,
+        "hasTable": true,
+        "hasPageBreaks": false,
+        "fontSizes": {
+            "title": 32,
+            "sectionHeader": 28,
+            "subHeader": 22,
+            "body": 11,
+            "table": 10
+        },
+        "styling": {
+            "headers": "bold with consistent spacing",
+            "table": "bordered decision matrix with header highlighting",
+            "spacing": "professional technical documentation format"
+        }
+    },
+    "handlebarsHelpers": [
+        "formatDate",
+        "conditional"
+    ],
+    "usageInstructions": [
+        "Fill in ADR number following your team's numbering convention",
+        "Provide clear, specific title that describes the architectural decision",
+        "Document the context thoroughly - this is crucial for future understanding",
+        "List all constraints and forces that influenced the decision",
+        "Include at least 2-3 alternatives in the decision matrix for comparison",
+        "Score options on a consistent scale (recommended: 1-10)",
+        "Be honest about negative consequences and trade-offs",
+        "Include implementation timeline and key milestones",
+        "Link to related ADRs to maintain decision traceability",
+        "Set appropriate review date based on decision criticality",
+        "Update status as decision progresses through lifecycle",
+        "Keep language technical but accessible to stakeholders"
+    ]
+}
