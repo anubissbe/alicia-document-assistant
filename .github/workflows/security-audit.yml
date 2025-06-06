@@ -1,0 +1,56 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run at 2 AM UTC every Monday
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        cd web-app
+        npm ci
+
+    - name: Run npm audit
+      run: |
+        cd web-app
+        npm audit --production
+      continue-on-error: true
+
+    - name: Run npm audit (including dev)
+      run: |
+        cd web-app
+        npm audit
+
+    - name: Check for outdated packages
+      run: |
+        cd web-app
+        npm outdated || true
+
+    - name: Security Summary
+      run: |
+        echo "## Security Audit Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Production Dependencies" >> $GITHUB_STEP_SUMMARY
+        cd web-app
+        npm audit --production --json | jq '.metadata.vulnerabilities' >> $GITHUB_STEP_SUMMARY || echo "No vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### All Dependencies" >> $GITHUB_STEP_SUMMARY
+        npm audit --json | jq '.metadata.vulnerabilities' >> $GITHUB_STEP_SUMMARY || echo "No vulnerabilities found" >> $GITHUB_STEP_SUMMARY
