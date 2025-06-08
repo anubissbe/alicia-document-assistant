@@ -1,0 +1,33 @@
+name: Sync Komment docs to Wiki
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Clone Wiki
+        run: |
+          git clone https://x-access-token:${{ secrets.WIKI_PAT }}@github.com/${{ github.repository }}.wiki.git wiki
+
+      - name: Copy komment-export to Wiki
+        run: |
+          cp -r komment-export/* wiki/
+
+      - name: Commit and Push
+        run: |
+          cd wiki
+          git add .
+          git commit -m "Sync Komment AI docs from main"
+          git push
