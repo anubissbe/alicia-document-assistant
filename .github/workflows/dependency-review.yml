@@ -1,17 +1,27 @@
-name: 'Dependency Review'
-on: [pull_request]
+# Dependency Review
+# Runs on self-hosted runners: 192.168.1.16
 
-permissions:
-  contents: read
+name: 🔍 Dependency Review
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   dependency-review:
-    runs-on: ubuntu-latest
+    name: 🔍 Dependency Review
+    runs-on: [self-hosted, linux, docker]
+    timeout-minutes: 10
     steps:
-      - name: 'Checkout Repository'
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
-      - name: 'Dependency Review'
+
+      - name: 🔍 Dependency Review
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: moderate
-          allow-licenses: MIT, Apache-2.0, BSD-3-Clause, ISC
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC
