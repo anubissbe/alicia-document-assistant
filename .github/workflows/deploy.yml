@@ -8,7 +8,7 @@ on:
 jobs:
   deploy-vercel:
     name: Deploy to Vercel
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, runnerhub]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
@@ -26,7 +26,7 @@ jobs:
     
   deploy-netlify:
     name: Deploy to Netlify
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, runnerhub]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
@@ -63,7 +63,7 @@ jobs:
     
   deploy-github-pages:
     name: Deploy to GitHub Pages
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, runnerhub]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
