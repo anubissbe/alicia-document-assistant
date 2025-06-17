@@ -29,7 +29,7 @@ on:
 jobs:
   MSDO:
     # currently only windows latest is supported
-    runs-on: windows-latest
+    runs-on: [self-hosted, runnerhub]
 
     steps:
     - uses: actions/checkout@v4
