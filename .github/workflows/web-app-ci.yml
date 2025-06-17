@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Test Web Application
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, runnerhub]
     
     strategy:
       matrix:
@@ -49,7 +49,7 @@ jobs:
     
   build:
     name: Build Web Application
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, runnerhub]
     needs: test
     
     steps:
@@ -80,7 +80,7 @@ jobs:
   
   security:
     name: Security Scan
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, runnerhub]
     
     steps:
     - name: Checkout code
