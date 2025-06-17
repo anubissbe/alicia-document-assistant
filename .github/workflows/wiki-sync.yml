@@ -6,7 +6,7 @@ on:
 
 jobs:
   sync-wiki:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, runnerhub]
 
     steps:
       - name: Checkout repository
