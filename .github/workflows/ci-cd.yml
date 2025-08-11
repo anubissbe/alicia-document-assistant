@@ -45,7 +45,7 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
       - name: 📥 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -167,7 +167,7 @@ jobs:
     needs: setup
     steps:
       - name: 📥 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🟢 Setup Node.js
         if: needs.setup.outputs.language == 'javascript' || needs.setup.outputs.language == 'unknown'
@@ -258,7 +258,7 @@ jobs:
       actions: read
     steps:
       - name: 📥 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -325,7 +325,7 @@ jobs:
       fail-fast: false
     steps:
       - name: 📥 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🟢 Setup Node.js
         if: needs.setup.outputs.language == 'javascript' || needs.setup.outputs.language == 'unknown'
@@ -401,7 +401,7 @@ jobs:
     if: secrets.SONARCLOUD_TOKEN
     steps:
       - name: 📥 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -424,7 +424,7 @@ jobs:
       image-tags: ${{ steps.meta.outputs.tags }}
     steps:
       - name: 📥 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🟢 Setup Node.js
         if: needs.setup.outputs.language == 'javascript' || needs.setup.outputs.language == 'unknown'
@@ -556,7 +556,7 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
     steps:
       - name: 📥 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🐳 Login to DockerHub
         if: secrets.DOCKERHUB_TOKEN
